@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Catálogo{% endblock %}</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <strong>Catálogo de Celulares</strong>
+      <nav>
+        <a href="{% url 'home' %}">Inicio</a>
+        <a href="{% url 'celulares' %}">Celulares</a>
+        <a href="{% url 'celular_nuevo' %}">Cargar nuevo</a>
+      </nav>
+    </div>
+  </header>
+  <main class="wrap">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

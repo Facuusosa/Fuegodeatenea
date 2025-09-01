@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Detalle{% endblock %}
+{% block content %}
+<h2>{{ sahumerio.marca }} {{ sahumerio.nombre }}</h2>
+
+{% if sahumerio.imagen_url %}
+  <img src="{{ sahumerio.imagen_url }}" alt="{{ sahumerio.marca }} {{ sahumerio.nombre }}" style="max-width:300px;">
+{% endif %}
+
+<p>{{ sahumerio.descripcion }}</p>
+<p>Stock: {{ sahumerio.stock }}</p>
+{% if sahumerio.precio %}<p>Precio: ${{ sahumerio.precio }}</p>{% endif %}
+
+<p>
+  <a class="btn" href="{% url 'sahumerio_editar' sahumerio.id %}">Editar</a>
+  <a class="btn" href="{% url 'sahumerio_borrar' sahumerio.id %}">Borrar</a>
+  <a class="btn" href="{% url 'sahumerios_lista' %}">Volver</a>
+</p>
+{% endblock %}

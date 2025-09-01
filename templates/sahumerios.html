@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Sahumerios{% endblock %}
+{% block content %}
+<h2>Sahumerios</h2>
+
+<p><a class="btn" href="{% url 'sahumerio_nuevo' %}">+ Nuevo</a></p>
+
+<div class="grid">
+  {% for s in sahumerios %}
+    <a href="{% url 'sahumerio_detalle' s.id %}">
+      <div class="card">
+        {% if s.imagen_url %}
+          <div class="imgbox">
+            <img src="{{ s.imagen_url }}" alt="{{ s.marca }} {{ s.nombre }}">
+          </div>
+        {% endif %}
+        <h3>{{ s.marca }} {{ s.nombre }}</h3>
+        <p class="meta">{{ s.descripcion }}</p>
+        <p class="price">${{ s.precio }}</p>
+        <p class="stock">Stock: {{ s.stock }}</p>
+      </div>
+    </a>
+  {% empty %}
+    <p>No hay sahumerios cargados.</p>
+  {% endfor %}
+</div>
+{% endblock %}

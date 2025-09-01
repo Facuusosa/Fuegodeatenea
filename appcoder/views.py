@@ -1,17 +1,30 @@
-from django.shortcuts import render, redirect
-from .models import Celular
-from .forms import CelularForm
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
+from .models import Sahumerio
 
-def celulares_lista(request):
-    celulares = Celular.objects.all().order_by('marca', 'modelo')
-    return render(request, 'celulares.html', {'celulares': celulares})
+class SahumerioLista(ListView):
+    model = Sahumerio
+    template_name = "sahumerios.html"
+    context_object_name = "sahumerios"
 
-def celular_nuevo(request):
-    if request.method == 'POST':
-        form = CelularForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('celulares')
-    else:
-        form = CelularForm()
-    return render(request, 'formularios/celular_form.html', {'form': form})
+class SahumerioDetalle(DetailView):
+    model = Sahumerio
+    template_name = "sahumerio_detalle.html"
+    context_object_name = "sahumerio"
+
+class SahumerioCrear(CreateView):
+    model = Sahumerio
+    fields = ["marca", "nombre", "descripcion", "stock", "precio", "imagen_url", "disponible"]
+    template_name = "formularios/sahumerio_form.html"
+    success_url = reverse_lazy("sahumerios_lista")
+
+class SahumerioEditar(UpdateView):
+    model = Sahumerio
+    fields = ["marca", "nombre", "descripcion", "stock", "precio", "imagen_url", "disponible"]
+    template_name = "formularios/sahumerio_form.html"
+    success_url = reverse_lazy("sahumerios_lista")
+
+class SahumerioBorrar(DeleteView):
+    model = Sahumerio
+    template_name = "formularios/sahumerio_form.html"
+    success_url = reverse_lazy("sahumerios_lista")

@@ -1,10 +1,12 @@
 from django.contrib import admin
-from django.urls import path
-from appcoder import views
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', views.celulares_lista, name='home'),
-    path('celulares/', views.celulares_lista, name='celulares'),
-    path('celulares/nuevo/', views.celular_nuevo, name='celular_nuevo'),
+    path("admin/", admin.site.urls),
+    path("", include("appcoder.urls")),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

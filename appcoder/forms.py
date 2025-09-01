@@ -1,7 +1,7 @@
 from django import forms
-from .models import Celular
+from .models import Sahumerio
 
-class CelularForm(forms.ModelForm):
+class SahumerioForm(forms.ModelForm):
     class Meta:
-        model = Celular
-        fields = ['marca', 'modelo', 'almacenamiento_gb', 'ram_gb', 'precio', 'imagen_url', 'disponible']
+        model = Sahumerio
+        fields = ["marca", "nombre", "descripcion", "stock", "precio", "imagen_url", "disponible"]

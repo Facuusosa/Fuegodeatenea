@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% block title %}Nuevo Celular{% endblock %}
+{% block title %}Formulario{% endblock %}
 {% block content %}
-<h2>Nuevo Celular</h2>
+<h2>Formulario de Sahumerio</h2>
 <form method="post" class="form">
   {% csrf_token %}
   {{ form.as_p }}
   <button type="submit" class="btn">Guardar</button>
 </form>
+<a class="btn" href="{% url 'sahumerios_lista' %}">Volver</a>
 {% endblock %}

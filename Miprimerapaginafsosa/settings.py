@@ -13,7 +13,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.humanize",
     "appcoder",
+    "usuarios",
+    "productos",    
+
 ]
 
 MIDDLEWARE = [
@@ -22,9 +26,12 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    # mi middleware va acá
+    "Miprimerapaginafsosa.middleware.OnlyFsosaAdminMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
 
 ROOT_URLCONF = "Miprimerapaginafsosa.urls"
 
@@ -43,6 +50,7 @@ TEMPLATES = [
         },
     },
 ]
+
 
 WSGI_APPLICATION = "Miprimerapaginafsosa.wsgi.application"
 
@@ -67,3 +75,8 @@ MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "sahumerios_lista"
+LOGOUT_REDIRECT_URL = "sahumerios_lista"
+

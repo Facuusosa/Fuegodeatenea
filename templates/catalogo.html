@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% block title %}Sahumerios{% endblock %}
+
+{% block content %}
+<h2 class="titulo-seccion">Sahumerios</h2>
+
+<div class="grid grid-catalogo">
+  {% for it in items %}
+    <div class="card card-prod">
+      <div class="imgbox">
+        {% if it.imagenes and it.imagenes.0 %}
+          <img
+            src="{% static 'img/productos/' %}{{ it.imagenes.0 }}"
+            alt="{{ it.titulo|default:'Sahumerio' }}"
+            class="zoomable"
+            data-zoom-src="{% static 'img/productos/' %}{{ it.imagenes.0 }}"
+            loading="lazy"
+          >
+        {% else %}
+          <span class="sin-img">Sin imagen</span>
+        {% endif %}
+      </div>
+
+      <h3 class="prod-titulo">{{ it.titulo }}</h3>
+      {% if it.descripcion %}<p class="meta">{{ it.descripcion }}</p>{% endif %}
+      <p class="price">${{ it.precio|floatformat:0|intcomma }}</p>
+      {% if it.duracion %}<p class="stock">{{ it.duracion }}</p>{% endif %}
+    </div>
+  {% endfor %}
+</div>
+
+<div id="lightbox" aria-hidden="true" class="lightbox">
+  <img id="lightbox-img" alt="Imagen ampliada">
+</div>
+{% endblock %}

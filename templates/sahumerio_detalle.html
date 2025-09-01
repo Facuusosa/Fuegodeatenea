@@ -1,19 +1,20 @@
 {% extends "base.html" %}
-{% block title %}Detalle{% endblock %}
+{% block title %}{{ object.marca }} {{ object.nombre }}{% endblock %}
 {% block content %}
-<h2>{{ sahumerio.marca }} {{ sahumerio.nombre }}</h2>
+<article>
+  {% if object.imagen %}
+    <img src="{{ object.imagen.url }}" alt="{{ object.marca }} {{ object.nombre }}" style="max-width:380px;display:block;margin-bottom:16px">
+  {% endif %}
+  <h2>{{ object.marca }} {{ object.nombre }}</h2>
+  {% if object.descripcion %}<p>{{ object.descripcion }}</p>{% endif %}
+  <p>Stock: {{ object.stock }}</p>
+  {% if object.precio %}<p>Precio: ${{ object.precio }}</p>{% endif %}
 
-{% if sahumerio.imagen_url %}
-  <img src="{{ sahumerio.imagen_url }}" alt="{{ sahumerio.marca }} {{ sahumerio.nombre }}" style="max-width:300px;">
+{% if user.is_authenticated and user.username|lower == 'fsosa' %}
+  <div style="margin-top:16px;display:flex;gap:12px">
+    <a class="btn" href="{% url 'sahumerio_editar' object.id %}">Editar</a>
+    <a class="btn" href="{% url 'sahumerio_borrar' object.id %}">Borrar</a>
+  </div>
 {% endif %}
-
-<p>{{ sahumerio.descripcion }}</p>
-<p>Stock: {{ sahumerio.stock }}</p>
-{% if sahumerio.precio %}<p>Precio: ${{ sahumerio.precio }}</p>{% endif %}
-
-<p>
-  <a class="btn" href="{% url 'sahumerio_editar' sahumerio.id %}">Editar</a>
-  <a class="btn" href="{% url 'sahumerio_borrar' sahumerio.id %}">Borrar</a>
-  <a class="btn" href="{% url 'sahumerios_lista' %}">Volver</a>
-</p>
+</article>
 {% endblock %}

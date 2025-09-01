@@ -5,23 +5,60 @@
   <meta charset="UTF-8">
   <title>{% block title %}Fuego de Atenea{% endblock %}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  {% block meta %}{% endblock %}
+  <link rel="icon" href="{% static 'img/fuegodeatenealogo.png' %}">
   <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+  {% block styles %}{% endblock %}
 </head>
 <body>
-  <div class="topbar">
-    <div class="wrap">
-      <div><strong>Fuego de Atenea</strong></div>
-      <nav>
-        <a href="{% url 'sahumerios_lista' %}">Sahumerios</a>
-        <a href="/admin/">Admin</a>
+  <header class="topbar">
+    <div class="wrap" style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <a href="{% url 'landing' %}" style="text-decoration:none;color:inherit;display:flex;align-items:center;gap:8px">
+          <img src="{% static 'img/fuegodeatenealogo.png' %}" alt="Fuego de Atenea" style="height:28px">
+          <strong>Fuego de Atenea</strong>
+        </a>
+      </div>
+      {% with current=request.resolver_match.url_name %}
+      <nav style="display:flex;gap:16px">
+        <a href="{% url 'catalogo' %}" {% if current == 'catalogo' %}aria-current="page"{% endif %}>Sahumerios</a>
+        {% if user.is_authenticated and user.username|lower == 'fsosa' %}
+          <a href="/admin/" target="_blank" rel="noopener">Admin</a>
+        {% endif %}
+        {% if user.is_authenticated %}
+          <a href="{% url 'perfil' %}" {% if current == 'perfil' %}aria-current="page"{% endif %}>Perfil ({{ user.username }})</a>
+          <a href="{% url 'logout' %}">Salir</a>
+        {% else %}
+          <a href="{% url 'login' %}" {% if current == 'login' %}aria-current="page"{% endif %}>Ingresar</a>
+          <a href="{% url 'registro' %}" {% if current == 'registro' %}aria-current="page"{% endif %}>Registrarme</a>
+        {% endif %}
       </nav>
+      {% endwith %}
     </div>
-  </div>
+  </header>
 
-  <div class="wrap">
+  <main class="wrap">
+    {% if messages %}
+      <div class="messages" aria-live="polite" role="region">
+        {% for message in messages %}
+          <div class="msg {{ message.tags }}" role="alert" style="padding:10px 12px;border-radius:6px;margin:12px 0">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
     {% block content %}{% endblock %}
-  </div>
+  </main>
 
-  <script src="{% static 'js/main.js' %}"></script>
+  <footer class="wrap" style="padding:24px 0;opacity:.8;text-align:center">
+    <small>&copy; {% now "Y" %} Fuego de Atenea · 
+      <a href="https://www.instagram.com/fuego.de.atenea" target="_blank" rel="noopener">@fuego.de.atenea</a>
+    </small>
+  </footer>
+
+  <script>window.CSRF_TOKEN=document.querySelector('meta[name="csrf-token"]')?.content;</script>
+  <script src="{% static 'js/main.js' %}" defer></script>
+  {% block scripts %}{% endblock %}
 </body>
 </html>

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Bienvenidos Fuego de Atenea{% endblock %}
+{% block content %}
+<section style="display:grid;grid-template-columns:1fr;gap:20px;align-items:center; text-align:center; padding:24px 0">
+  <img src="{% static 'img/fuegodeatenealogo.png' %}" alt="Fuego de Atenea - logo" style="max-width:160px; margin:0 auto 8px auto">
+  <h1 style="margin:0;">Bienvenidos <span style="white-space:nowrap">Fuego de Atenea</span></h1>
+  <p style="margin:0;opacity:.85">
+    Una página simple y cuidada de <strong>sahumerios, inciensos y velas</strong>.
+  </p>
+  <p style="margin:0;opacity:.85">
+    Soy <strong>Facundo Sosa</strong> y voy agregando materiales de a poco.
+  </p>
+  <div style="display:flex;gap:12px;justify-content:center; margin-top:12px;">
+    <a href="{% url 'catalogo' %}" class="btn" style="padding:10px 14px; border:1px solid #111; border-radius:8px; text-decoration:none;">
+      Ver catálogo
+    </a>
+    <a href="https://www.instagram.com/fuego.de.atenea?igsh=d3N4bDRsOHUxZzN4&utm_source=qr" target="_blank" rel="noopener" class="btn"
+       style="padding:10px 14px; border:1px solid #111; border-radius:8px; text-decoration:none;">
+      Instagram @fuego.de.atenea
+    </a>
+  </div>
+</section>
+{% endblock %}

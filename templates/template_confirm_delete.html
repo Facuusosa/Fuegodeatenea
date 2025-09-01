@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Borrar sahumerio{% endblock %}
+{% block content %}
+<h2>¿Borrar "{{ object.marca }} {{ object.nombre }}"?</h2>
+<form method="post" style="margin-top:12px">
+  {% csrf_token %}
+  <button type="submit">Confirmar</button>
+  <a href="{% url 'sahumerio_detalle' object.id %}" style="margin-left:8px">Cancelar</a>
+</form>
+{% endblock %}

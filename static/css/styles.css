@@ -1,24 +1,105 @@
+:root{
+  --bg:#f5f5f5;
+  --text:#1f1f1f;
+  --muted:#686868;
+  --border:#e1e1e1;
+  --card:#ffffff;
+  --primary:#1f1f1f;
+  --primary-contrast:#ffffff;
+  --topbar:#222222;
+  --topbar-link:#d9d9d9;
+  --topbar-link-hover:#ffffff;
+  --radius:12px;
+  --radius-sm:8px;
+  --shadow-sm:0 4px 12px rgba(0,0,0,.06);
+  --shadow-md:0 16px 36px rgba(0,0,0,.14);
+  --transition:.22s ease;
+}
+
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial, sans-serif;color:#222;background:#f5f5f5}
-.wrap{max-width:1000px;margin:0 auto;padding:16px}
-.topbar{background:#222;color:#fff}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  color:var(--text);
+  background:var(--bg);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+.wrap{max-width:1480px;margin:0 auto;padding:28px}
+.topbar{background:var(--topbar);color:var(--primary-contrast)}
 .topbar .wrap{display:flex;justify-content:space-between;align-items:center}
-.topbar a{color:#ddd;text-decoration:none;margin-left:12px}
-.topbar a:hover{color:#fff}
-h2{margin-top:12px}
+.topbar a{color:var(--topbar-link);text-decoration:none;margin-left:14px;transition:color var(--transition)}
+.topbar a:hover{color:var(--topbar-link-hover)}
 
-.btn{display:inline-block;background:#222;color:#fff;border:none;padding:8px 12px;border-radius:6px;text-decoration:none}
-.btn:hover{opacity:.9}
+h2.titulo-seccion{margin:8px 0 18px;font-size:2.3rem;letter-spacing:.2px}
 
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:12px}
-.card{background:#fff;border:1px solid #e3e3e3;border-radius:10px;padding:12px}
-.imgbox{width:100%;aspect-ratio:16/10;overflow:hidden;border-radius:8px;border:1px solid #eee;background:#fafafa;margin-bottom:8px}
-.imgbox img{width:100%;height:100%;object-fit:cover}
-h3{margin:6px 0 4px;font-size:16px}
-.meta{color:#666;font-size:13px;margin:0 0 6px}
-.price{font-weight:bold;margin:0 0 6px}
-.stock{font-size:13px;color:#444;margin:0}
+.grid.grid-catalogo{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(420px,1fr));
+  gap:28px;
+  margin-top:22px;
+}
+
+.card.card-prod{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:18px;
+  box-shadow:var(--shadow-sm);
+  transition:box-shadow var(--transition),transform var(--transition),border-color var(--transition)
+}
+.card.card-prod:hover{box-shadow:var(--shadow-md);transform:translateY(-4px);border-color:#dcdcdc}
+
+.imgbox{
+  width:100%;
+  aspect-ratio:3/4;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+  border-radius:14px;
+  border:1px solid var(--border);
+  background:#fff;
+  margin-bottom:12px;
+}
+.imgbox img{
+  max-width:90%;
+  max-height:90%;
+  object-fit:contain;
+  padding:6px;
+  transform:scale(1);
+  transition:transform .28s ease;
+  cursor:zoom-in;
+}
+.card.card-prod:hover .imgbox img{transform:scale(1.06)}
+
+.prod-titulo{font-size:20px;margin:8px 0 6px;line-height:1.25}
+.meta{color:var(--muted);font-size:15px;line-height:1.38;margin:0 0 10px}
+.price{font-size:20px;font-weight:800;margin:0 0 6px;color:#111}
+.stock{font-size:15px;color:#444;margin:0}
 
 .form input,.form select,.form textarea{
-  width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;margin:6px 0
+  width:100%;padding:10px;border:1px solid #cccccc;border-radius:var(--radius-sm);
+  margin:8px 0;transition:border-color var(--transition),box-shadow var(--transition)
+}
+.form input:focus,.form select:focus,.form textarea:focus{
+  border-color:var(--primary);
+  box-shadow:0 0 0 3px rgba(0,0,0,.1);
+  outline:none;
+}
+
+.lightbox{
+  position:fixed;inset:0;background:rgba(0,0,0,.86);
+  display:none;align-items:center;justify-content:center;padding:24px;z-index:9999
+}
+.lightbox img{
+  max-width:96vw;max-height:90vh;border-radius:14px;box-shadow:0 18px 46px rgba(0,0,0,.45)
+}
+.lightbox.is-open{display:flex}
+
+@media (max-width:1300px){
+  .grid.grid-catalogo{grid-template-columns:repeat(2,minmax(420px,1fr))}
+}
+@media (max-width:860px){
+  .grid.grid-catalogo{grid-template-columns:1fr}
 }

@@ -11,8 +11,9 @@ class SoloFsosaMixin(UserPassesTestMixin):
 
 class SahumerioLista(ListView):
     model = Sahumerio
-    template_name = "sahumerios.html"
+    template_name = "catalogo.html"
     context_object_name = "object_list"
+
 
 class SahumerioDetalle(DetailView):
     model = Sahumerio

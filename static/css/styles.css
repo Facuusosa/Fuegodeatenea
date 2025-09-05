@@ -1,5 +1,4 @@
 :root {
-  /* Colores principales */
   --bg: #f5f5f5;
   --text: #1f1f1f;
   --muted: #686868;
@@ -12,20 +11,13 @@
   --topbar-link-hover: #ffffff;
   --success: #16a34a;
   --error: #dc2626;
-
-  /* Espaciado y dimensiones */
   --radius: 12px;
   --radius-sm: 8px;
-
-  /* Sombras */
   --shadow-sm: 0 4px 12px rgba(0, 0, 0, .06);
   --shadow-md: 0 16px 36px rgba(0, 0, 0, .14);
-
-  /* Transiciones */
   --transition: .22s ease-out;
 }
 
-/* Base */
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -49,7 +41,6 @@ body {
   padding: 28px;
 }
 
-/* Topbar */
 .topbar {
   background: var(--topbar);
   color: var(--primary-contrast);
@@ -73,7 +64,6 @@ body {
   color: var(--topbar-link-hover);
 }
 
-/* Títulos */
 h1, h2, h3 {
   margin: 0;
 }
@@ -84,7 +74,6 @@ h2.titulo-seccion {
   letter-spacing: .2px;
 }
 
-/* Botones */
 .btn, .btn-sec {
   display: inline-flex;
   align-items: center;
@@ -108,7 +97,7 @@ h2.titulo-seccion {
 .btn:focus {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
-  outline: none; /* Se elimina el outline por defecto en focus */
+  outline: none;
 }
 
 .btn:active {
@@ -126,7 +115,7 @@ h2.titulo-seccion {
 .btn-sec:focus {
   transform: translateY(-1px);
   box-shadow: var(--shadow-sm);
-  outline: none; /* Se elimina el outline por defecto en focus */
+  outline: none;
 }
 
 .btn-sec:active {
@@ -134,7 +123,6 @@ h2.titulo-seccion {
   box-shadow: none;
 }
 
-/* Mensajes */
 .messages {
   margin-bottom: 16px;
 }
@@ -156,7 +144,6 @@ h2.titulo-seccion {
   background: color-mix(in srgb, var(--error) 5%, transparent);
 }
 
-/* Catálogo */
 .grid.grid-catalogo {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -164,7 +151,6 @@ h2.titulo-seccion {
   margin-top: 22px;
 }
 
-/* Tarjetas */
 .card.card-prod {
   background: var(--card);
   border: 1px solid var(--border);
@@ -181,7 +167,6 @@ h2.titulo-seccion {
   border-color: #dcdcdc;
 }
 
-/* Caja de imagen */
 .imgbox {
   width: 100%;
   aspect-ratio: 3 / 4;
@@ -210,6 +195,10 @@ h2.titulo-seccion {
   transform: scale(1.03);
 }
 
+.imgbox:hover img {
+  transform: scale(1.04);
+}
+
 .prod-titulo {
   font-size: 1.25rem;
   margin: 8px 0 6px;
@@ -236,7 +225,6 @@ h2.titulo-seccion {
   margin: 0;
 }
 
-/* Lightbox (zoom) - Se mantuvo como estaba */
 .lightbox {
   position: fixed;
   inset: 0;
@@ -266,26 +254,23 @@ h2.titulo-seccion {
   overflow: hidden;
 }
 
-/* Páginas de detalle - Ajustes para tamaño y zoom */
 .detail-img {
-  width: auto; /* Permitir que el ancho se ajuste al contenido */
-  max-width: min(480px, 80vw); /* Tamaño inicial más pequeño */
-  max-height: 70vh; /* Altura máxima reducida */
-  margin: 0 auto 20px; /* Centrar y añadir espacio inferior */
-  display: block; /* Para que margin: auto funcione correctamente */
+  width: auto;
+  max-width: min(480px, 80vw);
+  max-height: 70vh;
+  margin: 0 auto 20px;
+  display: block;
   object-fit: contain;
   border-radius: var(--radius);
-  cursor: zoom-in; /* Indica que se puede hacer zoom */
-  transition: transform .3s ease-in-out; /* Transición suave para el zoom */
+  cursor: zoom-in;
+  transition: transform .3s ease-in-out;
 }
 
-/* Estado de zoom (aplicado con JavaScript) */
 .detail-img.is-zoomed {
-  transform: scale(1.5); /* Aumenta el tamaño en un 50% */
-  cursor: zoom-out; /* Indica que se puede reducir el zoom */
+  transform: scale(1.5);
+  cursor: zoom-out;
 }
 
-/* Formularios */
 .form-card {
   background: #fff;
   border: 1px solid var(--border);
@@ -321,7 +306,6 @@ h2.titulo-seccion {
   margin-bottom: 6px;
 }
 
-/* Campos de formulario */
 :where(.form input, .form select, .form textarea, .field input, .field select, .field textarea) {
   width: 100%;
   padding: 10px;
@@ -330,11 +314,10 @@ h2.titulo-seccion {
   transition: border-color var(--transition), box-shadow var(--transition);
 }
 
-/* Estilos de enfoque para campos de formulario */
 :where(.form input, .form select, .form textarea, .field input, .field select, .field textarea):focus {
   border-color: var(--primary);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 15%, transparent);
-  outline: 2px solid var(--primary); /* Anillo de enfoque para accesibilidad */
+  outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
 
@@ -343,7 +326,6 @@ h2.titulo-seccion {
   margin-top: 6px;
 }
 
-/* Chips / hints (sugerencias) */
 .hint {
   font-size: 0.75rem;
   color: var(--muted);
@@ -367,7 +349,6 @@ h2.titulo-seccion {
   background: #f0f0f0;
 }
 
-/* Responsive */
 @media (width < 1300px) {
   .grid.grid-catalogo {
     grid-template-columns: repeat(2, 1fr);

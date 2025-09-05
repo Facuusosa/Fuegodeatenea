@@ -9,7 +9,7 @@
   {% block meta %}{% endblock %}
 
   <link rel="icon" href="{% static 'img/fuegodeatenealogo.png' %}">
-  <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+  <link href="{% static 'css/styles.css' %}?v=3" rel="stylesheet">
 
   <style>
     :root{--bg:#f7f8fb;--text:#1a1a1a;--muted:#6b7280;--brand:#111827;--card:#ffffff;--b:#e5e7eb;--shadow:0 1px 6px rgba(0,0,0,.05);--btn:#111827;--btnText:#fff;--btnDanger:#dc2626;--btnSec:#374151}
@@ -54,7 +54,7 @@
         <strong>Fuego de Atenea</strong>
       </a>
 
-      {% with current=request.resolver_match.url_name edit=request.GET.modo %}
+      {% with current=request.resolver_match.url_name|default:'' edit=request.GET.modo|default:'' %}
       <nav>
         <a href="{% url 'sahumerios_lista' %}"
            {% if current == 'sahumerios_lista' and edit != 'edit' %}aria-current="page"{% endif %}>
@@ -63,10 +63,14 @@
 
         {% if user.is_authenticated and user.username|lower == 'fsosa' %}
           <a href="{% url 'sahumerios_lista' %}?modo=edit"
-             {% if current == 'sahumerios_lista' and edit == 'edit' or current == 'sahumerio_nuevo' or current == 'sahumerio_editar' %}aria-current="page"{% endif %}>
+             {% if current == 'sahumerios_lista' and edit == 'edit' %}
+               aria-current="page"
+             {% elif current == 'sahumerio_nuevo' or current == 'sahumerio_editar' %}
+               aria-current="page"
+             {% endif %}>
              Agregar/editar material
           </a>
-          <a href="/admin/" target="_blank" rel="noopener">Admin</a>
+          <a href="/admin/" target="_blank" rel="noopener noreferrer">Admin</a>
         {% endif %}
 
         {% if user.is_authenticated %}
@@ -106,16 +110,40 @@
   <script>window.CSRF_TOKEN=document.querySelector('meta[name="csrf-token"]')?.content;</script>
   <script>
     (function(){
-      const lb=document.getElementById('lightbox'); const img=document.getElementById('lbImg'); const btn=document.getElementById('lbClose');
+      const lb=document.getElementById('lightbox');
+      const img=document.getElementById('lbImg');
+      const btn=document.getElementById('lbClose');
+
       let scale=1, tx=0, ty=0, dragging=false, sx=0, sy=0;
-      function open(src){scale=1;tx=0;ty=0;img.style.transform='translate(0,0) scale(1)'; img.src=src; lb.classList.add('show')}
+
+      function open(src){
+        scale=1;tx=0;ty=0;
+        img.style.transform='translate(0,0) scale(1)';
+        img.src=src;
+        lb.classList.add('show');
+      }
       function close(){lb.classList.remove('show'); img.src=''}
       function apply(){img.style.transform=`translate(${tx}px,${ty}px) scale(${scale})`}
-      img.addEventListener('pointerdown',e=>{dragging=true;img.setPointerCapture(e.pointerId);sx=e.clientX;sy=e.clientY;img.style.cursor='grabbing'})
-      img.addEventListener('pointermove',e=>{if(!dragging)return;tx+=e.clientX-sx;ty+=e.clientY-sy;sx=e.clientX;sy=e.clientY;apply()})
-      img.addEventListener('pointerup',()=>{dragging=false;img.style.cursor='grab'})
-      img.addEventListener('wheel',e=>{e.preventDefault();const f=e.deltaY<0?1.1:0.9;const ns=Math.min(6,Math.max(1,scale*f));const rect=img.getBoundingClientRect();const cx=e.clientX-rect.left;const cy=e.clientY-rect.top;const k=ns/scale;tx=cx-(cx-tx)*k;ty=cy-(cy-ty)*k;scale=ns;apply()},{passive:false})
-      lb.addEventListener('click',e=>{if(e.target===lb) close()}); btn.addEventListener('click',close); document.addEventListener('keydown',e=>{if(e.key==='Escape') close()})
+
+      img.addEventListener('pointerdown',e=>{dragging=true;img.setPointerCapture(e.pointerId);sx=e.clientX;sy=e.clientY;img.style.cursor='grabbing'});
+      img.addEventListener('pointermove',e=>{if(!dragging)return;tx+=e.clientX-sx;ty+=e.clientY-sy;sx=e.clientX;sy=e.clientY;apply()});
+      img.addEventListener('pointerup',()=>{dragging=false;img.style.cursor='grab'});
+      img.addEventListener('wheel',e=>{
+        e.preventDefault();
+        const f=e.deltaY<0?1.1:0.9;
+        const ns=Math.min(6,Math.max(1,scale*f));
+        const rect=img.getBoundingClientRect();
+        const cx=e.clientX-rect.left;
+        const cy=e.clientY-rect.top;
+        const k=ns/scale;
+        tx=cx-(cx-tx)*k; ty=cy-(cy-ty)*k;
+        scale=ns; apply();
+      },{passive:false});
+
+      lb.addEventListener('click',e=>{if(e.target===lb) close()});
+      btn.addEventListener('click',close);
+      document.addEventListener('keydown',e=>{if(e.key==='Escape') close()});
+
       document.addEventListener('click',e=>{
         const el=e.target.closest('[data-zoom-src]');
         if(!el) return;
@@ -128,4 +156,3 @@
   {% block scripts %}{% endblock %}
 </body>
 </html>
- 

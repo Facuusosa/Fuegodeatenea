@@ -1,13 +1,8 @@
 from django.contrib import admin
-from .models import Marca, Sahumerio
-
-@admin.register(Marca)
-class MarcaAdmin(admin.ModelAdmin):
-    list_display = ("nombre",)
-    search_fields = ("nombre",)
+from .models import Sahumerio
 
 @admin.register(Sahumerio)
 class SahumerioAdmin(admin.ModelAdmin):
-    list_display = ("marca", "nombre", "stock", "precio", "disponible")
-    search_fields = ("nombre", "marca__nombre")
-    list_filter = ("marca", "disponible")
+    list_display = ("marca", "nombre", "precio", "stock", "activo", "actualizado")
+    list_filter = ("activo",)
+    search_fields = ("marca", "nombre", "descripcion")

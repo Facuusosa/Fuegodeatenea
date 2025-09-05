@@ -1,37 +1,72 @@
 {% extends "base.html" %}
 {% load static %}
-{% load humanize %}
-{% block title %}Sahumerios{% endblock %}
+{% block title %}Catálogo{% endblock %}
 
 {% block content %}
-<h2 class="titulo-seccion">Sahumerios</h2>
+<h1 style="margin:0 0 14px 0">Catálogo</h1>
 
-<div class="grid grid-catalogo">
+{% if edit_mode %}
+  <div class="card" style="padding:10px 12px;margin-bottom:14px;display:flex;gap:10px;align-items:center">
+    <strong>Modo edición activo</strong>
+    <a class="btn btn-sec" href="{% url 'sahumerios_lista' %}">Salir de edición</a>
+    <a class="btn" href="{% url 'sahumerio_nuevo' %}">+ Crear nuevo</a>
+  </div>
+{% endif %}
+
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px">
   {% for it in items %}
-    <div class="card card-prod">
-      <div class="imgbox">
-        {% if it.imagenes and it.imagenes.0 %}
-          <img
-            src="{% static 'img/productos/' %}{{ it.imagenes.0 }}"
-            alt="{{ it.titulo|default:'Sahumerio' }}"
-            class="zoomable"
-            data-zoom-src="{% static 'img/productos/' %}{{ it.imagenes.0 }}"
-            loading="lazy"
-          >
+  <article class="card" style="overflow:hidden">
+    <a href="{% if it.origen == 'DB' %}{% url 'sahumerio_detalle' it.pk %}{% else %}{% url 'excel_detalle' it.idx %}{% endif %}"
+       style="display:block;border-bottom:1px solid #eee;background:#fafafa;max-height:320px;min-height:320px;display:flex;align-items:center;justify-content:center;overflow:hidden">
+      {% if it.img_file %}
+        <img src="{% static 'img/productos/' %}{{ it.img_file }}" alt="{{ it.titulo }}"
+             style="width:100%;height:100%;object-fit:contain"
+             data-zoom-src="{% static 'img/productos/' %}{{ it.img_file }}">
+      {% elif it.img_abs %}
+        <img src="{{ it.img_abs }}" alt="{{ it.titulo }}"
+             style="width:100%;height:100%;object-fit:contain"
+             data-zoom-src="{{ it.img_abs }}">
+      {% else %}
+        <div style="color:#999;padding:40px 0">Sin imagen</div>
+      {% endif %}
+    </a>
+
+    <div style="padding:12px">
+      <a class="title"
+         href="{% if it.origen == 'DB' %}{% url 'sahumerio_detalle' it.pk %}{% else %}{% url 'excel_detalle' it.idx %}{% endif %}"
+         style="display:block;font-weight:700;margin-bottom:4px">{{ it.titulo }}</a>
+
+      {% if it.marca %}
+        <p class="meta" style="margin:.1rem 0;color:#666">Marca: {{ it.marca }}</p>
+      {% endif %}
+      {% if it.descripcion %}
+        <p class="meta" style="margin:.25rem 0;color:#666;min-height:2.2em">{{ it.descripcion }}</p>
+      {% endif %}
+      {% if it.precio %}
+        <div class="price" style="font-weight:700;margin:.25rem 0">${{ it.precio }}</div>
+      {% endif %}
+
+      {% if edit_mode %}
+        {% if it.origen == "DB" %}
+          <div class="row" style="display:flex;gap:8px;margin-top:8px">
+            <a class="btn btn-sec" href="{% url 'sahumerio_editar' it.pk %}?volver={{ request.get_full_path|urlencode }}">Editar</a>
+            <form method="post" action="{% url 'sahumerio_borrar' it.pk %}"
+                  onsubmit="return confirm('¿Borrar este sahumerio?')">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger">Borrar</button>
+            </form>
+          </div>
         {% else %}
-          <span class="sin-img">Sin imagen</span>
+          <div class="row" style="margin-top:8px">
+            <a class="btn"
+               href="{% url 'sahumerio_nuevo' %}?sug_marca={{ it.marca|urlencode }}&sug_nombre={{ it.titulo|urlencode }}&sug_descripcion={{ it.descripcion|urlencode }}&sug_precio={{ it.precio|urlencode }}&sug_imagen_url={{ it.img_abs|urlencode }}&sug_imagen_file={{ it.img_file|urlencode }}">
+              Crear
+            </a>
+          </div>
         {% endif %}
-      </div>
-
-      <h3 class="prod-titulo">{{ it.titulo }}</h3>
-      {% if it.descripcion %}<p class="meta">{{ it.descripcion }}</p>{% endif %}
-      <p class="price">${{ it.precio|floatformat:0|intcomma }}</p>
-      {% if it.duracion %}<p class="stock">{{ it.duracion }}</p>{% endif %}
+      {% endif %}
     </div>
+  </article>
   {% endfor %}
-</div>
-
-<div id="lightbox" aria-hidden="true" class="lightbox">
-  <img id="lightbox-img" alt="Imagen ampliada">
 </div>
 {% endblock %}

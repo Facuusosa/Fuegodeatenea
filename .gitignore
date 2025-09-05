@@ -283,8 +283,18 @@ pyrightconfig.json
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/python,visualstudiocode,django
+# Essentials for this Django project
 venv/
 __pycache__/
-*.pyc
 db.sqlite3
+media/
+
+.vscode/
+*.pyc
+*.log
+.ruff_cache/
+.mypy_cache/
+
+
 *.zip
+

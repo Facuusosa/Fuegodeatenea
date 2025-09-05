@@ -1,10 +1,97 @@
 {% extends "base.html" %}
 {% block title %}Sahumerio{% endblock %}
 {% block content %}
-<h2 style="margin-bottom:12px">Sahumerio</h2>
-<form method="post" enctype="multipart/form-data" style="max-width:520px">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Guardar</button>
-</form>
+<div class="card" style="padding:20px;max-width:1100px;margin:0 auto">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <h2 style="margin:0">Sahumerio</h2>
+    <a href="{% url 'sahumerios_lista' %}?modo=edit" class="btn btn-sec">Volver</a>
+  </div>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div>
+        <label for="{{ form.marca.id_for_label }}">Marca</label>
+        {{ form.marca }}
+      </div>
+      <div>
+        <label for="{{ form.nombre.id_for_label }}">Nombre</label>
+        {{ form.nombre }}
+      </div>
+      <div>
+        <label for="{{ form.precio.id_for_label }}">Precio</label>
+        {{ form.precio }}
+      </div>
+      <div>
+        <label for="{{ form.stock.id_for_label }}">Stock</label>
+        {{ form.stock }}
+      </div>
+      <div style="grid-column:1/-1">
+        <label for="{{ form.descripcion.id_for_label }}">Descripción</label>
+        {{ form.descripcion }}
+      </div>
+
+      <div style="grid-column:1/-1">
+        <label for="{{ form.imagen_file.id_for_label }}">Subir foto (opcional)</label>
+        {{ form.imagen_file }}
+        <p class="hint">Si cargás una foto, tendrá prioridad.</p>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:10px">
+        <label for="{{ form.activo.id_for_label }}" style="margin-right:6px">Activo</label>
+        {{ form.activo }}
+      </div>
+    </div>
+
+    <div style="margin-top:14px">
+      <button type="submit" class="btn">Guardar</button>
+    </div>
+  </form>
+
+  <div style="margin-top:22px">
+    <h3 style="margin:0 0 10px 0">Vista previa:</h3>
+    <div id="preview-box"
+         class="card"
+         style="border:1px solid #eee;border-radius:12px;background:#fafafa;align-items:center;justify-content:center;overflow:hidden;height:420px;display:{% if form.instance.imagen_file %}flex{% else %}none{% endif %};">
+      {% if form.instance.imagen_file %}
+        <img id="preview-img"
+             src="{{ form.instance.imagen_file.url }}"
+             alt="Vista previa"
+             style="max-width:100%;max-height:100%;object-fit:contain"
+             data-zoom-src="{{ form.instance.imagen_file.url }}">
+      {% else %}
+        <img id="preview-img"
+             alt="Vista previa"
+             style="max-width:100%;max-height:100%;object-fit:contain"
+             data-zoom-src="">
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+  const input = document.getElementById('id_imagen_file');
+  const box   = document.getElementById('preview-box');
+  const img   = document.getElementById('preview-img');
+  if(!input || !box || !img) return;
+
+  function show(src){
+    if(!src) return;
+    img.src = src;
+    img.setAttribute('data-zoom-src', src);
+    box.style.display = 'flex';
+  }
+
+  input.addEventListener('change', function(){
+    const f = this.files && this.files[0];
+    if(!f) return;
+    const reader = new FileReader();
+    reader.onload = e => show(e.target.result);
+    reader.readAsDataURL(f);
+  });
+})();
+</script>
 {% endblock %}

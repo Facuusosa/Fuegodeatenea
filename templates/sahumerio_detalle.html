@@ -1,20 +1,34 @@
 {% extends "base.html" %}
-{% block title %}{{ object.marca }} {{ object.nombre }}{% endblock %}
+{% block title %}{{ object.nombre }}{% endblock %}
 {% block content %}
-<article>
-  {% if object.imagen %}
-    <img src="{{ object.imagen.url }}" alt="{{ object.marca }} {{ object.nombre }}" style="max-width:380px;display:block;margin-bottom:16px">
-  {% endif %}
-  <h2>{{ object.marca }} {{ object.nombre }}</h2>
-  {% if object.descripcion %}<p>{{ object.descripcion }}</p>{% endif %}
-  <p>Stock: {{ object.stock }}</p>
-  {% if object.precio %}<p>Precio: ${{ object.precio }}</p>{% endif %}
-
-{% if user.is_authenticated and user.username|lower == 'fsosa' %}
-  <div style="margin-top:16px;display:flex;gap:12px">
-    <a class="btn" href="{% url 'sahumerio_editar' object.id %}">Editar</a>
-    <a class="btn" href="{% url 'sahumerio_borrar' object.id %}">Borrar</a>
+<div style="max-width:980px;margin:0 auto">
+  <a href="{% url 'sahumerios_lista' %}" class="btn" style="margin-bottom:12px">Volver</a>
+  <div style="display:grid;grid-template-columns:420px 1fr;gap:24px">
+    {% if object.imagen_resuelta %}
+      <div class="zoomable" style="border:1px solid #eee;border-radius:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#fafafa;height:520px">
+        <img src="{{ object.imagen_resuelta }}" alt="{{ object.nombre }}" style="max-width:100%;max-height:100%;object-fit:contain" data-zoom-src="{{ object.imagen_resuelta }}">
+      </div>
+    {% else %}
+      <div style="border:1px solid #eee;border-radius:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#fafafa;height:520px">
+        <span style="color:#999">Sin imagen</span>
+      </div>
+    {% endif %}
+    <div>
+      <h1 style="font-size:1.6rem;margin:0 0 .5rem 0">{{ object.nombre }}</h1>
+      {% if object.marca %}<div style="color:#666;margin-bottom:.5rem">{{ object.marca }}</div>{% endif %}
+      <div style="font-weight:700;font-size:1.2rem;margin-bottom:.75rem">${{ object.precio }}</div>
+      {% if object.descripcion %}<p style="white-space:pre-wrap">{{ object.descripcion }}</p>{% endif %}
+      <div style="margin-top:1rem;color:#666;font-size:.9rem">Stock: {{ object.stock }} • {% if object.activo %}Activo{% else %}Inactivo{% endif %}</div>
+      {% if request.user.is_authenticated and request.user.username|lower == "fsosa" %}
+      <div style="display:flex;gap:.5rem;margin-top:1rem">
+        <a class="btn" href="{% url 'sahumerio_editar' object.pk %}?volver=edit">Editar</a>
+        <form method="post" action="{% url 'sahumerio_borrar' object.pk %}" onsubmit="return confirm('¿Borrar este sahumerio?')">
+          {% csrf_token %}
+          <button class="btn btn-danger">Borrar</button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
   </div>
-{% endif %}
-</article>
+</div>
 {% endblock %}

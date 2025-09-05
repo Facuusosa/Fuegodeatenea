@@ -1,17 +1,24 @@
 from django.db import models
 
-class Marca(models.Model):
-    nombre = models.CharField(max_length=100, unique=True)
-    def __str__(self):
-        return self.nombre
-
 class Sahumerio(models.Model):
-    marca = models.ForeignKey(Marca, on_delete=models.CASCADE, related_name="sahumerios")
+    marca = models.CharField(max_length=80, blank=True, default='')
     nombre = models.CharField(max_length=120)
-    descripcion = models.CharField(max_length=200, blank=True, default="")  # 👈 acá
+    precio = models.DecimalField(max_digits=10, decimal_places=2)
     stock = models.PositiveIntegerField(default=0)
-    precio = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+    descripcion = models.TextField(blank=True)
     imagen_url = models.URLField(blank=True)
-    disponible = models.BooleanField(default=True)
+    imagen_file = models.ImageField(upload_to='productos/', blank=True, null=True)
+    activo = models.BooleanField(default=True)
+    creado = models.DateTimeField(auto_now_add=True)
+    actualizado = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['marca', 'nombre']
+
     def __str__(self):
-        return f"{self.nombre} ({self.marca})"
+        return f'{self.marca} {self.nombre}'
+
+    def imagen_resuelta(self):
+        if self.imagen_file:
+            return self.imagen_file.url
+        return self.imagen_url or ''

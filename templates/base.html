@@ -7,25 +7,68 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="csrf-token" content="{{ csrf_token }}">
   {% block meta %}{% endblock %}
+
   <link rel="icon" href="{% static 'img/fuegodeatenealogo.png' %}">
   <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+
+  <style>
+    :root{--bg:#f7f8fb;--text:#1a1a1a;--muted:#6b7280;--brand:#111827;--card:#ffffff;--b:#e5e7eb;--shadow:0 1px 6px rgba(0,0,0,.05);--btn:#111827;--btnText:#fff;--btnDanger:#dc2626;--btnSec:#374151}
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial,"Noto Sans";color:var(--text);background:var(--bg)}
+    a{text-decoration:none;color:inherit}
+    .wrap{max-width:1150px;margin:0 auto;padding:0 22px}
+    .topbar{background:var(--brand);color:#fff;position:sticky;top:0;z-index:10}
+    .topbar .wrap{padding:12px 22px}
+    .topbar nav{display:flex;gap:16px;align-items:center}
+    .topbar nav a{color:#e5e7eb;opacity:.9}
+    .topbar nav a:hover{opacity:1}
+    .topbar nav a[aria-current="page"]{color:#fff;font-weight:700;text-decoration:underline}
+    main.wrap{padding:26px 22px 40px}
+    h1,h2,h3{margin:0 0 .6rem 0}
+    h2{font-size:1.6rem}
+    .btn{display:inline-block;background:var(--btn);color:var(--btnText);border:1px solid #0000;border-radius:10px;padding:8px 14px;font-weight:600;line-height:1;cursor:pointer;transition:.15s box-shadow,.15s transform,.15s background}
+    .btn:hover{box-shadow:var(--shadow)}
+    .btn:active{transform:translateY(1px)}
+    .btn-sec{background:var(--btnSec);color:#fff}
+    .btn-danger{background:var(--btnDanger);color:#fff}
+    .card{background:var(--card);border:1px solid var(--b);border-radius:14px;box-shadow:var(--shadow)}
+    .msg{background:#eef6ff}
+    .msg.error{background:#fee2e2}
+    footer.wrap{color:var(--muted)}
+    .lb{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.75);z-index:1000}
+    .lb.show{display:flex}
+    .lb img{max-width:90vw;max-height:90vh;transform-origin:0 0;cursor:grab;touch-action:none}
+    .lb .close{position:absolute;top:14px;right:14px;background:#000;border:0;color:#fff;border-radius:10px;padding:8px 12px;font-weight:700;cursor:pointer}
+    [data-zoom-src]{cursor:zoom-in}
+    .zoomable::after{content:none!important;display:none!important}
+    @media (max-width:720px){.topbar .wrap{padding:10px 16px} main.wrap{padding:20px 16px 28px}}
+  </style>
+
   {% block styles %}{% endblock %}
 </head>
 <body>
   <header class="topbar">
     <div class="wrap" style="display:flex;justify-content:space-between;align-items:center">
-      <div>
-        <a href="{% url 'landing' %}" style="text-decoration:none;color:inherit;display:flex;align-items:center;gap:8px">
-          <img src="{% static 'img/fuegodeatenealogo.png' %}" alt="Fuego de Atenea" style="height:28px">
-          <strong>Fuego de Atenea</strong>
+      <a href="{% url 'landing' %}" style="display:flex;align-items:center;gap:8px;color:#fff">
+        <img src="{% static 'img/fuegodeatenealogo.png' %}" alt="Fuego de Atenea" style="height:28px">
+        <strong>Fuego de Atenea</strong>
+      </a>
+
+      {% with current=request.resolver_match.url_name edit=request.GET.modo %}
+      <nav>
+        <a href="{% url 'sahumerios_lista' %}"
+           {% if current == 'sahumerios_lista' and edit != 'edit' %}aria-current="page"{% endif %}>
+           Sahumerios
         </a>
-      </div>
-      {% with current=request.resolver_match.url_name %}
-      <nav style="display:flex;gap:16px">
-        <a href="{% url 'catalogo' %}" {% if current == 'catalogo' %}aria-current="page"{% endif %}>Sahumerios</a>
+
         {% if user.is_authenticated and user.username|lower == 'fsosa' %}
+          <a href="{% url 'sahumerios_lista' %}?modo=edit"
+             {% if current == 'sahumerios_lista' and edit == 'edit' or current == 'sahumerio_nuevo' or current == 'sahumerio_editar' %}aria-current="page"{% endif %}>
+             Agregar/editar material
+          </a>
           <a href="/admin/" target="_blank" rel="noopener">Admin</a>
         {% endif %}
+
         {% if user.is_authenticated %}
           <a href="{% url 'perfil' %}" {% if current == 'perfil' %}aria-current="page"{% endif %}>Perfil ({{ user.username }})</a>
           <a href="{% url 'logout' %}">Salir</a>
@@ -42,7 +85,7 @@
     {% if messages %}
       <div class="messages" aria-live="polite" role="region">
         {% for message in messages %}
-          <div class="msg {{ message.tags }}" role="alert" style="padding:10px 12px;border-radius:6px;margin:12px 0">
+          <div class="msg {{ message.tags }}" role="alert" style="padding:10px 12px;border-radius:10px;margin:12px 0">
             {{ message }}
           </div>
         {% endfor %}
@@ -51,14 +94,38 @@
     {% block content %}{% endblock %}
   </main>
 
-  <footer class="wrap" style="padding:24px 0;opacity:.8;text-align:center">
-    <small>&copy; {% now "Y" %} Fuego de Atenea · 
-      <a href="https://www.instagram.com/fuego.de.atenea" target="_blank" rel="noopener">@fuego.de.atenea</a>
-    </small>
+  <footer class="wrap" style="padding:24px 0;text-align:center">
+    <small>&copy; {% now "Y" %} Fuego de Atenea · <a href="https://www.instagram.com/fuego.de.atenea" target="_blank" rel="noopener">@fuego.de.atenea</a></small>
   </footer>
 
+  <div class="lb" id="lightbox">
+    <button class="close" id="lbClose">Cerrar</button>
+    <img id="lbImg" src="" alt="">
+  </div>
+
   <script>window.CSRF_TOKEN=document.querySelector('meta[name="csrf-token"]')?.content;</script>
-  <script src="{% static 'js/main.js' %}" defer></script>
+  <script>
+    (function(){
+      const lb=document.getElementById('lightbox'); const img=document.getElementById('lbImg'); const btn=document.getElementById('lbClose');
+      let scale=1, tx=0, ty=0, dragging=false, sx=0, sy=0;
+      function open(src){scale=1;tx=0;ty=0;img.style.transform='translate(0,0) scale(1)'; img.src=src; lb.classList.add('show')}
+      function close(){lb.classList.remove('show'); img.src=''}
+      function apply(){img.style.transform=`translate(${tx}px,${ty}px) scale(${scale})`}
+      img.addEventListener('pointerdown',e=>{dragging=true;img.setPointerCapture(e.pointerId);sx=e.clientX;sy=e.clientY;img.style.cursor='grabbing'})
+      img.addEventListener('pointermove',e=>{if(!dragging)return;tx+=e.clientX-sx;ty+=e.clientY-sy;sx=e.clientX;sy=e.clientY;apply()})
+      img.addEventListener('pointerup',()=>{dragging=false;img.style.cursor='grab'})
+      img.addEventListener('wheel',e=>{e.preventDefault();const f=e.deltaY<0?1.1:0.9;const ns=Math.min(6,Math.max(1,scale*f));const rect=img.getBoundingClientRect();const cx=e.clientX-rect.left;const cy=e.clientY-rect.top;const k=ns/scale;tx=cx-(cx-tx)*k;ty=cy-(cy-ty)*k;scale=ns;apply()},{passive:false})
+      lb.addEventListener('click',e=>{if(e.target===lb) close()}); btn.addEventListener('click',close); document.addEventListener('keydown',e=>{if(e.key==='Escape') close()})
+      document.addEventListener('click',e=>{
+        const el=e.target.closest('[data-zoom-src]');
+        if(!el) return;
+        e.preventDefault();
+        open(el.getAttribute('data-zoom-src'));
+      });
+    })();
+  </script>
+
   {% block scripts %}{% endblock %}
 </body>
 </html>
+ 

@@ -9,18 +9,15 @@ import pandas as pd
 import unicodedata, re
 from difflib import SequenceMatcher
 
-
 class SoloFsosaMixin(UserPassesTestMixin):
     def test_func(self):
         u = self.request.user
         return u.is_authenticated and u.username.lower() == "fsosa"
 
-
 def _norm_text(s: str) -> str:
     s = str(s or "").strip().lower()
     s = unicodedata.normalize("NFKD", s).encode("ascii", "ignore").decode("ascii")
     return re.sub(r"[^a-z0-9]+", "", s)
-
 
 def _pick_col(cols, *needles):
     norm_cols = { _norm_text(c): c for c in cols }
@@ -33,7 +30,6 @@ def _pick_col(cols, *needles):
             return orig
     return None
 
-
 def _index_product_files():
     prod_dir = Path(settings.BASE_DIR) / "static" / "img" / "productos"
     name_lut = {}
@@ -44,7 +40,6 @@ def _index_product_files():
                 name_lut[p.name.lower()] = p.name
                 stem_lut[_norm_text(p.stem)] = p.name
     return name_lut, stem_lut
-
 
 def _resolve_local_image(name: str, name_lut: dict, stem_lut: dict) -> str:
     if not name:
@@ -77,7 +72,6 @@ def _resolve_local_image(name: str, name_lut: dict, stem_lut: dict) -> str:
             best_name = fname
     return best_name if best_score >= 0.6 else ""
 
-
 def _parse_img_cell(cell: str, name_lut: dict, stem_lut: dict):
     s = str(cell or "").strip().strip("'\"").replace("\\", "/")
     if not s:
@@ -94,7 +88,6 @@ def _parse_img_cell(cell: str, name_lut: dict, stem_lut: dict):
     s = s.split("/")[-1]
     return _resolve_local_image(s, name_lut, stem_lut), ""
 
-
 def _leer_excel():
     ruta = Path(settings.BASE_DIR) / "final.xlsx"
     if not ruta.exists():
@@ -110,7 +103,6 @@ def _leer_excel():
     col_precio   = _pick_col(cols, "precio","valor","importe")
     col_duracion = _pick_col(cols, "duracion","duración")
     col_imagen   = _pick_col(cols, "imagenes","imagen","image","foto","pic")
-
     name_lut, stem_lut = _index_product_files()
     items = []
     for i, r in df.iterrows():
@@ -156,20 +148,16 @@ def _leer_excel():
         })
     return items
 
-
 class CatalogoExcelView(TemplateView):
     template_name = "catalogo.html"
-
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         x_items = _leer_excel()
-
         edit_mode = (
             self.request.user.is_authenticated
             and self.request.user.username.lower() == "fsosa"
             and self.request.GET.get("modo") == "edit"
         )
-
         db_qs = Sahumerio.objects.all()
         db_items = []
         for o in db_qs:
@@ -180,6 +168,7 @@ class CatalogoExcelView(TemplateView):
             db_items.append({
                 "origen": "DB",
                 "pk": o.pk,
+                "id": o.pk,
                 "idx": None,
                 "titulo": getattr(o, "nombre", "") or "",
                 "descripcion": getattr(o, "descripcion", "") or "",
@@ -190,7 +179,6 @@ class CatalogoExcelView(TemplateView):
                 "raw": "",
                 "marca": getattr(o, "marca", "") or "",
             })
-
         qs = db_qs.values("id", "nombre", "marca")
         lut = {}
         for q in qs:
@@ -198,25 +186,20 @@ class CatalogoExcelView(TemplateView):
             m = q["marca"] or ""
             for k in {_norm_text(n), _norm_text(f"{m} {n}"), _norm_text(f"{n} {m}")}:
                 lut[k] = q["id"]
-
         for it in x_items:
             it["origen"] = "XLSX"
             it["pk"] = None
             it["match_id"] = lut.get(_norm_text(it["titulo"]))
-
         combinados = x_items + db_items
-
         def _key(x):
             a = (x.get("marca") or "").lower()
             b = (x.get("titulo") or "").lower()
             return (a, b)
-
         combinados.sort(key=_key)
         ctx["items"] = combinados
         ctx["edit_mode"] = edit_mode
         ctx["debug"] = bool(self.request.GET.get("debug"))
         return ctx
-
 
 class ExcelDetalleView(TemplateView):
     template_name = "sahumerio_detalle_excel.html"
@@ -239,19 +222,16 @@ class ExcelDetalleView(TemplateView):
         ctx["match_id"] = match_id
         return ctx
 
-
 class SahumerioDetalle(DetailView):
     model = Sahumerio
     template_name = "sahumerio_detalle.html"
     context_object_name = "object"
-
 
 class SahumerioCrear(LoginRequiredMixin, SoloFsosaMixin, CreateView):
     model = Sahumerio
     form_class = SahumerioForm
     template_name = "sahumerio_form.html"
     success_url = reverse_lazy("sahumerios_lista")
-
     def get_initial(self):
         ini = super().get_initial()
         g = self.request.GET
@@ -261,13 +241,11 @@ class SahumerioCrear(LoginRequiredMixin, SoloFsosaMixin, CreateView):
         if g.get("sug_precio"): ini["precio"] = g.get("sug_precio")
         return ini
 
-
 class SahumerioEditar(LoginRequiredMixin, SoloFsosaMixin, UpdateView):
     model = Sahumerio
     form_class = SahumerioForm
     template_name = "sahumerio_form.html"
     success_url = reverse_lazy("sahumerios_lista")
-
 
 class SahumerioBorrar(LoginRequiredMixin, SoloFsosaMixin, DeleteView):
     model = Sahumerio

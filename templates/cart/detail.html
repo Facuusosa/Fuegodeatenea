@@ -1,0 +1,364 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% block title %}Carrito{% endblock %}
+
+{% block styles %}
+<style>
+  .cart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  
+  .cart-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text);
+    margin: 0;
+  }
+  
+  .cart-count {
+    color: var(--muted);
+    font-size: 1rem;
+    font-weight: 500;
+  }
+  
+  .cart-empty {
+    text-align: center;
+    padding: 60px 20px;
+  }
+  
+  .cart-empty p {
+    font-size: 1.1rem;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+  
+  .cart-list {
+    display: grid;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+  
+  .cart-item {
+    background: var(--card);
+    border: 1px solid var(--b);
+    border-radius: 16px;
+    padding: 24px;
+    display: grid;
+    grid-template-columns: 140px 1fr auto;
+    gap: 24px;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,.04);
+    transition: all 0.2s ease;
+  }
+  
+  .cart-item:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,.08);
+    transform: translateY(-2px);
+  }
+  
+  .cart-item-image {
+    width: 140px;
+    height: 140px;
+    border: 2px solid var(--b);
+    border-radius: 14px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fafafa;
+    flex-shrink: 0;
+  }
+  
+  .cart-item-image img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+  
+  .cart-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+  }
+  
+  .cart-item-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+    line-height: 1.3;
+  }
+  
+  .cart-item-price {
+    font-size: 1.1rem;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  
+  .cart-item-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  
+  .qty-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 1px solid var(--b);
+    background: white;
+    color: var(--text);
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .qty-btn:hover {
+    background: var(--bg);
+    border-color: var(--text);
+  }
+  
+  .qty-btn:active {
+    transform: scale(0.95);
+  }
+  
+  .qty-input {
+    width: 70px;
+    height: 36px;
+    text-align: center;
+    padding: 8px;
+    border: 1px solid var(--b);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: border-color 0.15s ease;
+  }
+  
+  .qty-input:focus {
+    outline: none;
+    border-color: var(--brand);
+  }
+  
+  .cart-item-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+    text-align: right;
+  }
+  
+  .cart-item-subtotal {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  
+  .remove-btn {
+    background: transparent;
+    color: var(--btnDanger);
+    border: 1px solid var(--btnDanger);
+    padding: 6px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  
+  .remove-btn:hover {
+    background: var(--btnDanger);
+    color: white;
+  }
+  
+  .cart-summary {
+    background: var(--card);
+    border: 2px solid var(--b);
+    border-radius: 16px;
+    padding: 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    box-shadow: 0 4px 12px rgba(0,0,0,.06);
+  }
+  
+  .cart-total {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--text);
+  }
+  
+  .cart-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  
+  @media (max-width: 768px) {
+    .cart-item {
+      grid-template-columns: 100px 1fr;
+      gap: 16px;
+      padding: 20px;
+    }
+    
+    .cart-item-image {
+      width: 100px;
+      height: 100px;
+    }
+    
+    .cart-item-actions {
+      grid-column: 1 / -1;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+    
+    .cart-title {
+      font-size: 1.6rem;
+    }
+    
+    .cart-summary {
+      flex-direction: column;
+      align-items: stretch;
+      text-align: center;
+    }
+    
+    .cart-actions {
+      flex-direction: column;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="cart-header">
+  <div>
+    <h2 class="cart-title">Carrito</h2>
+    {% if cart|length > 0 %}
+      <div class="cart-count">{{ cart|length }} {% if cart|length == 1 %}ítem{% else %}ítems{% endif %}</div>
+    {% endif %}
+  </div>
+  
+  {% if cart|length > 0 %}
+    <form method="post" action="{% url 'cart:clear' %}">
+      {% csrf_token %}
+      <button class="btn-sec" type="submit">Vaciar carrito</button>
+    </form>
+  {% endif %}
+</div>
+
+{% if cart|length == 0 %}
+  <div class="cart-empty">
+    <p>Tu carrito está vacío</p>
+    <a class="btn" href="{% url 'catalogo' %}">Ver catálogo</a>
+  </div>
+{% else %}
+
+  <div class="cart-list">
+    {% for item in cart %}
+      <article class="cart-item">
+        <div class="cart-item-image">
+          <img
+            src="{{ item.image_url }}"
+            alt="{{ item.name }}"
+            loading="lazy">
+        </div>
+
+        <div class="cart-item-info">
+          <h3 class="cart-item-name">{{ item.name }}</h3>
+          <div class="cart-item-price">$ {{ item.price|floatformat:0|intcomma }}</div>
+
+          <form method="post" action="{% url 'cart:add' %}" class="form-update">
+            {% csrf_token %}
+            <input type="hidden" name="origin" value="{% if item.is_db %}DB{% else %}XLS{% endif %}">
+            <input type="hidden" name="product_id" value="{{ item.id }}">
+            <input type="hidden" name="replace" value="1">
+            {% if not item.is_db %}
+              <input type="hidden" name="name" value="{{ item.name }}">
+              <input type="hidden" name="price" value="{{ item.price }}">
+              <input type="hidden" name="img" value="{{ item.img }}">
+            {% endif %}
+
+            <div class="cart-item-controls">
+              <button type="button" class="qty-btn btn-qty" data-step="-1" aria-label="Disminuir cantidad">−</button>
+              <input type="number" name="quantity" value="{{ item.quantity|default:1 }}" min="1" step="1" class="qty-input" aria-label="Cantidad">
+              <button type="button" class="qty-btn btn-qty" data-step="1" aria-label="Aumentar cantidad">+</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="cart-item-actions">
+          <div class="cart-item-subtotal">$ {{ item.subtotal|floatformat:0|intcomma }}</div>
+          <form method="post" action="{% url 'cart:remove' %}">
+            {% csrf_token %}
+            <input type="hidden" name="product_id" value="{{ item.id }}">
+            <button class="remove-btn" type="submit">Quitar</button>
+          </form>
+        </div>
+      </article>
+    {% endfor %}
+  </div>
+
+  <div class="cart-summary">
+    <div class="cart-total">Total: $ {{ cart.total|default:cart.get_total_price|floatformat:0|intcomma }}</div>
+    <div class="cart-actions">
+      <a class="btn" href="{% url 'cart:checkout_form' %}">Finalizar compra</a>
+      <a class="btn-sec" href="{% url 'catalogo' %}">Seguir comprando</a>
+    </div>
+  </div>
+
+{% endif %}
+
+<script>
+(function () {
+  function submitUpdate(form) {
+    form.querySelectorAll("button, input[type=submit]").forEach(function(b){ b.disabled = true; });
+    form.submit();
+  }
+
+  document.querySelectorAll(".form-update").forEach(function(form){
+    var inputQty = form.querySelector('input[name="quantity"]');
+
+    form.querySelectorAll(".btn-qty").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var step = parseInt(btn.getAttribute("data-step"), 10);
+        var val = parseInt(inputQty.value || "1", 10);
+        if (isNaN(val)) val = 1;
+        val += step;
+        if (val < 1) val = 1;
+        inputQty.value = val;
+        submitUpdate(form);
+      });
+    });
+
+    var t;
+    function debounce() {
+      clearTimeout(t);
+      t = setTimeout(function(){
+        var val = parseInt(inputQty.value || "1", 10);
+        if (isNaN(val) || val < 1) { val = 1; inputQty.value = 1; }
+        submitUpdate(form);
+      }, 400);
+    }
+    inputQty.addEventListener("input", debounce);
+    inputQty.addEventListener("keyup", function(e){
+      if (e.key === "Enter") { e.preventDefault(); debounce(); }
+    });
+  });
+})();
+</script>
+{% endblock %}

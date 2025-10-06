@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.conf import settings
 from pathlib import Path
 import pandas as pd
+from appcoder.views import CatalogoExcelView
 
 def catalogo(request):
 
@@ -33,3 +34,6 @@ def catalogo(request):
 
     items.sort(key=lambda x: x["titulo"])
     return render(request, "catalogo.html", {"items": items})
+# Reuse the main catalog view from ``appcoder`` so the context matches the
+# expectations of ``templates/catalogo.html`` (origen, idx, pk, etc.).
+catalogo = CatalogoExcelView.as_view()

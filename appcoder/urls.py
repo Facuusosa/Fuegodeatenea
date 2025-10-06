@@ -1,4 +1,5 @@
-from django.urls import path
+# appcoder/urls.py
+from django.urls import path, include
 from .views import (
     CatalogoExcelView, ExcelDetalleView,
     SahumerioCrear, SahumerioEditar, SahumerioBorrar, SahumerioDetalle
@@ -13,4 +14,7 @@ urlpatterns = [
     path("sahumerios/nuevo/", SahumerioCrear.as_view(), name="sahumerio_nuevo"),
     path("sahumerios/<int:pk>/editar/", SahumerioEditar.as_view(), name="sahumerio_editar"),
     path("sahumerios/<int:pk>/borrar/", SahumerioBorrar.as_view(), name="sahumerio_borrar"),
+
+    # ✅ carrito con namespace
+    path("cart/", include(("cart.urls", "cart"), namespace="cart")),
 ]

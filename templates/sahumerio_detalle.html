@@ -1,38 +1,33 @@
 {% extends "base.html" %}
 {% load static %}
 {% block title %}{{ object.nombre }}{% endblock %}
-
 {% block content %}
-<a href="{% url 'sahumerios_lista' %}" class="btn btn-sec">Volver</a>
+<h2 class="titulo-seccion">{{ object.nombre }}</h2>
 
-<div class="wrap" style="max-width:1200px;margin:18px auto 0;display:grid;grid-template-columns:1fr 1fr;gap:28px">
+<div style="display:grid;grid-template-columns:320px 1fr;gap:20px;align-items:flex-start;max-width:980px">
   <div>
     {% if object.imagen_file %}
-      <img class="detail-img" src="{{ object.imagen_file.url }}" alt="{{ object.nombre }}">
-    {% elif object.imagen_url %}
-      <img class="detail-img" src="{{ object.imagen_url }}" alt="{{ object.nombre }}">
+      <img src="{{ object.imagen_file.url }}" alt="{{ object.nombre }}" style="width:100%;height:auto;border-radius:14px;object-fit:cover">
     {% else %}
-      <img class="detail-img" src="{% static 'img/placeholder.png' %}" alt="Sin imagen">
+      <img src="{% static 'img/placeholder.png' %}" alt="{{ object.nombre }}" style="width:100%;height:auto;border-radius:14px;object-fit:cover">
     {% endif %}
   </div>
 
   <div>
-    <h2 style="margin:0 0 8px">{{ object.nombre }}</h2>
-    {% if object.marca %}<p class="meta"><strong>Marca:</strong> {{ object.marca }}</p>{% endif %}
-    <p class="price">${{ object.precio }}</p>
-    {% if object.descripcion %}<p class="meta">{{ object.descripcion }}</p>{% endif %}
-    <p class="meta">Stock: {{ object.stock }} • {% if object.activo %}Activo{% else %}Inactivo{% endif %}</p>
+    {% if object.marca %}<p class="meta" style="margin:0 0 6px 0">Marca: {{ object.marca }}</p>{% endif %}
+    {% if object.descripcion %}<p class="meta" style="margin:0 0 12px 0">{{ object.descripcion }}</p>{% endif %}
+    <div style="font-size:1.6rem;font-weight:700;margin:6px 0">$ {{ object.precio }}</div>
 
-    {% comment %} SOLO fsosa ve acciones de edición {% endcomment %}
-    {% if user.is_authenticated and user.username|lower == 'fsosa' %}
-      <div style="display:flex;gap:8px;margin-top:10px">
-        <a class="btn-sec" href="{% url 'sahumerio_editar' object.pk %}?volver={{ request.get_full_path|urlencode }}">Editar</a>
-        <form method="post" action="{% url 'sahumerio_borrar' object.pk %}" onsubmit="return confirm('¿Borrar este sahumerio?')">
-          {% csrf_token %}
-          <button class="btn" style="background:#dc2626">Borrar</button>
-        </form>
-      </div>
-    {% endif %}
+    <form action="{% url 'cart:add_db' object.pk %}" method="post" style="display:flex;gap:10px;align-items:center;margin-top:12px">
+      {% csrf_token %}
+      <input type="number" name="quantity" value="1" min="1" style="width:90px;padding:8px 10px;border:1px solid #ddd;border-radius:10px;text-align:center">
+      <button type="submit" class="btn">Agregar al carrito</button>
+    </form>
+
+    <div style="margin-top:16px;display:flex;gap:10px">
+      <a class="btn-sec" href="{% url 'catalogo' %}">Volver al catálogo</a>
+      <a class="btn-sec" href="{% url 'cart:detail' %}">Ver carrito</a>
+    </div>
   </div>
 </div>
 {% endblock %}

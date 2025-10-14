@@ -1,10 +1,683 @@
 {% extends "base.html" %}
-{% block title %}Iniciar sesión{% endblock %}
+{% load static %}
+{% block title %}Iniciar sesión - Fuego de Atenea{% endblock %}
+
+{% block styles %}
+<style>
+:root {
+    --auth-bg: #f9f7f4;
+    --auth-card: #ffffff;
+    --auth-text: #3d3731;
+    --auth-text-muted: #8c7a5e;
+    --auth-gold: #c9a961;
+    --auth-gold-light: #d4b574;
+    --auth-gold-dark: #b89550;
+    --auth-border: #e8dfd0;
+    --auth-error: #d64545;
+    --auth-success: #4caf50;
+    --auth-focus-ring: rgba(201, 169, 97, 0.15);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--auth-bg);
+    color: var(--auth-text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.auth-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.auth-card {
+    background: var(--auth-card);
+    border: 2px solid var(--auth-border);
+    border-radius: 16px;
+    padding: 48px;
+    max-width: 460px;
+    width: 100%;
+    box-shadow: 0 8px 32px rgba(201, 169, 97, 0.15);
+    animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.auth-logo {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.auth-logo-icon {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, var(--auth-gold-light), var(--auth-gold));
+    border-radius: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 16px rgba(201, 169, 97, 0.3);
+    transition: transform 0.3s ease;
+}
+
+.auth-logo-icon:hover {
+    transform: scale(1.05);
+}
+
+.auth-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--auth-text);
+    margin: 0 0 8px 0;
+    text-align: center;
+    letter-spacing: -0.02em;
+}
+
+.auth-subtitle {
+    font-size: 0.95rem;
+    color: var(--auth-text-muted);
+    text-align: center;
+    margin: 0 0 32px 0;
+    line-height: 1.5;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--auth-text);
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.form-label .required {
+    color: var(--auth-error);
+}
+
+.form-input-wrapper {
+    position: relative;
+}
+
+.form-input,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="username"] {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 1rem;
+    border: 2px solid var(--auth-border);
+    border-radius: 10px;
+    background: var(--auth-bg);
+    color: var(--auth-text);
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.form-input:focus,
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="username"]:focus {
+    outline: none;
+    border-color: var(--auth-gold);
+    box-shadow: 0 0 0 4px var(--auth-focus-ring);
+    background: #ffffff;
+}
+
+.form-input.error,
+input.error {
+    border-color: var(--auth-error);
+    background: rgba(214, 69, 69, 0.05);
+}
+
+.form-input.error:focus,
+input.error:focus {
+    box-shadow: 0 0 0 4px rgba(214, 69, 69, 0.1);
+}
+
+.form-input.success {
+    border-color: var(--auth-success);
+}
+
+.form-input-wrapper.has-toggle input {
+    padding-right: 48px;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--auth-text-muted);
+    cursor: pointer;
+    padding: 8px;
+    font-size: 1.2rem;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+}
+
+.password-toggle:hover {
+    color: var(--auth-gold);
+    background: rgba(201, 169, 97, 0.1);
+}
+
+.password-toggle:focus {
+    outline: 2px solid var(--auth-gold);
+    outline-offset: 2px;
+}
+
+.form-error {
+    font-size: 0.85rem;
+    color: var(--auth-error);
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    line-height: 1.4;
+}
+
+.form-error-icon {
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.form-help {
+    font-size: 0.85rem;
+    color: var(--auth-text-muted);
+    margin-top: 4px;
+    line-height: 1.4;
+}
+
+.form-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: -8px;
+    gap: 12px;
+}
+
+.form-remember {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: var(--auth-text);
+    cursor: pointer;
+    user-select: none;
+}
+
+.form-remember input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--auth-gold);
+}
+
+.form-link {
+    font-size: 0.9rem;
+    color: var(--auth-gold);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.form-link:hover {
+    color: var(--auth-gold-dark);
+    text-decoration: underline;
+}
+
+.form-link:focus {
+    outline: 2px solid var(--auth-gold);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 16px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #ffffff;
+    background: linear-gradient(135deg, var(--auth-gold-light), var(--auth-gold));
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(201, 169, 97, 0.3);
+    margin-top: 8px;
+    font-family: inherit;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-submit::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(201, 169, 97, 0.4);
+}
+
+.btn-submit:hover::before {
+    left: 100%;
+}
+
+.btn-submit:active {
+    transform: translateY(0);
+}
+
+.btn-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-submit:focus {
+    outline: 3px solid var(--auth-gold-dark);
+    outline-offset: 2px;
+}
+
+.btn-submit.loading {
+    pointer-events: none;
+}
+
+.btn-submit.loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    margin-left: 8px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.auth-divider {
+    text-align: center;
+    margin: 32px 0;
+    position: relative;
+}
+
+.auth-divider::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 100%;
+    height: 1px;
+    background: var(--auth-border);
+}
+
+.auth-divider-text {
+    background: var(--auth-card);
+    padding: 0 16px;
+    font-size: 0.85rem;
+    color: var(--auth-text-muted);
+    position: relative;
+    font-weight: 500;
+}
+
+.auth-switch {
+    text-align: center;
+    font-size: 0.95rem;
+    color: var(--auth-text-muted);
+}
+
+.auth-switch a {
+    color: var(--auth-gold);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.auth-switch a:hover {
+    color: var(--auth-gold-dark);
+    text-decoration: underline;
+}
+
+.auth-switch a:focus {
+    outline: 2px solid var(--auth-gold);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+.alert {
+    padding: 14px 16px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    line-height: 1.5;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.alert-icon {
+    flex-shrink: 0;
+    font-size: 1.1rem;
+    margin-top: 1px;
+}
+
+.alert-error {
+    background: rgba(214, 69, 69, 0.1);
+    border: 1px solid rgba(214, 69, 69, 0.3);
+    color: var(--auth-error);
+}
+
+.alert-success {
+    background: rgba(76, 175, 80, 0.1);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+    color: var(--auth-success);
+}
+
+.alert-info {
+    background: rgba(33, 150, 243, 0.1);
+    border: 1px solid rgba(33, 150, 243, 0.3);
+    color: #1976d2;
+}
+
+.alert-warning {
+    background: rgba(255, 152, 0, 0.1);
+    border: 1px solid rgba(255, 152, 0, 0.3);
+    color: #f57c00;
+}
+
+@media (max-width: 540px) {
+    .auth-card {
+        padding: 32px 24px;
+    }
+    
+    .auth-title {
+        font-size: 1.5rem;
+    }
+    
+    .form-footer {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+    }
+    
+    .form-link {
+        align-self: flex-end;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<h2>Iniciar sesión</h2>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Entrar</button>
-</form>
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-logo">
+            <div class="auth-logo-icon">🔥</div>
+            <h1 class="auth-title">Bienvenido de vuelta</h1>
+            <p class="auth-subtitle">Ingresá a tu cuenta de Fuego de Atenea</p>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}" role="alert">
+                    <span class="alert-icon">
+                        {% if message.tags == 'error' %}⚠️
+                        {% elif message.tags == 'success' %}✓
+                        {% elif message.tags == 'warning' %}⚡
+                        {% else %}ℹ️{% endif %}
+                    </span>
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% if form.non_field_errors %}
+            <div class="alert alert-error" role="alert">
+                <span class="alert-icon">⚠️</span>
+                <div>
+                    {% for error in form.non_field_errors %}
+                        <div>{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        <form method="post" class="auth-form" id="loginForm" novalidate>
+            {% csrf_token %}
+            
+            {% for field in form %}
+                <div class="form-group">
+                    <label class="form-label" for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                        {% if field.field.required %}
+                            <span class="required" aria-label="requerido">*</span>
+                        {% endif %}
+                    </label>
+                    
+                    <div class="form-input-wrapper {% if field.name == 'password' %}has-toggle{% endif %}">
+                        {% if field.name == 'password' %}
+                            <input type="password" 
+                                   name="{{ field.name }}" 
+                                   id="{{ field.id_for_label }}"
+                                   class="form-input {% if field.errors %}error{% endif %}"
+                                   value="{{ field.value|default:'' }}"
+                                   placeholder="Ingresá tu contraseña"
+                                   autocomplete="current-password"
+                                   {% if field.field.required %}required{% endif %}
+                                   aria-describedby="{% if field.errors %}{{ field.id_for_label }}-error{% endif %} {% if field.help_text %}{{ field.id_for_label }}-help{% endif %}">
+                            <button type="button" 
+                                    class="password-toggle" 
+                                    onclick="togglePassword('{{ field.id_for_label }}')"
+                                    aria-label="Mostrar u ocultar contraseña"
+                                    tabindex="-1">
+                                👁️
+                            </button>
+                        {% else %}
+                            {% if field.name == 'username' %}
+                                <input type="text" 
+                                       name="{{ field.name }}" 
+                                       id="{{ field.id_for_label }}"
+                                       class="form-input {% if field.errors %}error{% endif %}"
+                                       value="{{ field.value|default:'' }}"
+                                       placeholder="Ingresá tu usuario o email"
+                                       autocomplete="username"
+                                       {% if field.field.required %}required{% endif %}
+                                       aria-describedby="{% if field.errors %}{{ field.id_for_label }}-error{% endif %} {% if field.help_text %}{{ field.id_for_label }}-help{% endif %}">
+                            {% else %}
+                                {{ field }}
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                    
+                    {% if field.errors %}
+                        <span class="form-error" id="{{ field.id_for_label }}-error" role="alert">
+                            <span class="form-error-icon">⚠️</span>
+                            <span>{{ field.errors.0 }}</span>
+                        </span>
+                    {% endif %}
+                    
+                    {% if field.help_text %}
+                        <span class="form-help" id="{{ field.id_for_label }}-help">{{ field.help_text }}</span>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <div class="form-footer">
+                <label class="form-remember">
+                    <input type="checkbox" 
+                           name="remember_me" 
+                           id="remember_me"
+                           value="on">
+                    <span>Recordarme</span>
+                </label>
+                <a href="#" class="form-link" onclick="alert('Funcionalidad de recuperación próximamente'); return false;">¿Olvidaste tu contraseña?</a>
+            </div>
+
+            <button type="submit" class="btn-submit" id="submitBtn">
+                Iniciar sesión
+            </button>
+        </form>
+
+        <div class="auth-divider">
+            <span class="auth-divider-text">O</span>
+        </div>
+
+        <div class="auth-switch">
+            ¿No tenés cuenta? <a href="{% url 'registro' %}">Registrate gratis</a>
+        </div>
+    </div>
+</div>
+
+<script>
+function togglePassword(fieldId) {
+    const field = document.getElementById(fieldId);
+    const btn = field.parentElement.querySelector('.password-toggle');
+    
+    if (field.type === 'password') {
+        field.type = 'text';
+        btn.textContent = '🙈';
+        btn.setAttribute('aria-label', 'Ocultar contraseña');
+    } else {
+        field.type = 'password';
+        btn.textContent = '👁️';
+        btn.setAttribute('aria-label', 'Mostrar contraseña');
+    }
+}
+
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+    const btn = document.getElementById('submitBtn');
+    const inputs = this.querySelectorAll('input[required]');
+    let hasErrors = false;
+    
+    inputs.forEach(function(input) {
+        if (!input.value.trim()) {
+            input.classList.add('error');
+            hasErrors = true;
+        } else {
+            input.classList.remove('error');
+        }
+    });
+    
+    if (hasErrors) {
+        e.preventDefault();
+        return;
+    }
+    
+    btn.disabled = true;
+    btn.classList.add('loading');
+    const originalText = btn.textContent;
+    btn.textContent = 'Ingresando...';
+    
+    setTimeout(function() {
+        if (btn.disabled) {
+            btn.disabled = false;
+            btn.classList.remove('loading');
+            btn.textContent = originalText;
+        }
+    }, 3000);
+});
+
+document.querySelectorAll('.form-input, input[type="text"], input[type="password"]').forEach(function(input) {
+    input.addEventListener('input', function() {
+        this.classList.remove('error');
+    });
+    
+    if (input.name === 'username') {
+        input.addEventListener('blur', function() {
+            if (this.value.trim().length > 0) {
+                this.classList.add('success');
+            } else {
+                this.classList.remove('success');
+            }
+        });
+    }
+});
+
+document.getElementById('remember_me').addEventListener('keydown', function(e) {
+    if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        this.checked = !this.checked;
+    }
+});
+
+document.querySelectorAll('.alert').forEach(function(alert) {
+    setTimeout(function() {
+        alert.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        alert.style.opacity = '0';
+        alert.style.transform = 'translateY(-10px)';
+        setTimeout(function() {
+            alert.remove();
+        }, 500);
+    }, 5000);
+});
+</script>
 {% endblock %}

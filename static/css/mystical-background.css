@@ -245,24 +245,14 @@ body.mystic-theme .wrap::after {
    AJUSTES PARA COMPONENTES - TEMA CLARO
    ======================================== */
 
-/* Topbar más elegante y CLARO para legibilidad */
+/* Topbar más elegante */
 body.mystic-theme .topbar {
-  background: rgba(245, 243, 240, 0.98);
-  backdrop-filter: blur(12px);
+  background: rgba(61, 55, 49, 0.95);
+  backdrop-filter: blur(10px);
   border-bottom: 2px solid var(--mystic-border-gold);
   box-shadow: 
-    0 2px 8px rgba(61, 55, 49, 0.08),
+    0 4px 12px rgba(61, 55, 49, 0.15),
     0 0 20px var(--mystic-gold-pale);
-}
-
-body.mystic-theme .topbar a {
-  color: #3d3731;
-  font-weight: 500;
-}
-
-body.mystic-theme .topbar a:hover {
-  color: var(--mystic-gold);
-  background: rgba(201, 169, 97, 0.1);
 }
 
 /* Cards con borde dorado sutil */

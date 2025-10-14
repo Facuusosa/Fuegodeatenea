@@ -1,7 +1,659 @@
 {% extends "base.html" %}
-{% block title %}Mi perfil{% endblock %}
+{% load static %}
+{% block title %}Mi perfil - Fuego de Atenea{% endblock %}
+
+{% block styles %}
+<style>
+:root {
+  --profile-bg: #f8f4ec;
+  --profile-card: #ffffff;
+  --profile-border: #eadfca;
+  --profile-accent: #d4a94f;
+  --profile-accent-soft: rgba(212, 169, 79, 0.15);
+  --profile-text: #3f3528;
+  --profile-muted: #8f8370;
+  --profile-danger: #d9534f;
+  --profile-success: #5cb85c;
+  --profile-radius: 16px;
+  --profile-transition: 0.25s ease;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--profile-bg);
+  color: var(--profile-text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+}
+
+.profile-container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 56px 24px 80px;
+}
+
+/* Profile Header */
+.profile-header {
+  background: var(--profile-card);
+  border: 1px solid var(--profile-border);
+  border-radius: 24px;
+  padding: 40px;
+  display: flex;
+  gap: 32px;
+  align-items: center;
+  box-shadow: 0 10px 40px rgba(31, 16, 3, 0.08);
+  margin-bottom: 48px;
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-header::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 90% 0%, rgba(212, 169, 79, 0.12), transparent 55%);
+  pointer-events: none;
+}
+
+.profile-avatar {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f4db9a, var(--profile-accent));
+  color: #2b200f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  font-weight: 700;
+  box-shadow: 0 14px 35px rgba(212, 169, 79, 0.35);
+  z-index: 1;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.profile-info {
+  z-index: 1;
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-name {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin: 0 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  letter-spacing: -0.02em;
+}
+
+.badge-verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: rgba(92, 184, 92, 0.15);
+  color: var(--profile-success);
+}
+
+.badge-verified span:first-child {
+  font-size: 1rem;
+}
+
+.profile-email {
+  margin: 0 0 20px;
+  color: var(--profile-muted);
+  font-size: 1rem;
+  word-break: break-word;
+}
+
+.profile-meta {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  color: var(--profile-muted);
+  font-size: 0.95rem;
+}
+
+.profile-meta li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-meta span[aria-hidden="true"] {
+  font-size: 1.15rem;
+  color: var(--profile-accent);
+}
+
+/* Account Settings */
+.profile-actions {
+  background: var(--profile-card);
+  border: 1px solid var(--profile-border);
+  border-radius: 20px;
+  padding: 36px;
+  box-shadow: 0 12px 32px rgba(31, 16, 3, 0.08);
+}
+
+.section-title {
+  margin: 0 0 28px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  letter-spacing: -0.01em;
+}
+
+.section-title span[aria-hidden="true"] {
+  font-size: 1.75rem;
+}
+
+.actions-list {
+  display: grid;
+  gap: 16px;
+}
+
+.action-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid var(--profile-border);
+  border-radius: var(--profile-radius);
+  background: var(--profile-card);
+  padding: 24px;
+  transition: all var(--profile-transition);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.action-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--profile-accent);
+  transform: scaleY(0);
+  transition: transform var(--profile-transition);
+}
+
+.action-item:hover::before {
+  transform: scaleY(1);
+}
+
+.action-item:hover {
+  border-color: var(--profile-accent);
+  transform: translateX(6px);
+  box-shadow: 0 8px 20px rgba(212, 169, 79, 0.15);
+}
+
+.action-item:focus-visible {
+  outline: 2px solid var(--profile-accent);
+  outline-offset: 2px;
+}
+
+.action-info {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex: 1;
+  min-width: 0;
+}
+
+.action-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: var(--profile-accent-soft);
+  color: var(--profile-accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(212, 169, 79, 0.1);
+}
+
+.action-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.action-text {
+  margin: 0 0 4px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--profile-text);
+}
+
+.action-subtext {
+  margin: 0;
+  color: var(--profile-muted);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.action-link {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--profile-accent);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  transition: all var(--profile-transition);
+  flex-shrink: 0;
+}
+
+.action-link:hover {
+  background: var(--profile-accent-soft);
+  transform: translateX(2px);
+}
+
+.action-link span {
+  transition: transform var(--profile-transition);
+}
+
+.action-link:hover span {
+  transform: translateX(3px);
+}
+
+/* Danger variant */
+.action-item.danger {
+  border-color: rgba(217, 83, 79, 0.25);
+}
+
+.action-item.danger::before {
+  background: var(--profile-danger);
+}
+
+.action-item.danger:hover {
+  border-color: rgba(217, 83, 79, 0.4);
+  box-shadow: 0 8px 20px rgba(217, 83, 79, 0.12);
+}
+
+.action-item.danger .action-icon {
+  background: rgba(217, 83, 79, 0.12);
+  color: var(--profile-danger);
+}
+
+.action-item.danger .action-link {
+  color: var(--profile-danger);
+}
+
+.action-item.danger .action-link:hover {
+  background: rgba(217, 83, 79, 0.12);
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(21, 15, 6, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: 1200;
+  padding: 24px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--profile-transition), visibility var(--profile-transition);
+}
+
+.modal-overlay.is-visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal {
+  background: var(--profile-card);
+  border-radius: 20px;
+  padding: 36px;
+  max-width: 440px;
+  width: 100%;
+  border: 1px solid var(--profile-border);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+  transform: scale(0.95);
+  transition: transform var(--profile-transition);
+}
+
+.modal-overlay.is-visible .modal {
+  transform: scale(1);
+}
+
+.modal-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.modal-icon {
+  font-size: 3.5rem;
+  margin-bottom: 16px;
+}
+
+.modal-title {
+  margin: 0 0 10px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--profile-text);
+}
+
+.modal-message {
+  margin: 0;
+  color: var(--profile-muted);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.modal-actions {
+  margin-top: 32px;
+  display: flex;
+  gap: 12px;
+}
+
+.modal-button {
+  flex: 1;
+  padding: 16px;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--profile-transition);
+  border: none;
+  font-family: inherit;
+}
+
+.modal-button:focus-visible {
+  outline: 2px solid var(--profile-accent);
+  outline-offset: 2px;
+}
+
+.modal-button.primary {
+  background: linear-gradient(135deg, #f4db9a, var(--profile-accent));
+  color: #1f1405;
+  box-shadow: 0 8px 20px rgba(212, 169, 79, 0.3);
+}
+
+.modal-button.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(212, 169, 79, 0.4);
+}
+
+.modal-button.primary:active {
+  transform: translateY(0);
+}
+
+.modal-button.secondary {
+  background: transparent;
+  border: 1px solid var(--profile-border);
+  color: var(--profile-text);
+}
+
+.modal-button.secondary:hover {
+  background: var(--profile-accent-soft);
+  border-color: var(--profile-accent);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .profile-header {
+    flex-direction: column;
+    text-align: center;
+    padding: 32px 24px;
+  }
+
+  .profile-name {
+    justify-content: center;
+  }
+
+  .profile-meta {
+    justify-content: center;
+  }
+
+  .profile-actions {
+    padding: 28px 20px;
+  }
+
+  .action-item {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+
+  .action-item:hover {
+    transform: translateY(-4px) translateX(0);
+  }
+
+  .action-info {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-container {
+    padding: 40px 16px 60px;
+  }
+
+  .profile-header {
+    padding: 24px 20px;
+  }
+
+  .profile-avatar {
+    width: 90px;
+    height: 90px;
+    font-size: 2.5rem;
+  }
+
+  .profile-name {
+    font-size: 1.75rem;
+  }
+
+  .action-item {
+    padding: 20px;
+  }
+
+  .action-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 1.4rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<h2>Perfil de {{ user.username }}</h2>
-<p>Email: {{ user.email }}</p>
-<a href="{% url 'password_change' %}">Cambiar contraseña</a>
+<div class="profile-container">
+  <!-- Profile Header -->
+  <header class="profile-header">
+    <div class="profile-avatar" aria-label="Avatar de {{ user.username }}">
+      {{ user.get_full_name|default:user.username|slice:":1"|upper }}
+    </div>
+    <div class="profile-info">
+      <h1 class="profile-name">
+        {{ user.get_full_name|default:user.username }}
+        {% if user.email %}
+        <span class="badge-verified" role="status">
+          <span aria-hidden="true">✓</span>
+          <span>Verificado</span>
+        </span>
+        {% endif %}
+      </h1>
+      <p class="profile-email">{{ user.email|default:"Sin correo configurado" }}</p>
+      <ul class="profile-meta">
+        <li>
+          <span aria-hidden="true">📅</span>
+          <span>Miembro desde {{ user.date_joined|date:"F Y" }}</span>
+        </li>
+        <li>
+          <span aria-hidden="true">🕒</span>
+          {% if user.last_login %}
+          <span>Último acceso: {{ user.last_login|date:"d/m/Y H:i" }}</span>
+          {% else %}
+          <span>Último acceso: Hoy</span>
+          {% endif %}
+        </li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Account Settings -->
+  <section class="profile-actions" aria-label="Configuración de la cuenta">
+    <h2 class="section-title">
+      <span aria-hidden="true">⚙️</span>
+      <span>Configuración de cuenta</span>
+    </h2>
+    <div class="actions-list">
+      <!-- Change Password -->
+      <a 
+        href="{% url 'password_change' %}" 
+        class="action-item"
+        role="button"
+        aria-label="Cambiar contraseña">
+        <div class="action-info">
+          <span class="action-icon" aria-hidden="true">🔐</span>
+          <div class="action-content">
+            <p class="action-text">Cambiar contraseña</p>
+            <p class="action-subtext">Actualiza tu contraseña de forma segura</p>
+          </div>
+        </div>
+        <span class="action-link">
+          Modificar <span aria-hidden="true">→</span>
+        </span>
+      </a>
+
+      <!-- Logout -->
+      <button 
+        type="button"
+        class="action-item danger"
+        onclick="ProfileManager.showLogoutModal()"
+        aria-label="Cerrar sesión">
+        <div class="action-info">
+          <span class="action-icon" aria-hidden="true">🚪</span>
+          <div class="action-content">
+            <p class="action-text">Cerrar sesión</p>
+            <p class="action-subtext">Salir de tu cuenta de forma segura</p>
+          </div>
+        </div>
+        <span class="action-link">
+          Salir <span aria-hidden="true">→</span>
+        </span>
+      </button>
+    </div>
+  </section>
+</div>
+
+<!-- Logout Confirmation Modal -->
+<div 
+  class="modal-overlay" 
+  id="logoutModal"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="logoutModalTitle"
+  aria-describedby="logoutModalMessage">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-icon" aria-hidden="true">👋</div>
+      <h2 class="modal-title" id="logoutModalTitle">¿Cerrar sesión?</h2>
+      <p class="modal-message" id="logoutModalMessage">
+        ¿Estás seguro que querés salir de tu cuenta? Podés volver a iniciar sesión en cualquier momento.
+      </p>
+    </div>
+    <div class="modal-actions">
+      <button 
+        class="modal-button secondary" 
+        type="button" 
+        onclick="ProfileManager.closeLogoutModal()">
+        Cancelar
+      </button>
+      <form method="post" action="{% url 'logout' %}" style="flex: 1; margin: 0;">
+        {% csrf_token %}
+        <button class="modal-button primary" type="submit" style="width: 100%;">
+          Cerrar sesión
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const ProfileManager = (() => {
+  const dom = {
+    logoutModal: document.getElementById('logoutModal')
+  };
+
+  const show = (modal) => {
+    if (!modal) return;
+    modal.classList.add('is-visible');
+    const firstButton = modal.querySelector('button');
+    if (firstButton) {
+      requestAnimationFrame(() => firstButton.focus());
+    }
+  };
+
+  const hide = (modal) => {
+    if (!modal) return;
+    modal.classList.remove('is-visible');
+  };
+
+  const showLogoutModal = () => show(dom.logoutModal);
+  const closeLogoutModal = () => hide(dom.logoutModal);
+
+  // Close modal on Escape key
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      closeLogoutModal();
+    }
+  });
+
+  // Close modal on overlay click
+  document.querySelectorAll('.modal-overlay').forEach((overlay) => {
+    overlay.addEventListener('click', (event) => {
+      if (event.target === overlay) {
+        hide(overlay);
+      }
+    });
+  });
+
+  return {
+    showLogoutModal,
+    closeLogoutModal
+  };
+})();
+</script>
 {% endblock %}

@@ -1,156 +1,366 @@
+09.69 KB •392 líneas
+•
+El formato puede ser inconsistente con la fuente
 {% extends "base.html" %}
 {% load static %}
 {% block title %}{{ it.titulo }} - Fuego de Atenea{% endblock %}
+{% block body_class %}page-detail{% endblock %}
+
+{% block styles %}
+<style>
+  .product-detail-wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .breadcrumb {
+    margin-bottom: 32px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .breadcrumb a {
+    font-weight: 500;
+    transition: color 0.2s ease;
+  }
+  
+  body.mystic-theme .breadcrumb a {
+    color: var(--mystic-gold);
+  }
+  
+  body.mystic-theme .breadcrumb a:hover {
+    color: var(--mystic-text);
+  }
+  
+  body.mystic-theme .breadcrumb-separator {
+    color: var(--mystic-border);
+  }
+  
+  body.mystic-theme .breadcrumb-current {
+    color: var(--mystic-text);
+    opacity: 0.7;
+  }
+  
+  .product-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+  
+  .product-image-section {
+    position: sticky;
+    top: 100px;
+  }
+  
+  .product-image-container {
+    border-radius: 16px;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(249, 247, 244, 0.8), rgba(255, 255, 255, 0.6));
+    border: 2px solid;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    cursor: zoom-in;
+    transition: all 0.3s ease;
+  }
+  
+  body.mystic-theme .product-image-container {
+    border-color: var(--mystic-border);
+  }
+  
+  .product-image-container:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 48px rgba(201, 169, 97, 0.2);
+  }
+  
+  .product-image-container img {
+    width: 100%;
+    height: auto;
+    min-height: 400px;
+    object-fit: contain;
+    display: block;
+    padding: 24px;
+  }
+  
+  .product-info-section h1 {
+    font-size: 2.25rem;
+    font-weight: 400;
+    margin: 0 0 16px 0;
+    letter-spacing: -0.02em;
+  }
+  
+  body.mystic-theme .product-info-section h1 {
+    color: var(--mystic-text);
+  }
+  
+  .product-marca {
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 20px;
+    opacity: 0.8;
+  }
+  
+  .product-description {
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: 32px;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid;
+  }
+  
+  body.mystic-theme .product-description {
+    background: rgba(255, 255, 255, 0.5);
+    border-color: var(--mystic-border);
+    color: var(--mystic-text);
+  }
+  
+  .product-price {
+    font-size: 3rem;
+    font-weight: 300;
+    letter-spacing: -0.03em;
+    margin: 32px 0;
+  }
+  
+  body.mystic-theme .product-price {
+    color: var(--mystic-gold);
+    text-shadow: 0 2px 12px rgba(201, 169, 97, 0.3);
+  }
+  
+  .quantity-section {
+    margin-bottom: 24px;
+  }
+  
+  .quantity-label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  .quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  
+  .qty-btn {
+    width: 44px;
+    height: 44px;
+    border: 2px solid;
+    background: transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    font-weight: 500;
+  }
+  
+  body.mystic-theme .qty-btn {
+    border-color: var(--mystic-border);
+    color: var(--mystic-text);
+  }
+  
+  body.mystic-theme .qty-btn:hover {
+    background: rgba(201, 169, 97, 0.15);
+    border-color: var(--mystic-gold);
+    transform: scale(1.05);
+  }
+  
+  .qty-input {
+    width: 80px;
+    height: 44px;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border: 2px solid;
+    border-radius: 8px;
+    background: transparent;
+  }
+  
+  body.mystic-theme .qty-input {
+    border-color: var(--mystic-border);
+    color: var(--mystic-text);
+  }
+  
+  .qty-input:focus {
+    outline: none;
+    border-color: var(--mystic-gold);
+    box-shadow: 0 0 0 3px rgba(201, 169, 97, 0.15);
+  }
+  
+  .add-to-cart-btn {
+    width: 100%;
+    padding: 16px 32px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  }
+  
+  body.mystic-theme .add-to-cart-btn {
+    background: linear-gradient(135deg, var(--mystic-gold-light), var(--mystic-gold));
+    color: #3d3731;
+  }
+  
+  body.mystic-theme .add-to-cart-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(201, 169, 97, 0.4);
+  }
+  
+  .actions-section {
+    margin-top: 32px;
+    padding-top: 32px;
+    border-top: 2px solid;
+  }
+  
+  body.mystic-theme .actions-section {
+    border-top-color: var(--mystic-border);
+  }
+  
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border: 1px solid;
+  }
+  
+  body.mystic-theme .back-link {
+    background: rgba(255, 255, 255, 0.6);
+    border-color: var(--mystic-border);
+    color: var(--mystic-text);
+  }
+  
+  body.mystic-theme .back-link:hover {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: var(--mystic-gold);
+    transform: translateX(-4px);
+  }
+  
+  @media (max-width: 860px) {
+    .product-grid {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+    
+    .product-image-section {
+      position: relative;
+      top: 0;
+    }
+    
+    .product-image-container img {
+      min-height: 300px;
+    }
+    
+    .product-info-section h1 {
+      font-size: 1.75rem;
+    }
+    
+    .product-price {
+      font-size: 2.25rem;
+    }
+  }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="product-detail-container" style="max-width:1000px;margin:0 auto;padding:20px 0;">
+<div class="product-detail-wrap">
   
-  <!-- Breadcrumb Navigation -->
-  <nav style="margin-bottom:24px;font-size:14px;color:#6b7280;">
-    <a href="{% url 'sahumerios_lista' %}" style="color:#111827;text-decoration:none;font-weight:500;">🏠 Catálogo</a>
-    <span style="margin:0 8px;">›</span>
-    <span style="color:#6b7280;">{{ it.titulo }}</span>
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb">
+    <a href="{% url 'sahumerios_lista' %}">Catálogo</a>
+    <span class="breadcrumb-separator">›</span>
+    <span class="breadcrumb-current">{{ it.titulo }}</span>
   </nav>
 
-  <div class="product-detail-card" style="background:white;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,0.08);overflow:hidden;">
-    <div class="product-detail-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:40px;padding:40px;">
-      
-      <!-- Columna Imagen -->
-      <div class="product-image-section">
-        <div class="product-image-container" style="border-radius:12px;overflow:hidden;background:#f8f9fa;position:relative;">
-          {% if it.img_file %}
-            <img src="{% static 'img/productos/' %}{{ it.img_file }}" 
-                 alt="{{ it.titulo }}" 
-                 style="width:100%;height:400px;object-fit:cover;border-radius:12px;">
-          {% elif it.img_abs %}
-            <img src="{{ it.img_abs }}" 
-                 alt="{{ it.titulo }}" 
-                 style="width:100%;height:400px;object-fit:cover;border-radius:12px;">
-          {% else %}
-            <img src="{% static 'img/placeholder.png' %}" 
-                 alt="{{ it.titulo }}" 
-                 style="width:100%;height:400px;object-fit:cover;border-radius:12px;padding:40px;background:#f8f9fa;">
-          {% endif %}
-        </div>
+  <!-- Product Grid -->
+  <div class="product-grid">
+    
+    <!-- Imagen -->
+    <div class="product-image-section">
+      <div class="product-image-container" data-zoom-src="{% if it.img_abs %}{{ it.img_abs }}{% elif it.img_file %}{% static 'img/productos/' %}{{ it.img_file }}{% else %}{% static 'img/placeholder.png' %}{% endif %}">
+        {% if it.img_abs %}
+          <img src="{{ it.img_abs }}" alt="{{ it.titulo }}">
+        {% elif it.img_file %}
+          <img src="{% static 'img/productos/' %}{{ it.img_file }}" alt="{{ it.titulo }}">
+        {% else %}
+          <img src="{% static 'img/placeholder.png' %}" alt="{{ it.titulo }}">
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Información -->
+    <div class="product-info-section">
+      <h1>{{ it.titulo }}</h1>
+
+      {% if it.marca %}
+      <div class="product-marca">
+        {{ it.marca }}
+      </div>
+      {% endif %}
+
+      {% if it.descripcion %}
+      <div class="product-description">
+        {{ it.descripcion }}
+      </div>
+      {% endif %}
+
+      <div class="product-price">
+        ${{ it.precio }}
       </div>
 
-      <!-- Columna Información -->
-      <div class="product-info-section">
-        <div style="margin-bottom:16px;">
-          <span style="background:#e0f2fe;color:#0369a1;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;text-transform:uppercase;">
-            {% if match_id %}Producto Disponible{% else %}Importado{% endif %}
-          </span>
-        </div>
-
-        <h1 style="font-size:2rem;font-weight:700;color:#111827;margin:0 0 12px 0;line-height:1.2;">
-          {{ it.titulo }}
-        </h1>
-
-        {% if it.marca %}
-        <div style="margin-bottom:16px;">
-          <span style="font-weight:600;color:#374151;">Marca:</span>
-          <span style="color:#6b7280;margin-left:8px;">{{ it.marca }}</span>
-        </div>
-        {% endif %}
-
-        {% if it.descripcion %}
-        <div style="margin-bottom:24px;padding:16px;background:#f8f9fa;border-radius:8px;">
-          <p style="margin:0;color:#4b5563;line-height:1.6;">{{ it.descripcion }}</p>
-        </div>
-        {% endif %}
-
-        <!-- Precio -->
-        <div style="margin-bottom:24px;">
-          <div style="font-size:2.5rem;font-weight:700;color:#111827;margin:0;">
-            ${{ it.precio }}
-          </div>
-          {% if not match_id %}
-          <div style="color:#6b7280;font-size:14px;margin-top:4px;">
-            Precio especial de importación
-          </div>
-          {% endif %}
-        </div>
-
-        <!-- Formulario Agregar al Carrito -->
-        <div class="add-to-cart-section" style="margin-bottom:24px;">
-          {% if match_id %}
-            <!-- ✅ Producto vinculado a DB -->
-            <form action="{% url 'cart:add_db' match_id %}" method="post" class="cart-form" data-cart-form>
-              {% csrf_token %}
-              <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;">
-                <label style="font-weight:600;color:#374151;">Cantidad:</label>
-                <div style="display:flex;align-items:center;gap:8px;">
-                  <button type="button" class="qty-minus" style="width:36px;height:36px;border:1px solid #d1d5db;background:white;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;">−</button>
-                  <input type="number" name="quantity" value="1" min="1" style="width:70px;padding:8px;border:1px solid #d1d5db;border-radius:8px;text-align:center;font-weight:600;">
-                  <button type="button" class="qty-plus" style="width:36px;height:36px;border:1px solid #d1d5db;background:white;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;">+</button>
-                </div>
-              </div>
-              <input type="hidden" name="replace" value="0">
-              <button type="submit" class="btn" style="background:#10b981;color:white;border:none;padding:12px 24px;border-radius:10px;font-weight:600;cursor:pointer;width:100%;font-size:16px;">
-                🛒 Agregar al Carrito
-              </button>
-            </form>
-            <div style="margin-top:8px;text-align:center;">
-              <span style="color:#059669;font-size:14px;">✅ Producto disponible en stock</span>
-            </div>
-
-          {% else %}
-            <!-- 🔄 Producto de Excel (sin vincular) - AHORA SÍ PUEDE AGREGARSE -->
-            <form action="{% url 'cart:add' %}" method="post" class="cart-form" data-cart-form>
-              {% csrf_token %}
-              <input type="hidden" name="origin" value="X">
-              <input type="hidden" name="product_id" value="{{ it.idx }}">
-              <input type="hidden" name="name" value="{{ it.titulo }}">
-              <input type="hidden" name="price" value="{{ it.precio }}">
-              <input type="hidden" name="img" value="{% if it.img_abs %}{{ it.img_abs }}{% elif it.img_file %}{% static 'img/productos/' %}{{ it.img_file }}{% else %}{% static 'img/placeholder.png' %}{% endif %}">
-              <input type="hidden" name="replace" value="0">
-              
-              <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;">
-                <label style="font-weight:600;color:#374151;">Cantidad:</label>
-                <div style="display:flex;align-items:center;gap:8px;">
-                  <button type="button" class="qty-minus" style="width:36px;height:36px;border:1px solid #d1d5db;background:white;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;">−</button>
-                  <input type="number" name="quantity" value="1" min="1" style="width:70px;padding:8px;border:1px solid #d1d5db;border-radius:8px;text-align:center;font-weight:600;">
-                  <button type="button" class="qty-plus" style="width:36px;height:36px;border:1px solid #d1d5db;background:white;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;">+</button>
-                </div>
-              </div>
-              
-              <button type="submit" class="btn" style="background:#f59e0b;color:white;border:none;padding:12px 24px;border-radius:10px;font-weight:600;cursor:pointer;width:100%;font-size:16px;">
-                🛒 Agregar al Carrito
-              </button>
-            </form>
-            <div style="margin-top:8px;text-align:center;">
-              <span style="color:#d97706;font-size:14px;">📦 Producto de importación - Entrega especial</span>
-            </div>
-          {% endif %}
-        </div>
-
-        <!-- Botones de Acción -->
-        <div style="display:flex;gap:12px;margin-top:24px;">
-          <a href="{% url 'sahumerios_lista' %}" 
-             style="flex:1;padding:12px 20px;border:1px solid #d1d5db;border-radius:10px;text-align:center;color:#374151;text-decoration:none;font-weight:600;background:white;">
-            ↩️ Volver al Catálogo
-          </a>
-          <a href="{% url 'cart:detail' %}" 
-             style="flex:1;padding:12px 20px;border:1px solid #111827;border-radius:10px;text-align:center;color:white;text-decoration:none;font-weight:600;background:#111827;">
-            🛒 Ver Carrito
-          </a>
-        </div>
-
-        <!-- Información Adicional para productos Excel -->
-        {% if not match_id %}
-        <div style="margin-top:24px;padding:16px;background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;">
-          <div style="display:flex;align-items:flex-start;gap:12px;">
-            <div style="font-size:18px;">💡</div>
-            <div>
-              <p style="margin:0 0 8px 0;font-weight:600;color:#92400e;">Producto de Catálogo Importado</p>
-              <p style="margin:0;color:#92400e;font-size:14px;line-height:1.4;">
-                Este producto está disponible mediante nuestro sistema de importación. 
-                Agrégalo al carrito y coordinaremos la disponibilidad contigo.
-              </p>
-            </div>
+      <!-- Formulario Agregar al Carrito -->
+      <form action="{% url 'cart:add' %}" method="post" class="cart-form" data-cart-form>
+        {% csrf_token %}
+        <input type="hidden" name="origin" value="X">
+        <input type="hidden" name="product_id" value="{{ it.idx }}">
+        <input type="hidden" name="name" value="{{ it.titulo }}">
+        <input type="hidden" name="price" value="{{ it.precio }}">
+        <input type="hidden" name="img" value="{% if it.img_abs %}{{ it.img_abs }}{% elif it.img_file %}{% static 'img/productos/' %}{{ it.img_file }}{% else %}{% static 'img/placeholder.png' %}{% endif %}">
+        <input type="hidden" name="replace" value="0">
+        
+        <div class="quantity-section">
+          <label class="quantity-label">Cantidad</label>
+          <div class="quantity-controls">
+            <button type="button" class="qty-btn qty-minus">−</button>
+            <input type="number" name="quantity" value="1" min="1" class="qty-input">
+            <button type="button" class="qty-btn qty-plus">+</button>
           </div>
         </div>
-        {% endif %}
+        
+        <button type="submit" class="add-to-cart-btn">
+          <span>🛒</span>
+          <span>Agregar al Carrito</span>
+        </button>
+      </form>
+
+      <!-- Volver -->
+      <div class="actions-section">
+        <a href="{% url 'sahumerios_lista' %}" class="back-link">
+          <span>←</span>
+          <span>Volver al Catálogo</span>
+        </a>
       </div>
     </div>
   </div>
@@ -158,61 +368,28 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // Control de cantidad +/-
-  document.querySelectorAll('.cart-form').forEach(form => {
-    const minusBtn = form.querySelector('.qty-minus');
-    const plusBtn = form.querySelector('.qty-plus');
-    const quantityInput = form.querySelector('input[name="quantity"]');
-    
-    if (minusBtn && plusBtn && quantityInput) {
-      minusBtn.addEventListener('click', function() {
-        const currentValue = parseInt(quantityInput.value) || 1;
-        quantityInput.value = Math.max(1, currentValue - 1);
-      });
-      
-      plusBtn.addEventListener('click', function() {
-        const currentValue = parseInt(quantityInput.value) || 1;
-        quantityInput.value = currentValue + 1;
-      });
-    }
+  const form = document.querySelector('.cart-form');
+  const minusBtn = form.querySelector('.qty-minus');
+  const plusBtn = form.querySelector('.qty-plus');
+  const quantityInput = form.querySelector('.qty-input');
+  
+  // Controles de cantidad
+  minusBtn.addEventListener('click', function() {
+    const current = parseInt(quantityInput.value) || 1;
+    quantityInput.value = Math.max(1, current - 1);
   });
   
-  // Actualizar carrito después de agregar productos
-  document.querySelectorAll('form[data-cart-form]').forEach(form => {
-    form.addEventListener('submit', function() {
-      // Disparar evento para actualizar el carrito
-      setTimeout(() => {
-        document.dispatchEvent(new CustomEvent('cartUpdated'));
-      }, 800);
-    });
+  plusBtn.addEventListener('click', function() {
+    const current = parseInt(quantityInput.value) || 1;
+    quantityInput.value = current + 1;
+  });
+  
+  // Actualizar carrito después de agregar
+  form.addEventListener('submit', function() {
+    setTimeout(() => {
+      document.dispatchEvent(new CustomEvent('cartUpdated'));
+    }, 500);
   });
 });
 </script>
-
-<style>
-@media (max-width: 768px) {
-  .product-detail-grid {
-    grid-template-columns: 1fr !important;
-    gap: 20px !important;
-    padding: 20px !important;
-  }
-  
-  .product-image-container img {
-    height: 300px !important;
-  }
-  
-  .product-detail-container {
-    padding: 10px !important;
-  }
-}
-
-.qty-minus:hover, .qty-plus:hover {
-  background: #f3f4f6 !important;
-}
-
-.btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-</style>
 {% endblock %}

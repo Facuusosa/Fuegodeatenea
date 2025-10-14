@@ -40,12 +40,33 @@ class Cart:
     def _guess_image_url_from_product(product) -> str | None:
         """
         Intenta extraer la URL de imagen de un modelo de BD (ImageField u otros campos típicos).
+        ACTUALIZADO: Prioriza imagen_file e imagen_url del modelo Sahumerio.
         """
-        candidates = ("imagen", "image", "foto", "img", "picture", "photo", "image_url")
+        # Primero intentar con el método imagen_resuelta() si existe
+        if hasattr(product, 'imagen_resuelta'):
+            try:
+                url = product.imagen_resuelta()
+                if url:
+                    return url
+            except Exception:
+                pass
+        
+        # Lista de candidatos en orden de prioridad
+        candidates = (
+            "imagen_file",  # Campo principal del modelo Sahumerio
+            "imagen_url",   # Campo alternativo del modelo Sahumerio
+            "imagen", 
+            "image", 
+            "foto", 
+            "img", 
+            "picture", 
+            "photo"
+        )
+        
         for attr in candidates:
             if hasattr(product, attr):
                 value = getattr(product, attr)
-                if value is None:
+                if value is None or value == '':
                     continue
                 try:
                     # Si es ImageFieldFile tendrá .url
@@ -158,6 +179,8 @@ class Cart:
         pid = str(getattr(product, "id"))
         name = getattr(product, "nombre", None) or getattr(product, "name", None) or str(product)
         price = self._to_decimal(getattr(product, "precio", None) or getattr(product, "price", None) or 0)
+        
+        # CORRECCIÓN: Usar el método mejorado que busca imagen_file e imagen_url
         image_url = self._guess_image_url_from_product(product)
 
         item = self.cart.get(pid)

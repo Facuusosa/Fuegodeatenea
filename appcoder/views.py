@@ -161,10 +161,24 @@ class CatalogoExcelView(TemplateView):
         db_qs = Sahumerio.objects.all()
         db_items = []
         for o in db_qs:
-            if getattr(o, "imagen_file", None):
-                img_url = o.imagen_file.url
-            else:
-                img_url = ""
+            # CORRECCIÓN: Usar imagen_resuelta() para obtener la imagen correcta
+            img_url = o.imagen_resuelta()
+            
+            # Determinar si es file local o URL absoluta
+            img_file = ""
+            img_abs = ""
+            
+            if img_url:
+                # Si viene de imagen_file (ImageField), viene como /media/productos/...
+                if img_url.startswith('/media/') or img_url.startswith(settings.MEDIA_URL):
+                    img_abs = img_url
+                # Si viene de imagen_url (URLField), es una URL externa
+                elif img_url.startswith(('http://', 'https://')):
+                    img_abs = img_url
+                # Si es una ruta relativa, es un archivo local
+                else:
+                    img_file = img_url
+            
             db_items.append({
                 "origen": "DB",
                 "pk": o.pk,
@@ -174,8 +188,8 @@ class CatalogoExcelView(TemplateView):
                 "descripcion": getattr(o, "descripcion", "") or "",
                 "precio": float(getattr(o, "precio", 0) or 0),
                 "duracion": "",
-                "img_file": "",
-                "img_abs": img_url,
+                "img_file": img_file,
+                "img_abs": img_abs,
                 "raw": "",
                 "marca": getattr(o, "marca", "") or "",
             })

@@ -1,33 +1,472 @@
+<!-- USAR ESTE CÓDIGO PARA AMBOS ARCHIVOS:
+     1. templates/sahumerio_detalle.html
+     2. templates/sahumerio_detalle_excel.html
+-->
+
 {% extends "base.html" %}
 {% load static %}
-{% block title %}{{ object.nombre }}{% endblock %}
+{% load humanize %}
+
+<!-- Para DB: {{ object.nombre }} | Para Excel: {{ it.titulo }} -->
+{% block title %}{% if object %}{{ object.nombre }}{% else %}{{ it.titulo }}{% endif %} - Fuego de Atenea{% endblock %}
+
+{% block body_class %}page-detail{% endblock %}
+
+{% block styles %}
+<style>
+:root {
+    --mystic-bg: #f9f7f4;
+    --mystic-text: #3d3731;
+    --mystic-gold: #c9a961;
+    --mystic-gold-light: #d4b574;
+    --mystic-border: #e8dfd0;
+}
+
+body {
+    background: var(--mystic-bg);
+    color: var(--mystic-text);
+}
+
+.product-detail-wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.breadcrumb {
+    margin-bottom: 32px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.breadcrumb a {
+    color: var(--mystic-gold);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.breadcrumb a:hover {
+    color: var(--mystic-text);
+}
+
+.breadcrumb-separator {
+    color: var(--mystic-border);
+}
+
+.breadcrumb-current {
+    color: var(--mystic-text);
+    opacity: 0.7;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: start;
+}
+
+.product-image-section {
+    position: sticky;
+    top: 100px;
+}
+
+.product-image-container {
+    border-radius: 16px;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(249, 247, 244, 0.8), rgba(255, 255, 255, 0.6));
+    border: 2px solid var(--mystic-border);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    cursor: zoom-in;
+    transition: all 0.3s ease;
+}
+
+.product-image-container:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 48px rgba(201, 169, 97, 0.2);
+}
+
+.product-image-container img {
+    width: 100%;
+    height: auto;
+    min-height: 400px;
+    object-fit: contain;
+    display: block;
+    padding: 24px;
+}
+
+.product-info-section h1 {
+    font-size: 2.25rem;
+    font-weight: 400;
+    margin: 0 0 16px 0;
+    letter-spacing: -0.02em;
+    color: var(--mystic-text);
+}
+
+.product-marca {
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 20px;
+    opacity: 0.8;
+    color: var(--mystic-text);
+}
+
+.product-description {
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: 32px;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid var(--mystic-border);
+    background: rgba(255, 255, 255, 0.5);
+    color: var(--mystic-text);
+}
+
+.product-price {
+    font-size: 3rem;
+    font-weight: 300;
+    letter-spacing: -0.03em;
+    margin: 32px 0;
+    color: var(--mystic-gold);
+    text-shadow: 0 2px 12px rgba(201, 169, 97, 0.3);
+}
+
+.quantity-section {
+    margin-bottom: 24px;
+}
+
+.quantity-label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--mystic-text);
+}
+
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.qty-btn {
+    width: 44px;
+    height: 44px;
+    border: 2px solid var(--mystic-border);
+    background: transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    color: var(--mystic-text);
+}
+
+.qty-btn:hover {
+    background: rgba(201, 169, 97, 0.15);
+    border-color: var(--mystic-gold);
+    transform: scale(1.05);
+}
+
+.qty-input {
+    width: 80px;
+    height: 44px;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border: 2px solid var(--mystic-border);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--mystic-text);
+}
+
+.qty-input:focus {
+    outline: none;
+    border-color: var(--mystic-gold);
+    box-shadow: 0 0 0 3px rgba(201, 169, 97, 0.15);
+}
+
+.add-to-cart-btn {
+    width: 100%;
+    padding: 16px 32px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(135deg, var(--mystic-gold-light), var(--mystic-gold));
+    color: #3d3731;
+}
+
+.add-to-cart-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(201, 169, 97, 0.4);
+}
+
+.add-to-cart-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.actions-section {
+    margin-top: 32px;
+    padding-top: 32px;
+    border-top: 2px solid var(--mystic-border);
+    display: flex;
+    gap: 12px;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border: 1px solid var(--mystic-border);
+    background: rgba(255, 255, 255, 0.6);
+    color: var(--mystic-text);
+    text-decoration: none;
+}
+
+.back-link:hover {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: var(--mystic-gold);
+    transform: translateX(-4px);
+}
+
+@media (max-width: 860px) {
+    .product-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+    }
+    
+    .product-image-section {
+        position: relative;
+        top: 0;
+    }
+    
+    .product-image-container img {
+        min-height: 300px;
+    }
+    
+    .product-info-section h1 {
+        font-size: 1.75rem;
+    }
+    
+    .product-price {
+        font-size: 2.25rem;
+    }
+    
+    .actions-section {
+        flex-direction: column;
+    }
+    
+    .back-link {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<h2 class="titulo-seccion">{{ object.nombre }}</h2>
+<div class="product-detail-wrap">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="{% url 'catalogo' %}">Catálogo</a>
+        <span class="breadcrumb-separator">›</span>
+        <span class="breadcrumb-current">{% if object %}{{ object.nombre }}{% else %}{{ it.titulo }}{% endif %}</span>
+    </nav>
 
-<div style="display:grid;grid-template-columns:320px 1fr;gap:20px;align-items:flex-start;max-width:980px">
-  <div>
-    {% if object.imagen_file %}
-      <img src="{{ object.imagen_file.url }}" alt="{{ object.nombre }}" style="width:100%;height:auto;border-radius:14px;object-fit:cover">
-    {% else %}
-      <img src="{% static 'img/placeholder.png' %}" alt="{{ object.nombre }}" style="width:100%;height:auto;border-radius:14px;object-fit:cover">
-    {% endif %}
-  </div>
+    <!-- Product Grid -->
+    <div class="product-grid">
+        <!-- Imagen -->
+        <div class="product-image-section">
+            <div class="product-image-container">
+                {% if object %}
+                    {# Producto de DB #}
+                    {% if object.imagen_file %}
+                        <img src="{{ object.imagen_file.url }}" alt="{{ object.nombre }}">
+                    {% elif object.imagen_url %}
+                        <img src="{{ object.imagen_url }}" alt="{{ object.nombre }}">
+                    {% else %}
+                        <img src="{% static 'img/placeholder.png' %}" alt="{{ object.nombre }}">
+                    {% endif %}
+                {% else %}
+                    {# Producto de Excel #}
+                    {% if it.img_abs %}
+                        <img src="{{ it.img_abs }}" alt="{{ it.titulo }}">
+                    {% elif it.img_file %}
+                        <img src="{% static 'img/productos/' %}{{ it.img_file }}" alt="{{ it.titulo }}">
+                    {% else %}
+                        <img src="{% static 'img/placeholder.png' %}" alt="{{ it.titulo }}">
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
 
-  <div>
-    {% if object.marca %}<p class="meta" style="margin:0 0 6px 0">Marca: {{ object.marca }}</p>{% endif %}
-    {% if object.descripcion %}<p class="meta" style="margin:0 0 12px 0">{{ object.descripcion }}</p>{% endif %}
-    <div style="font-size:1.6rem;font-weight:700;margin:6px 0">$ {{ object.precio }}</div>
+        <!-- Información -->
+        <div class="product-info-section">
+            {% if object %}
+                {# Producto de DB #}
+                <h1>{{ object.nombre }}</h1>
 
-    <form action="{% url 'cart:add_db' object.pk %}" method="post" style="display:flex;gap:10px;align-items:center;margin-top:12px">
-      {% csrf_token %}
-      <input type="number" name="quantity" value="1" min="1" style="width:90px;padding:8px 10px;border:1px solid #ddd;border-radius:10px;text-align:center">
-      <button type="submit" class="btn">Agregar al carrito</button>
-    </form>
+                {% if object.marca %}
+                <div class="product-marca">{{ object.marca }}</div>
+                {% endif %}
 
-    <div style="margin-top:16px;display:flex;gap:10px">
-      <a class="btn-sec" href="{% url 'catalogo' %}">Volver al catálogo</a>
-      <a class="btn-sec" href="{% url 'cart:detail' %}">Ver carrito</a>
+                {% if object.descripcion %}
+                <div class="product-description">{{ object.descripcion }}</div>
+                {% endif %}
+
+                <div class="product-price">${{ object.precio|floatformat:0|intcomma }}</div>
+
+                <form action="{% url 'cart:add_db' object.pk %}" method="post" class="cart-form" data-cart-form>
+                    {% csrf_token %}
+                    <input type="hidden" name="replace" value="0">
+                    
+                    <div class="quantity-section">
+                        <label class="quantity-label">Cantidad</label>
+                        <div class="quantity-controls">
+                            <button type="button" class="qty-btn qty-minus">−</button>
+                            <input type="number" name="quantity" value="1" min="1" class="qty-input">
+                            <button type="button" class="qty-btn qty-plus">+</button>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="add-to-cart-btn">
+                        <span>🛒</span>
+                        <span>Agregar al Carrito</span>
+                    </button>
+                </form>
+            {% else %}
+                {# Producto de Excel #}
+                <h1>{{ it.titulo }}</h1>
+
+                {% if it.marca %}
+                <div class="product-marca">{{ it.marca }}</div>
+                {% endif %}
+
+                {% if it.descripcion %}
+                <div class="product-description">{{ it.descripcion }}</div>
+                {% endif %}
+
+                <div class="product-price">${{ it.precio|floatformat:0|intcomma }}</div>
+
+                <form action="{% url 'cart:add' %}" method="post" class="cart-form" data-cart-form>
+                    {% csrf_token %}
+                    <input type="hidden" name="origin" value="X">
+                    <input type="hidden" name="product_id" value="{{ it.idx }}">
+                    <input type="hidden" name="name" value="{{ it.titulo }}">
+                    <input type="hidden" name="price" value="{{ it.precio }}">
+                    <input type="hidden" name="img" value="{% if it.img_abs %}{{ it.img_abs }}{% elif it.img_file %}{% static 'img/productos/' %}{{ it.img_file }}{% else %}{% static 'img/placeholder.png' %}{% endif %}">
+                    <input type="hidden" name="replace" value="0">
+                    
+                    <div class="quantity-section">
+                        <label class="quantity-label">Cantidad</label>
+                        <div class="quantity-controls">
+                            <button type="button" class="qty-btn qty-minus">−</button>
+                            <input type="number" name="quantity" value="1" min="1" class="qty-input">
+                            <button type="button" class="qty-btn qty-plus">+</button>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="add-to-cart-btn">
+                        <span>🛒</span>
+                        <span>Agregar al Carrito</span>
+                    </button>
+                </form>
+            {% endif %}
+
+            <!-- Volver -->
+            <div class="actions-section">
+                <a href="{% url 'catalogo' %}" class="back-link">
+                    <span>←</span>
+                    <span>Volver al Catálogo</span>
+                </a>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('.cart-form');
+  if (!form) return;
+
+  const minusBtn = form.querySelector('.qty-minus');
+  const plusBtn = form.querySelector('.qty-plus');
+  const quantityInput = form.querySelector('.qty-input');
+  const submitBtn = form.querySelector('.add-to-cart-btn');
+  
+  // Controles de cantidad
+  if (minusBtn) {
+    minusBtn.addEventListener('click', function() {
+      const current = parseInt(quantityInput.value) || 1;
+      quantityInput.value = Math.max(1, current - 1);
+    });
+  }
+  
+  if (plusBtn) {
+    plusBtn.addEventListener('click', function() {
+      const current = parseInt(quantityInput.value) || 1;
+      quantityInput.value = current + 1;
+    });
+  }
+  
+  // Submit con feedback
+  form.addEventListener('submit', async function(event) {
+    event.preventDefault();
+    
+    if (!submitBtn) {
+      form.submit();
+      return;
+    }
+
+    const originalHTML = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<span>⏳</span><span>Agregando...</span>';
+    submitBtn.disabled = true;
+
+    try {
+      const response = await fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      });
+
+      if (!response.ok) throw new Error('HTTP ' + response.status);
+
+      document.dispatchEvent(new CustomEvent('cartUpdated'));
+      submitBtn.innerHTML = '<span>✓</span><span>Agregado al Carrito</span>';
+      quantityInput.value = '1';
+    } catch (error) {
+      console.error('Error:', error);
+      submitBtn.innerHTML = '<span>✗</span><span>Error</span>';
+    } finally {
+      setTimeout(() => {
+        submitBtn.innerHTML = originalHTML;
+        submitBtn.disabled = false;
+      }, 2000);
+    }
+  });
+});
+</script>
 {% endblock %}

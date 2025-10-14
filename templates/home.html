@@ -1,24 +1,526 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}Bienvenidos a Fuego de Atenea{% endblock %}
+
+{% block title %}Fuego de Atenea · Sahumerios Artesanales{% endblock %}
+
+{% block meta %}
+<meta name="description" content="Sahumerios, inciensos y velas artesanales. Productos naturales hechos con dedicación para elevar tu energía.">
+{% endblock %}
+
+{% block styles %}
+<style>
+  /* ==========================================
+     VARIABLES DE DISEÑO
+     ========================================== */
+  :root {
+    --fire-orange: #ff7b3d;
+    --fire-gold: #c9a961;
+    --earth-brown: #3d2817;
+    --warm-cream: #f5f3f0;
+    --shadow-soft: rgba(61, 40, 23, 0.08);
+    --shadow-medium: rgba(61, 40, 23, 0.15);
+  }
+
+  /* ==========================================
+     HERO SECTION - SPLIT SCREEN
+     ========================================== */
+  .hero-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 85vh;
+    margin: -40px -22px 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 60px;
+    background: linear-gradient(135deg, var(--warm-cream) 0%, #fff9f0 100%);
+    position: relative;
+  }
+
+  .hero-content::before {
+    content: '';
+    position: absolute;
+    top: 20%;
+    right: -50px;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(255, 123, 61, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    filter: blur(40px);
+    animation: pulse 8s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.2); opacity: 0.3; }
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 123, 61, 0.1);
+    border: 1px solid rgba(255, 123, 61, 0.3);
+    color: var(--fire-orange);
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 24px;
+    width: fit-content;
+    animation: slideInLeft 0.8s ease-out;
+  }
+
+  @keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-30px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .hero-title {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 700;
+    line-height: 1.1;
+    margin: 0 0 24px 0;
+    color: var(--earth-brown);
+    letter-spacing: -0.02em;
+    animation: slideInLeft 0.8s ease-out 0.1s both;
+  }
+
+  .hero-title .highlight {
+    background: linear-gradient(135deg, var(--fire-orange) 0%, var(--fire-gold) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: inline-block;
+  }
+
+  .hero-description {
+    font-size: 1.2rem;
+    line-height: 1.7;
+    color: rgba(61, 40, 23, 0.75);
+    margin: 0 0 32px 0;
+    max-width: 500px;
+    animation: slideInLeft 0.8s ease-out 0.2s both;
+  }
+
+  .hero-cta-group {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    animation: slideInLeft 0.8s ease-out 0.3s both;
+  }
+
+  .btn-hero-primary {
+    background: linear-gradient(135deg, var(--fire-orange) 0%, #ff9555 100%);
+    color: white;
+    padding: 16px 32px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    border: none;
+    box-shadow: 0 8px 24px rgba(255, 123, 61, 0.35);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-hero-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
+  }
+
+  .btn-hero-primary:hover::before {
+    left: 100%;
+  }
+
+  .btn-hero-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(255, 123, 61, 0.45);
+  }
+
+  .btn-hero-secondary {
+    background: white;
+    color: var(--earth-brown);
+    padding: 16px 32px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    border: 2px solid rgba(61, 40, 23, 0.15);
+    transition: all 0.3s ease;
+  }
+
+  .btn-hero-secondary:hover {
+    border-color: var(--fire-orange);
+    background: rgba(255, 123, 61, 0.05);
+    transform: translateY(-2px);
+  }
+
+  /* ==========================================
+     HERO VISUAL - SIDEBAR
+     ========================================== */
+  .hero-visual {
+    background: linear-gradient(135deg, var(--earth-brown) 0%, #2d1f10 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-visual::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255, 123, 61, 0.15) 0%, transparent 70%);
+    animation: rotate 20s linear infinite;
+  }
+
+  @keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .hero-logo-display {
+    position: relative;
+    z-index: 1;
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) scale(1); }
+    50% { transform: translateY(-20px) scale(1.05); }
+  }
+
+  .hero-logo-display img {
+    max-width: 350px;
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 20px 60px rgba(255, 123, 61, 0.6));
+  }
+
+  /* ==========================================
+     FEATURES SECTION
+     ========================================== */
+  .features-section {
+    padding: 80px 0;
+    background: white;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 40px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .feature-card {
+    text-align: center;
+    padding: 32px 24px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #fff 0%, var(--warm-cream) 100%);
+    border: 1px solid rgba(61, 40, 23, 0.08);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .feature-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px var(--shadow-medium);
+    border-color: rgba(255, 123, 61, 0.3);
+  }
+
+  .feature-icon {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    display: block;
+    animation: bounce 2s ease-in-out infinite;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .feature-card:nth-child(2) .feature-icon {
+    animation-delay: 0.2s;
+  }
+
+  .feature-card:nth-child(3) .feature-icon {
+    animation-delay: 0.4s;
+  }
+
+  .feature-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--earth-brown);
+    margin: 0 0 12px 0;
+  }
+
+  .feature-description {
+    color: rgba(61, 40, 23, 0.7);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* ==========================================
+     CTA SECTION
+     ========================================== */
+  .cta-section {
+    padding: 100px 0;
+    background: linear-gradient(135deg, var(--earth-brown) 0%, #4a3220 100%);
+    color: white;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.3;
+  }
+
+  .cta-content {
+    position: relative;
+    z-index: 1;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .cta-title {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 700;
+    margin: 0 0 20px 0;
+    letter-spacing: -0.02em;
+  }
+
+  .cta-subtitle {
+    font-size: 1.3rem;
+    opacity: 0.9;
+    margin: 0 0 40px 0;
+    line-height: 1.6;
+  }
+
+  .cta-button {
+    background: linear-gradient(135deg, var(--fire-orange) 0%, var(--fire-gold) 100%);
+    color: white;
+    padding: 18px 48px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    border: none;
+    box-shadow: 0 12px 32px rgba(255, 123, 61, 0.4);
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .cta-button:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 16px 48px rgba(255, 123, 61, 0.6);
+  }
+
+  /* ==========================================
+     INSTAGRAM SECTION
+     ========================================== */
+  .instagram-section {
+    padding: 80px 0;
+    background: var(--warm-cream);
+    text-align: center;
+  }
+
+  .section-title {
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    font-weight: 700;
+    color: var(--earth-brown);
+    margin: 0 0 16px 0;
+    letter-spacing: -0.02em;
+  }
+
+  .section-subtitle {
+    font-size: 1.2rem;
+    color: rgba(61, 40, 23, 0.7);
+    margin: 0 0 48px 0;
+  }
+
+  .instagram-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(135deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);
+    color: white;
+    padding: 16px 32px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    box-shadow: 0 8px 24px rgba(188, 24, 136, 0.3);
+    transition: all 0.3s ease;
+  }
+
+  .instagram-link:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 12px 32px rgba(188, 24, 136, 0.45);
+  }
+
+  /* ==========================================
+     RESPONSIVE
+     ========================================== */
+  @media (max-width: 1024px) {
+    .hero-container {
+      grid-template-columns: 1fr;
+      min-height: auto;
+    }
+
+    .hero-content {
+      padding: 60px 40px;
+    }
+
+    .hero-visual {
+      padding: 60px 40px;
+      min-height: 400px;
+    }
+
+    .hero-logo-display img {
+      max-width: 240px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .hero-content {
+      padding: 40px 24px;
+    }
+
+    .hero-title {
+      font-size: 2rem;
+    }
+
+    .hero-description {
+      font-size: 1rem;
+    }
+
+    .hero-cta-group {
+      flex-direction: column;
+    }
+
+    .btn-hero-primary,
+    .btn-hero-secondary {
+      width: 100%;
+      text-align: center;
+      justify-content: center;
+    }
+
+    .features-section {
+      padding: 60px 0;
+    }
+
+    .features-grid {
+      gap: 24px;
+    }
+
+    .cta-section {
+      padding: 60px 20px;
+    }
+
+    .instagram-section {
+      padding: 60px 20px;
+    }
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<section style="display:grid;grid-template-columns:1fr;gap:20px;align-items:center; text-align:center; padding:24px 0">
-  <img src="{% static 'img/fuegodeatenealogo.png' %}" alt="Fuego de Atenea - logo" style="max-width:160px; margin:0 auto 8px auto">
-  <h1 style="margin:0;">Bienvenidos a <span style="white-space:nowrap">Fuego de Atenea</span></h1>
-  <p style="margin:0;opacity:.85">
-    Una página simple y cuidada de <strong>sahumerios, inciensos y velas</strong>.
-  </p>
-  <p style="margin:0;opacity:.85">
-    Soy <strong>Facundo Sosa</strong> y voy agregando materiales de a poco.
-  </p>
-  <div style="display:flex;gap:12px;justify-content:center; margin-top:12px;">
-    <a href="{% url 'catalogo' %}" class="btn" style="padding:10px 14px; border:1px solid #111; border-radius:8px; text-decoration:none;">
-      Ver catálogo
-    </a>
-    <a href="https://www.instagram.com/fuego.de.atenea?igsh=d3N4bDRsOHUxZzN4&utm_source=qr" target="_blank" rel="noopener" class="btn"
-       style="padding:10px 14px; border:1px solid #111; border-radius:8px; text-decoration:none;">
-      Instagram @fuego.de.atenea
-    </a>
+<!-- HERO SECTION -->
+<div class="hero-container">
+  <div class="hero-content">
+    <div class="hero-badge">
+      🔥 Artesanales · Naturales · Exclusivos
+    </div>
+    
+    <h1 class="hero-title">
+      Cambia tu energia con <span class="highlight">Fuego de Atenea</span>
+    </h1>
+    
+    <p class="hero-description">
+      Sahumerios, inciensos y velas creados con dedicación. 
+      Cada producto es una invitación a conectar con tu esencia 
+      y transformar tus espacios en refugios de paz.
+    </p>
+    
+    <div class="hero-cta-group">
+      <a href="{% url 'sahumerios_lista' %}" class="btn-hero-primary">
+        Explorar productos 🌿
+      </a>
+    </div>
   </div>
+  
+  <div class="hero-visual">
+    <div class="hero-logo-display">
+      <img src="{% static 'img/fuegodeatenealogo.png' %}?v=2" 
+           alt="Fuego de Atenea - Logo">
+    </div>
+  </div>
+</div>
+
+<!-- INSTAGRAM SECTION -->
+<section class="instagram-section">
+  <h2 class="section-title">Seguinos en Instagram</h2>
+  <p class="section-subtitle">
+    Unite a nuestra comunidad, descubrí contenido exclusivo, 
+    y ofertas solo por historias.
+  </p>
+  <a href="https://www.instagram.com/fuego.de.atenea?igsh=d3N4bDRsOHUxZzN4&utm_source=qr" 
+     target="_blank" 
+     rel="noopener noreferrer"
+     class="instagram-link">
+    📸 @fuego.de.atenea
+  </a>
 </section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Intersection Observer para animaciones al scroll
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -100px 0px'
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, observerOptions);
+
+  document.querySelectorAll('.feature-card').forEach(card => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(30px)';
+    card.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+    observer.observe(card);
+  });
+</script>
 {% endblock %}

@@ -290,6 +290,8 @@ def cart_checkout_form(request: HttpRequest) -> HttpResponse:
     return render(request, "cart/checkout_form.html", {"cart": cart, "form": form})
 
 
+# Reemplazá la función cart_summary en cart/views.py con esta versión:
+
 def cart_summary(request: HttpRequest) -> JsonResponse:
     """
     Vista API para obtener resumen del carrito (usada por AJAX)
@@ -309,6 +311,7 @@ def cart_summary(request: HttpRequest) -> JsonResponse:
             'quantity': item.get('quantity', 1),
             'price': str(item.get('price', 0)),
             'subtotal': str(item.get('subtotal', 0)),
+            'image_url': item.get('image_url', ''),  # ← AGREGÁ ESTA LÍNEA
         })
     
     return JsonResponse(summary)

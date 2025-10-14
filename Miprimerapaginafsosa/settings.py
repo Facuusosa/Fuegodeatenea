@@ -86,7 +86,20 @@ LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "sahumerios_lista"
 LOGOUT_REDIRECT_URL = "sahumerios_lista"
 
-# ----- Carrito -----
+# ============================
+#  CONFIGURACIÓN DE SESIONES
+# ============================
+# Hacer que el carrito persista al cerrar el navegador
+SESSION_COOKIE_AGE = 1209600  # 2 semanas (en segundos)
+SESSION_SAVE_EVERY_REQUEST = True  # Actualiza la expiración en cada request
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # NO borrar al cerrar navegador
+SESSION_COOKIE_NAME = 'sessionid'  # Nombre de la cookie
+SESSION_COOKIE_HTTPONLY = True  # Seguridad: no accesible desde JavaScript
+SESSION_COOKIE_SAMESITE = 'Lax'  # Protección CSRF
+
+# ============================
+#  CARRITO
+# ============================
 CART_SESSION_ID = "cart"
 
 # WhatsApp (ideal en formato internacional sin +, ej. 54911XXXXXXXX)

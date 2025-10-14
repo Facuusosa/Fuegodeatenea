@@ -9,101 +9,602 @@
   {% block meta %}{% endblock %}
 
   <link rel="icon" href="{% static 'img/fuegodeatenealogo.png' %}">
-  <link href="{% static 'css/styles.css' %}?v=3" rel="stylesheet">
+  <link href="{% static 'css/styles.css' %}?v=4" rel="stylesheet">
+  <link href="{% static 'css/mystical-background.css' %}?v=2" rel="stylesheet">
 
   <style>
-    :root{--bg:#f7f8fb;--text:#1a1a1a;--muted:#6b7280;--brand:#111827;--card:#ffffff;--b:#e5e7eb;--shadow:0 1px 6px rgba(0,0,0,.05);--btn:#111827;--btnText:#fff;--btnDanger:#dc2626;--btnSec:#374151;--cart-active:#10b981}
-    *{box-sizing:border-box} html,body{height:100%}
-    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial,"Noto Sans";color:var(--text);background:var(--bg)}
-    a{text-decoration:none;color:inherit}
-    .wrap{max-width:1150px;margin:0 auto;padding:0 22px}
-    .topbar{background:var(--brand);color:#fff;position:sticky;top:0;z-index:10}
-    .topbar .wrap{padding:12px 22px}
-    .topbar nav{display:flex;gap:16px;align-items:center}
-    .topbar nav a{color:#e5e7eb;opacity:.9}
-    .topbar nav a:hover{opacity:1}
-    .topbar nav a[aria-current="page"]{color:#fff;font-weight:700;text-decoration:underline}
-    main.wrap{padding:26px 22px 40px}
-    h1,h2,h3{margin:0 0 .6rem 0}
-    h2{font-size:1.6rem}
-    .btn{display:inline-block;background:var(--btn);color:var(--btnText);border:1px solid #0000;border-radius:10px;padding:8px 14px;font-weight:600;line-height:1;cursor:pointer;transition:.15s box-shadow,.15s transform,.15s background}
-    .btn:hover{box-shadow:var(--shadow)}
-    .btn:active{transform:translateY(1px)}
-    .btn-sec{background:var(--btnSec);color:#fff}
-    .btn-danger{background:var(--btnDanger);color:#fff}
-    .card{background:var(--card);border:1px solid var(--b);border-radius:14px;box-shadow:var(--shadow)}
-    .msg{background:#eef6ff}
-    .msg.error{background:#fee2e2}
-    footer.wrap{color:var(--muted)}
-    .lb{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.75);z-index:1000}
-    .lb.show{display:flex}
-    .lb img{max-width:90vw;max-height:90vh;transform-origin:0 0;cursor:grab;touch-action:none}
-    .lb .close{position:absolute;top:14px;right:14px;background:#000;border:0;color:#fff;border-radius:10px;padding:8px 12px;font-weight:700;cursor:pointer}
-    [data-zoom-src]{cursor:zoom-in}
-    .zoomable::after{content:none!important;display:none!important}
+    /* ==========================================
+       ESTILOS BASE - TEMA MÍSTICO CLARO
+       ========================================== */
     
-    /* NUEVOS ESTILOS MEJORADOS PARA EL CARRITO */
-    .cart-widget{position:relative;display:inline-block}
-    .btn-cart-toggle{background:none;border:none;color:inherit;cursor:pointer;display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:8px;transition:all 0.3s ease}
-    .btn-cart-toggle:hover{background:rgba(255,255,255,0.1);transform:translateY(-1px)}
-    .btn-cart-toggle.cart-active{background:var(--cart-active);color:white;box-shadow:0 2px 8px rgba(16, 185, 129, 0.3)}
-    .cart-badge{background:#ef4444;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;animation:pulse 2s infinite}
-    .cart-dropdown{display:none;position:absolute;right:0;top:100%;background:white;border:1px solid #ddd;border-radius:12px;padding:16px;min-width:350px;box-shadow:0 8px 25px rgba(0,0,0,0.15);z-index:1000;margin-top:8px;color:#1a1a1a}
-    .cart-dropdown.show{display:block;animation:slideDown 0.3s ease}
-    .cart-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #f0f0f0}
-    .cart-title{font-weight:700;font-size:18px;color:#111827;margin:0}
-    .cart-count{background:#111827;color:white;border-radius:12px;padding:4px 10px;font-size:12px;font-weight:600}
-    .cart-item{display:flex;justify-content:space-between;align-items:flex-start;padding:12px 0;border-bottom:1px solid #f8f8f8}
-    .cart-item:last-child{border-bottom:none}
-    .cart-item-info{flex:1;min-width:0}
-    .cart-item-name{font-weight:600;margin:0 0 6px 0;color:#111827;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .cart-item-meta{font-size:14px;color:#6b7280;margin:0;display:flex;gap:8px;align-items:center}
-    .cart-item-total{font-weight:700;color:#111827;font-size:15px;min-width:80px;text-align:right}
-    .cart-empty{text-align:center;padding:30px 20px;color:#6b7280}
-    .cart-empty-icon{font-size:48px;margin-bottom:12px;opacity:0.5}
-    .cart-total{display:flex;justify-content:space-between;align-items:center;border-top:2px solid #eee;padding-top:16px;margin-top:16px;font-weight:700;font-size:18px;color:#111827}
-    .cart-actions{display:flex;gap:10px;margin-top:16px}
-    .cart-actions .btn{flex:1;text-align:center;padding:10px 16px;font-weight:600}
-    
-    /* Animaciones */
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-      100% { transform: scale(1); }
+    * {
+      box-sizing: border-box;
     }
     
-    @keyframes slideDown {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
+    html, body {
+      height: 100%;
+      margin: 0;
     }
     
-    /* Mejoras para productos en el dropdown */
-    .product-highlight{background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);color:white;padding:2px 8px;border-radius:6px;font-size:12px;font-weight:600}
+    body {
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans";
+    }
     
-    @media (max-width:720px){
-      .topbar .wrap{padding:10px 16px} 
-      main.wrap{padding:20px 16px 28px}
-      .cart-dropdown{position:fixed;left:16px;right:16px;top:80px;min-width:auto;max-width:none}
-      .cart-item-name{font-size:14px}
-      .cart-item-meta{font-size:13px}
+    a {
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.2s ease;
+    }
+    
+    .wrap {
+      max-width: 1150px;
+      margin: 0 auto;
+      padding: 0 22px;
+    }
+    
+    /* ==========================================
+       TOPBAR CON CARRITO
+       ========================================== */
+    
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+    
+    .topbar .wrap {
+      padding: 20px 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+    
+    .topbar-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+    
+    .topbar-logo img {
+      height: 48px;
+    }
+    
+    .topbar nav {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    .topbar nav a {
+      font-weight: 500;
+      font-size: 1rem;
+      padding: 8px 14px;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+    }
+    
+    .topbar nav a[aria-current="page"] {
+      font-weight: 600;
+    }
+    
+    /* ==========================================
+       CARRITO DROPDOWN
+       ========================================== */
+    
+    .cart-widget {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .cart-trigger {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: 500;
+      position: relative;
+    }
+    
+    .cart-icon {
+      font-size: 1.5rem;
+      line-height: 1;
+    }
+    
+    .cart-count {
+      position: absolute;
+      top: 2px;
+      right: 6px;
+      min-width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0 5px;
+      line-height: 1;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+    }
+    
+    .cart-count.hidden {
+      opacity: 0;
+      transform: scale(0.5);
+    }
+    
+    .cart-dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      min-width: 320px;
+      max-width: 380px;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1000;
+    }
+    
+    .cart-widget:hover .cart-dropdown {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    
+    .cart-dropdown-header {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid;
+    }
+    
+    .cart-dropdown-empty {
+      text-align: center;
+      padding: 24px 12px;
+      opacity: 0.7;
+      font-size: 0.9rem;
+    }
+    
+    .cart-dropdown-items {
+      max-height: 280px;
+      overflow-y: auto;
+      margin-bottom: 12px;
+    }
+    
+    .cart-dropdown-item {
+      display: flex;
+      gap: 12px;
+      padding: 10px;
+      margin-bottom: 8px;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+    
+    .cart-item-img {
+      width: 50px;
+      height: 50px;
+      border-radius: 6px;
+      object-fit: cover;
+      flex-shrink: 0;
+      border: 1px solid;
+    }
+    
+    .cart-item-info {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .cart-item-name {
+      font-weight: 600;
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    .cart-item-details {
+      font-size: 0.8rem;
+      opacity: 0.8;
+    }
+    
+    .cart-dropdown-footer {
+      padding-top: 12px;
+      border-top: 2px solid;
+    }
+    
+    .cart-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+    
+    .cart-actions {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .cart-actions .btn {
+      flex: 1;
+      font-size: 0.85rem;
+      padding: 10px 12px;
+      justify-content: center;
+    }
+    
+    /* ==========================================
+       MAIN CONTENT
+       ========================================== */
+    
+    main.wrap {
+      padding: 40px 22px;
+      min-height: calc(100vh - 180px);
+      position: relative;
+    }
+    
+    h1, h2, h3 {
+      margin: 0 0 1rem 0;
+      font-weight: 300;
+      letter-spacing: -0.02em;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+    }
+    
+    h2 {
+      font-size: 1.8rem;
+    }
+    
+    /* ==========================================
+       BOTONES
+       ========================================== */
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      padding: 10px 18px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      line-height: 1;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      letter-spacing: 0.01em;
+      text-decoration: none;
+    }
+    
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+    
+    .btn:active {
+      transform: translateY(0);
+    }
+    
+    .btn-sec {
+      backdrop-filter: blur(8px);
+    }
+    
+    /* ==========================================
+       MESSAGES
+       ========================================== */
+    
+    .messages {
+      margin-bottom: 20px;
+    }
+    
+    .msg {
+      padding: 14px 18px;
+      border-radius: 10px;
+      margin: 12px 0;
+      backdrop-filter: blur(10px);
+      border: 1px solid;
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* ==========================================
+       FOOTER
+       ========================================== */
+    
+    footer.wrap {
+      padding: 32px 22px;
+      text-align: center;
+      backdrop-filter: blur(8px);
+    }
+    
+    footer a {
+      border-bottom: 1px solid;
+      transition: all 0.2s ease;
+    }
+    
+    /* ==========================================
+       LIGHTBOX
+       ========================================== */
+    
+    .lb {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(20px);
+      z-index: 2000;
+    }
+    
+    .lb.show {
+      display: flex;
+    }
+    
+    .lb img {
+      max-width: 90vw;
+      max-height: 90vh;
+      transform-origin: 0 0;
+      cursor: grab;
+      touch-action: none;
+      border-radius: 8px;
+    }
+    
+    .lb .close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-weight: 600;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      transition: all 0.2s ease;
+      border: 1px solid;
+    }
+    
+    [data-zoom-src] {
+      cursor: zoom-in;
+    }
+    
+    /* ==========================================
+       COLORES TEMA MÍSTICO CLARO
+       ========================================== */
+    
+    body.mystic-theme {
+      --mystic-cream: #f5f3f0;
+      --mystic-text: #3d3731;
+      --mystic-gold: #c9a961;
+      --mystic-gold-light: #dfc889;
+      --mystic-border: rgba(201, 169, 97, 0.25);
+    }
+    
+    body.mystic-theme .topbar {
+      background: rgba(245, 243, 240, 0.98);
+      backdrop-filter: blur(12px);
+      border-bottom: 2px solid var(--mystic-border);
+      color: var(--mystic-text);
+    }
+    
+    body.mystic-theme .topbar-logo {
+      color: var(--mystic-text);
+    }
+    
+    body.mystic-theme .topbar nav a {
+      color: var(--mystic-text);
+    }
+    
+    body.mystic-theme .topbar nav a:hover {
+      background: rgba(201, 169, 97, 0.12);
+      color: var(--mystic-gold);
+    }
+    
+    body.mystic-theme .topbar nav a[aria-current="page"] {
+      background: rgba(201, 169, 97, 0.2);
+      color: var(--mystic-gold);
+    }
+    
+    body.mystic-theme .cart-trigger {
+      color: var(--mystic-text);
+    }
+    
+    body.mystic-theme .cart-trigger:hover {
+      background: rgba(201, 169, 97, 0.12);
+      color: var(--mystic-gold);
+    }
+    
+    body.mystic-theme .cart-count {
+      background: linear-gradient(135deg, var(--mystic-gold-light), var(--mystic-gold));
+      color: #3d3731;
+    }
+    
+    body.mystic-theme .cart-dropdown {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border: 2px solid var(--mystic-border);
+      color: var(--mystic-text);
+    }
+    
+    body.mystic-theme .cart-dropdown-header {
+      color: var(--mystic-gold);
+      border-bottom-color: var(--mystic-border);
+    }
+    
+    body.mystic-theme .cart-dropdown-item {
+      background: rgba(249, 247, 244, 0.6);
+      border: 1px solid var(--mystic-border);
+    }
+    
+    body.mystic-theme .cart-dropdown-item:hover {
+      background: rgba(249, 247, 244, 0.9);
+      border-color: var(--mystic-gold);
+    }
+    
+    body.mystic-theme .cart-item-img {
+      border-color: var(--mystic-border);
+      background: white;
+    }
+    
+    body.mystic-theme .cart-dropdown-footer {
+      border-top-color: var(--mystic-border);
+    }
+    
+    body.mystic-theme .btn {
+      background: linear-gradient(135deg, var(--mystic-gold-light), var(--mystic-gold));
+      color: #3d3731;
+      box-shadow: 0 4px 12px rgba(201, 169, 97, 0.3);
+    }
+    
+    body.mystic-theme .btn:hover {
+      box-shadow: 0 6px 20px rgba(201, 169, 97, 0.4);
+    }
+    
+    body.mystic-theme .btn-sec {
+      background: rgba(255, 255, 255, 0.7);
+      color: var(--mystic-text);
+      border-color: var(--mystic-border);
+    }
+    
+    body.mystic-theme .btn-sec:hover {
+      background: rgba(255, 255, 255, 0.9);
+      border-color: var(--mystic-gold);
+    }
+    
+    body.mystic-theme .msg {
+      background: rgba(255, 255, 255, 0.8);
+      border-color: var(--mystic-border);
+      color: var(--mystic-text);
+    }
+    
+    body.mystic-theme .msg.success {
+      background: rgba(34, 197, 94, 0.15);
+      border-color: rgba(34, 197, 94, 0.4);
+      color: #166534;
+    }
+    
+    body.mystic-theme .msg.error {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #991b1b;
+    }
+    
+    body.mystic-theme .msg.warning {
+      background: rgba(251, 191, 36, 0.15);
+      border-color: rgba(251, 191, 36, 0.4);
+      color: #92400e;
+    }
+    
+    body.mystic-theme footer {
+      color: rgba(61, 55, 49, 0.7);
+    }
+    
+    body.mystic-theme footer a {
+      color: var(--mystic-gold);
+      border-bottom-color: var(--mystic-gold);
+    }
+    
+    body.mystic-theme footer a:hover {
+      color: var(--mystic-text);
+    }
+    
+    body.mystic-theme .lb {
+      background: rgba(0, 0, 0, 0.9);
+    }
+    
+    body.mystic-theme .lb .close {
+      background: rgba(245, 243, 240, 0.95);
+      color: var(--mystic-text);
+      border-color: var(--mystic-border);
+    }
+    
+    body.mystic-theme .lb .close:hover {
+      background: var(--mystic-cream);
+      border-color: var(--mystic-gold);
+    }
+    
+    /* ==========================================
+       RESPONSIVE
+       ========================================== */
+    
+    @media (max-width: 860px) {
+      .topbar .wrap {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      
+      .topbar nav {
+        width: 100%;
+        justify-content: space-between;
+      }
+      
+      .cart-dropdown {
+        right: -10px;
+        max-width: calc(100vw - 32px);
+      }
+      
+      main.wrap {
+        padding: 24px 16px;
+      }
+    }
+    
+    @media (max-width: 640px) {
+      h1 {
+        font-size: 2rem;
+      }
+      
+      h2 {
+        font-size: 1.5rem;
+      }
+      
+      .cart-dropdown {
+        min-width: 280px;
+      }
     }
   </style>
 
   {% block styles %}{% endblock %}
 </head>
-<body>
+<body class="mystic-theme {% block body_class %}{% endblock %}">
+  <!-- Sol místico decorativo -->
+  <div class="mystic-sun"></div>
+  <div class="constellation-lines"></div>
+
   <header class="topbar">
-    <div class="wrap" style="display:flex;justify-content:space-between;align-items:center">
-      <a href="{% url 'landing' %}" style="display:flex;align-items:center;gap:8px;color:#fff">
-        <img src="{% static 'img/fuegodeatenealogo.png' %}" alt="Fuego de Atenea" style="height:28px">
+    <div class="wrap">
+      <a href="{% url 'landing' %}" class="topbar-logo">
+        <img src="{% static 'img/fuegodeatenealogo.png' %}" alt="Fuego de Atenea">
         <strong>Fuego de Atenea</strong>
       </a>
 
       {% with current=request.resolver_match.url_name|default:'' edit=request.GET.modo|default:'' %}
-      <nav style="display:flex;align-items:center;gap:16px">
+      <nav>
         <a href="{% url 'sahumerios_lista' %}"
            {% if current == 'sahumerios_lista' and edit != 'edit' %}aria-current="page"{% endif %}>
-           Sahumerios
+           Catálogo
         </a>
 
         {% if user.is_authenticated and user.username|lower == 'fsosa' %}
@@ -113,91 +614,49 @@
              {% elif current == 'sahumerio_nuevo' or current == 'sahumerio_editar' %}
                aria-current="page"
              {% endif %}>
-             Agregar/editar material
+             Editar
           </a>
           <a href="/admin/" target="_blank" rel="noopener noreferrer">Admin</a>
         {% endif %}
 
-        <!-- WIDGET DEL CARRITO MEJORADO -->
-        <div class="cart-widget">
-          <button class="btn-cart-toggle {% if current == 'cart:detail' or current == 'cart:checkout_form' %}cart-active{% endif %}" 
-                  id="cartToggle">
-            🛒 Carrito
-            {% if cart_len > 0 %}
-            <span class="cart-badge" id="cartBadge">{{ cart_len }}</span>
-            {% endif %}
-          </button>
-          
-          <div class="cart-dropdown" id="cartDropdown">
-            <div class="cart-header">
-              <h3 class="cart-title">Tu Carrito</h3>
-              {% if cart_len > 0 %}
-              <span class="cart-count">{{ cart_len }} ítem{{ cart_len|pluralize:"s" }}</span>
-              {% endif %}
-            </div>
-            
-            <div class="cart-items" id="cartItems">
-              {% if cart_len > 0 %}
-                <div style="max-height:280px;overflow-y:auto;" id="cartItemsList">
-                  {% for item in cart_items %}
-                  <div class="cart-item">
-                    <div class="cart-item-info">
-                      <div class="cart-item-name" title="{{ item.name }}">
-                        {{ item.name|truncatechars:35 }}
-                        {% if forloop.first and cart_len > 3 %}
-                        <span class="product-highlight">Nuevo</span>
-                        {% endif %}
-                      </div>
-                      <div class="cart-item-meta">
-                        <span>{{ item.quantity }} × ${{ item.price }}</span>
-                        <span style="color:#10b981;font-weight:600;">•</span>
-                        <span style="font-weight:500;">Subtotal: ${{ item.subtotal }}</span>
-                      </div>
-                    </div>
-                    <div class="cart-item-total">${{ item.subtotal }}</div>
-                  </div>
-                  {% endfor %}
-                  
-                  {% if cart_len > 3 %}
-                  <div style="text-align:center;padding:8px;color:#6b7280;font-size:14px;">
-                    + {{ cart_len|add:"-3" }} producto{{ cart_len|add:"-3"|pluralize:"s" }} más en el carrito
-                  </div>
-                  {% endif %}
-                </div>
-                
-                <div class="cart-total">
-                  <span>Total:</span>
-                  <span style="color:#10b981;font-size:20px;">${{ cart_total }}</span>
-                </div>
-                
-                <div class="cart-actions">
-                  <a href="{% url 'cart:detail' %}" class="btn" style="flex:2;background:#111827;">
-                    📋 Ver carrito completo
-                  </a>
-                  <a href="{% url 'cart:checkout_form' %}" class="btn" style="flex:1;background:#10b981;">
-                    🛍️ Comprar
-                  </a>
-                </div>
-              {% else %}
-                <div class="cart-empty">
-                  <div class="cart-empty-icon">🛒</div>
-                  <p style="margin:0 0 16px 0;font-size:16px;">Tu carrito está vacío</p>
-                  <a href="{% url 'sahumerios_lista' %}" class="btn" style="background:#111827;">
-                    Descubrir productos
-                  </a>
-                </div>
-              {% endif %}
-            </div>
-          </div>
-        </div>
-
         {% if user.is_authenticated %}
-          <a href="{% url 'perfil' %}" {% if current == 'perfil' %}aria-current="page"{% endif %}>Perfil ({{ user.username }})</a>
+          <a href="{% url 'perfil' %}" {% if current == 'perfil' %}aria-current="page"{% endif %}>
+            {{ user.username }}
+          </a>
           <a href="{% url 'logout' %}">Salir</a>
         {% else %}
           <a href="{% url 'login' %}" {% if current == 'login' %}aria-current="page"{% endif %}>Ingresar</a>
-          <a href="{% url 'registro' %}" {% if current == 'registro' %}aria-current="page"{% endif %}>Registrarme</a>
+          <a href="{% url 'registro' %}" {% if current == 'registro' %}aria-current="page"{% endif %}>Registrarse</a>
         {% endif %}
+
+        <!-- CARRITO WIDGET -->
+        <div class="cart-widget">
+          <div class="cart-trigger">
+            <span class="cart-icon">🛒</span>
+            <span class="cart-count hidden" id="cartCount">0</span>
+          </div>
+          
+          <div class="cart-dropdown" id="cartDropdown">
+            <div class="cart-dropdown-header">Tu Carrito</div>
+            
+            <div class="cart-dropdown-empty" id="cartEmpty">
+              Tu carrito está vacío
+            </div>
+            
+            <div class="cart-dropdown-items" id="cartItems" style="display:none;"></div>
+            
+            <div class="cart-dropdown-footer" id="cartFooter" style="display:none;">
+              <div class="cart-total">
+                <span>Total:</span>
+                <span id="cartTotal">$ 0</span>
+              </div>
+              <div class="cart-actions">
+                <a href="{% url 'cart:detail' %}" class="btn btn-sec">Ver carrito</a>
+                <a href="{% url 'cart:checkout_form' %}" class="btn">Comprar</a>
+              </div>
+            </div>
+          </div>
+        </div>
       </nav>
       {% endwith %}
     </div>
@@ -207,7 +666,7 @@
     {% if messages %}
       <div class="messages" aria-live="polite" role="region">
         {% for message in messages %}
-          <div class="msg {{ message.tags }}" role="alert" style="padding:10px 12px;border-radius:10px;margin:12px 0">
+          <div class="msg {% if message.tags %}{{ message.tags }}{% endif %}" role="alert">
             {{ message }}
           </div>
         {% endfor %}
@@ -216,8 +675,13 @@
     {% block content %}{% endblock %}
   </main>
 
-  <footer class="wrap" style="padding:24px 0;text-align:center">
-    <small>&copy; {% now "Y" %} Fuego de Atenea · <a href="https://www.instagram.com/fuego.de.atenea" target="_blank" rel="noopener">@fuego.de.atenea</a></small>
+  <footer class="wrap">
+    <small>
+      © {% now "Y" %} Fuego de Atenea · 
+      <a href="https://www.instagram.com/fuego.de.atenea" target="_blank" rel="noopener">
+        @fuego.de.atenea
+      </a>
+    </small>
   </footer>
 
   <div class="lb" id="lightbox">
@@ -225,85 +689,69 @@
     <img id="lbImg" src="" alt="">
   </div>
 
+  <script>window.CSRF_TOKEN=document.querySelector('meta[name="csrf-token"]')?.content;</script>
+  
+  <!-- CARRITO AJAX -->
   <script>
-    window.CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]')?.content;
+  (function() {
+    const cartCount = document.getElementById('cartCount');
+    const cartEmpty = document.getElementById('cartEmpty');
+    const cartItems = document.getElementById('cartItems');
+    const cartFooter = document.getElementById('cartFooter');
+    const cartTotal = document.getElementById('cartTotal');
     
-    // CARRITO DROPDOWN MEJORADO
-    document.addEventListener('DOMContentLoaded', function() {
-      const cartToggle = document.getElementById('cartToggle');
-      const cartDropdown = document.getElementById('cartDropdown');
-      
-      if (cartToggle && cartDropdown) {
-        cartToggle.addEventListener('click', function(e) {
-          e.stopPropagation();
-          cartDropdown.classList.toggle('show');
+    async function updateCart() {
+      try {
+        const response = await fetch('{% url "cart:summary" %}');
+        const data = await response.json();
+        
+        const count = data.total_items || 0;
+        cartCount.textContent = count;
+        
+        if (count > 0) {
+          cartCount.classList.remove('hidden');
+          cartEmpty.style.display = 'none';
+          cartItems.style.display = 'block';
+          cartFooter.style.display = 'block';
           
-          // Resaltar el botón cuando el dropdown está abierto
-          if (cartDropdown.classList.contains('show')) {
-            cartToggle.classList.add('cart-active');
-          } else {
-            // Solo quitar el resaltado si no estamos en una página del carrito
-            const isCartPage = window.location.pathname.includes('/cart/');
-            if (!isCartPage) {
-              cartToggle.classList.remove('cart-active');
-            }
-          }
-        });
-        
-        // Cerrar al hacer click fuera
-        document.addEventListener('click', function(e) {
-          if (!cartDropdown.contains(e.target) && e.target !== cartToggle) {
-            cartDropdown.classList.remove('show');
-            const isCartPage = window.location.pathname.includes('/cart/');
-            if (!isCartPage) {
-              cartToggle.classList.remove('cart-active');
-            }
-          }
-        });
-        
-        // Verificar si estamos en una página del carrito al cargar
-        const isCartPage = window.location.pathname.includes('/cart/');
-        if (isCartPage) {
-          cartToggle.classList.add('cart-active');
+          cartItems.innerHTML = data.items.map(item => `
+            <div class="cart-dropdown-item">
+              <img src="${item.image_url || '{% static "img/placeholder.png" %}'}" 
+                   alt="${item.name}" 
+                   class="cart-item-img"
+                   onerror="this.src='{% static "img/placeholder.png" %}'">
+              <div class="cart-item-info">
+                <div class="cart-item-name">${item.name}</div>
+                <div class="cart-item-details">${item.quantity} × $ ${item.price}</div>
+              </div>
+            </div>
+          `).join('');
+          
+          cartTotal.textContent = '$ ' + data.total_price;
+        } else {
+          cartCount.classList.add('hidden');
+          cartEmpty.style.display = 'block';
+          cartItems.style.display = 'none';
+          cartFooter.style.display = 'none';
         }
+      } catch (error) {
+        console.error('Error al actualizar carrito:', error);
       }
-      
-      // Actualizar carrito automáticamente cuando se agregan productos
-      function updateCartBadge() {
-        fetch('/cart/summary/')
-          .then(response => response.json())
-          .then(data => {
-            const badge = document.getElementById('cartBadge');
-            if (data.total_items > 0) {
-              if (!badge) {
-                const newBadge = document.createElement('span');
-                newBadge.className = 'cart-badge';
-                newBadge.id = 'cartBadge';
-                newBadge.textContent = data.total_items;
-                document.getElementById('cartToggle').appendChild(newBadge);
-                
-                // Animación cuando se agrega un producto nuevo
-                newBadge.style.animation = 'pulse 0.5s ease 3';
-              } else {
-                badge.textContent = data.total_items;
-                // Animación cuando se actualiza la cantidad
-                badge.style.animation = 'none';
-                setTimeout(() => {
-                  badge.style.animation = 'pulse 0.5s ease 2';
-                }, 10);
-              }
-            } else if (badge) {
-              badge.remove();
-            }
-          })
-          .catch(error => console.log('Error actualizando carrito:', error));
-      }
-      
-      // Escuchar eventos de actualización del carrito
-      document.addEventListener('cartUpdated', updateCartBadge);
-    });
-
-    // LIGHTBOX (existente)
+    }
+    
+    // Actualizar al cargar la página
+    updateCart();
+    
+    // Actualizar cuando se agregue algo al carrito
+    document.addEventListener('cartUpdated', updateCart);
+    
+    // Polling cada 30 segundos (opcional, para múltiples pestañas)
+    setInterval(updateCart, 30000);
+  })();
+  </script>
+  
+  <!-- LIGHTBOX -->
+  <script>
     (function(){
       const lb=document.getElementById('lightbox');
       const img=document.getElementById('lbImg');

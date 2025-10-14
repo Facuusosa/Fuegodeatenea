@@ -5,7 +5,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = "dev-only"
 DEBUG = True
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]  # Esto permite TODAS las conexiones
 
 INSTALLED_APPS = [
     "django.contrib.admin",

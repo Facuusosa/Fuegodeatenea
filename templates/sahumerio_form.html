@@ -1,70 +1,590 @@
 {% extends "base.html" %}
 {% block title %}Sahumerio{% endblock %}
+
+{% block extra_css %}
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: linear-gradient(135deg, #f5e6d3 0%, #e8d5c4 100%);
+  min-height: 100vh;
+}
+
+.sahumerio-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+}
+
+.sahumerio-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+  background: white;
+  padding: 2rem 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(139, 111, 71, 0.15);
+}
+
+.sahumerio-header h2 {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #2c3e50;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.sahumerio-header h2::before {
+  content: "✨";
+  font-size: 2.5rem;
+}
+
+.btn-volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  text-decoration: none;
+  transition: all 0.3s;
+  font-weight: 600;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-volver:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  text-decoration: none;
+  color: white;
+}
+
+.sahumerio-main {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 2.5rem;
+}
+
+.sahumerio-form-card,
+.sahumerio-preview-card {
+  background: white;
+  border-radius: 20px;
+  padding: 3rem;
+  box-shadow: 0 8px 30px rgba(139, 111, 71, 0.12);
+  border: 1px solid rgba(139, 111, 71, 0.1);
+}
+
+.form-section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #8b6f47;
+  margin: 0 0 2rem 0;
+  padding-bottom: 1rem;
+  border-bottom: 3px solid #f0e6d9;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-field.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-field label {
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 0.75rem;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-field label::before {
+  content: "▸";
+  color: #8b6f47;
+  font-weight: bold;
+}
+
+.form-field input[type="text"],
+.form-field input[type="number"],
+.form-field textarea,
+.form-field select {
+  width: 100%;
+  padding: 1.25rem 1.5rem;
+  font-size: 1.15rem;
+  border: 2px solid #e0d5c7;
+  border-radius: 12px;
+  transition: all 0.3s;
+  background: #fdfbf7;
+  font-family: inherit;
+}
+
+.form-field input:focus,
+.form-field textarea:focus,
+.form-field select:focus {
+  outline: none;
+  border-color: #8b6f47;
+  box-shadow: 0 0 0 4px rgba(139, 111, 71, 0.15);
+  background: white;
+  transform: translateY(-2px);
+}
+
+.form-field input:hover,
+.form-field textarea:hover,
+.form-field select:hover {
+  border-color: #a88960;
+}
+
+.form-field textarea {
+  resize: vertical;
+  min-height: 180px;
+  line-height: 1.6;
+}
+
+.upload-section {
+  margin-top: 0.75rem;
+  padding: 3rem;
+  border: 3px dashed #d4c4b0;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #fdfbf7 0%, #f9f5ef 100%);
+  text-align: center;
+  transition: all 0.4s;
+  cursor: pointer;
+  position: relative;
+  min-height: 250px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.upload-section:hover {
+  border-color: #8b6f47;
+  background: white;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(139, 111, 71, 0.15);
+}
+
+.upload-section.dragover {
+  border-color: #8b6f47;
+  background: #fff9f0;
+  border-style: solid;
+}
+
+.upload-section input[type="file"] {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.upload-icon {
+  font-size: 4rem;
+  margin-bottom: 1.25rem;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.upload-text {
+  color: #495057;
+  font-size: 1.15rem;
+  line-height: 1.6;
+}
+
+.upload-text strong {
+  display: block;
+  margin-bottom: 0.75rem;
+  color: #8b6f47;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.hint {
+  font-size: 1rem;
+  color: #6c757d;
+  margin-top: 0.75rem;
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.checkbox-section {
+  background: linear-gradient(135deg, #f9f5ef 0%, #f0e6d9 100%);
+  padding: 1.75rem;
+  border-radius: 12px;
+  margin: 2rem 0;
+  border: 2px solid #e8d5c4;
+}
+
+.checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.checkbox-wrapper input[type="checkbox"] {
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  accent-color: #8b6f47;
+}
+
+.checkbox-wrapper label {
+  margin: 0 !important;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 600;
+  font-size: 1.15rem;
+  color: #2c3e50;
+}
+
+.checkbox-wrapper label::before {
+  display: none;
+}
+
+.btn-guardar {
+  background: linear-gradient(135deg, #8b6f47 0%, #6d5635 100%);
+  color: white;
+  padding: 1.5rem 3rem;
+  border: none;
+  border-radius: 14px;
+  font-size: 1.3rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 8px 20px rgba(139, 111, 71, 0.3);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-guardar:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(139, 111, 71, 0.4);
+  background: linear-gradient(135deg, #9d7d53 0%, #7d6241 100%);
+}
+
+.btn-guardar:active {
+  transform: translateY(-2px);
+}
+
+.preview-section {
+  position: sticky;
+  top: 2rem;
+}
+
+.preview-section h3 {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #8b6f47;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-bottom: 1rem;
+  border-bottom: 3px solid #f0e6d9;
+}
+
+.preview-box {
+  border: 3px solid #e8d5c4;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #fdfbf7 0%, #f9f5ef 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  min-height: 500px;
+  position: relative;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.preview-box.has-image {
+  background: #f8f8f8;
+}
+
+.preview-box img {
+  max-width: 100%;
+  max-height: 500px;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.empty-preview {
+  color: #adb5bd;
+  font-size: 1.3rem;
+  text-align: center;
+  padding: 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.empty-preview-icon {
+  font-size: 5rem;
+  opacity: 0.5;
+}
+
+.file-selected-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: #28a745;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1rem;
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.upload-section.has-file .file-selected-badge {
+  display: flex;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.preview-box img {
+  animation: fadeIn 0.4s ease-out;
+}
+
+@media (max-width: 1200px) {
+  .sahumerio-main {
+    grid-template-columns: 1fr;
+  }
+  
+  .preview-section {
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .sahumerio-wrapper {
+    padding: 1.5rem 1rem;
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .sahumerio-form-card,
+  .sahumerio-preview-card {
+    padding: 2rem;
+  }
+  
+  .sahumerio-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding: 1.5rem;
+  }
+  
+  .sahumerio-header h2 {
+    font-size: 2rem;
+  }
+  
+  .btn-volver,
+  .btn-guardar {
+    width: 100%;
+  }
+}
+
+/* Error styling */
+.form-field .error-message {
+  color: #dc3545;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+}
+
+.form-field.has-error input,
+.form-field.has-error textarea,
+.form-field.has-error select {
+  border-color: #dc3545;
+}
+
+.form-field.has-error input:focus,
+.form-field.has-error textarea:focus,
+.form-field.has-error select:focus {
+  box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.15);
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="card" style="padding:20px;max-width:1100px;margin:0 auto">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-    <h2 style="margin:0">Sahumerio</h2>
-    <a href="{% url 'sahumerios_lista' %}?modo=edit" class="btn btn-sec">Volver</a>
+<div class="sahumerio-wrapper">
+  <div class="sahumerio-header">
+    <h2>Sahumerio</h2>
+    <a href="{% url 'sahumerios_lista' %}?modo=edit" class="btn-volver">
+      ← Volver al Listado
+    </a>
   </div>
 
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-      <div>
-        <label for="{{ form.marca.id_for_label }}">Marca</label>
-        {{ form.marca }}
-      </div>
-      <div>
-        <label for="{{ form.nombre.id_for_label }}">Nombre</label>
-        {{ form.nombre }}
-      </div>
-      <div>
-        <label for="{{ form.precio.id_for_label }}">Precio</label>
-        {{ form.precio }}
-      </div>
-      <div>
-        <label for="{{ form.stock.id_for_label }}">Stock</label>
-        {{ form.stock }}
-      </div>
-      <div style="grid-column:1/-1">
-        <label for="{{ form.descripcion.id_for_label }}">Descripción</label>
-        {{ form.descripcion }}
-      </div>
+  <div class="sahumerio-main">
+    <!-- FORMULARIO -->
+    <div class="sahumerio-form-card">
+      <h3 class="form-section-title">📝 Información del Producto</h3>
+      
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="form-grid">
+          <!-- Marca -->
+          <div class="form-field {% if form.marca.errors %}has-error{% endif %}">
+            <label for="{{ form.marca.id_for_label }}">Marca</label>
+            {{ form.marca }}
+            {% if form.marca.errors %}
+              <span class="error-message">⚠️ {{ form.marca.errors.0 }}</span>
+            {% endif %}
+          </div>
 
-      <div style="grid-column:1/-1">
-        <label for="{{ form.imagen_file.id_for_label }}">Subir foto (opcional)</label>
-        {{ form.imagen_file }}
-        <p class="hint">Si cargás una foto, tendrá prioridad.</p>
-      </div>
+          <!-- Nombre -->
+          <div class="form-field {% if form.nombre.errors %}has-error{% endif %}">
+            <label for="{{ form.nombre.id_for_label }}">Nombre</label>
+            {{ form.nombre }}
+            {% if form.nombre.errors %}
+              <span class="error-message">⚠️ {{ form.nombre.errors.0 }}</span>
+            {% endif %}
+          </div>
 
-      <div style="display:flex;align-items:center;gap:10px">
-        <label for="{{ form.activo.id_for_label }}" style="margin-right:6px">Activo</label>
-        {{ form.activo }}
-      </div>
+          <!-- Precio -->
+          <div class="form-field {% if form.precio.errors %}has-error{% endif %}">
+            <label for="{{ form.precio.id_for_label }}">Precio</label>
+            {{ form.precio }}
+            <span class="hint">💰 Precio en pesos argentinos</span>
+            {% if form.precio.errors %}
+              <span class="error-message">⚠️ {{ form.precio.errors.0 }}</span>
+            {% endif %}
+          </div>
+
+          <!-- Stock -->
+          <div class="form-field {% if form.stock.errors %}has-error{% endif %}">
+            <label for="{{ form.stock.id_for_label }}">Stock</label>
+            {{ form.stock }}
+            <span class="hint">📦 Cantidad disponible en inventario</span>
+            {% if form.stock.errors %}
+              <span class="error-message">⚠️ {{ form.stock.errors.0 }}</span>
+            {% endif %}
+          </div>
+
+          <!-- Descripción -->
+          <div class="form-field full-width {% if form.descripcion.errors %}has-error{% endif %}">
+            <label for="{{ form.descripcion.id_for_label }}">Descripción</label>
+            {{ form.descripcion }}
+            <span class="hint">📄 Detalles sobre aroma, duración, ingredientes, beneficios, etc.</span>
+            {% if form.descripcion.errors %}
+              <span class="error-message">⚠️ {{ form.descripcion.errors.0 }}</span>
+            {% endif %}
+          </div>
+
+          <!-- Imagen -->
+          <div class="form-field full-width {% if form.imagen_file.errors %}has-error{% endif %}">
+            <label for="{{ form.imagen_file.id_for_label }}">Fotografía del Producto</label>
+            <div class="upload-section" id="upload-area">
+              <div class="upload-icon">📸</div>
+              <div class="upload-text">
+                <strong>Click aquí o arrastra tu imagen</strong>
+                <span>Formatos: JPG, PNG, WEBP | Tamaño máximo: 5MB</span>
+              </div>
+              <span class="file-selected-badge">✓ Archivo seleccionado</span>
+              {{ form.imagen_file }}
+            </div>
+            <p class="hint">💡 La imagen nueva reemplazará cualquier foto existente del producto</p>
+            {% if form.imagen_file.errors %}
+              <span class="error-message">⚠️ {{ form.imagen_file.errors.0 }}</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Checkbox Activo -->
+        <div class="checkbox-section">
+          <div class="checkbox-wrapper">
+            {{ form.activo }}
+            <label for="{{ form.activo.id_for_label }}">
+              ✅ Producto activo y visible en el catálogo público
+            </label>
+          </div>
+        </div>
+
+        <!-- Botón Guardar -->
+        <button type="submit" class="btn-guardar">
+          <span>💾</span>
+          Guardar Sahumerio
+        </button>
+      </form>
     </div>
 
-    <div style="margin-top:14px">
-      <button type="submit" class="btn">Guardar</button>
-    </div>
-  </form>
-
-  <div style="margin-top:22px">
-    <h3 style="margin:0 0 10px 0">Vista previa:</h3>
-    <div id="preview-box"
-         class="card"
-         style="border:1px solid #eee;border-radius:12px;background:#fafafa;align-items:center;justify-content:center;overflow:hidden;height:420px;display:{% if form.instance.imagen_file %}flex{% else %}none{% endif %};">
-      {% if form.instance.imagen_file %}
-        <img id="preview-img"
-             src="{{ form.instance.imagen_file.url }}"
-             alt="Vista previa"
-             style="max-width:100%;max-height:100%;object-fit:contain"
-             data-zoom-src="{{ form.instance.imagen_file.url }}">
-      {% else %}
-        <img id="preview-img"
-             alt="Vista previa"
-             style="max-width:100%;max-height:100%;object-fit:contain"
-             data-zoom-src="">
-      {% endif %}
+    <!-- VISTA PREVIA -->
+    <div class="sahumerio-preview-card preview-section">
+      <h3>🖼️ Vista Previa de Imagen</h3>
+      <div id="preview-box" class="preview-box {% if form.instance.imagen_file %}has-image{% endif %}">
+        {% if form.instance.imagen_file %}
+          <img id="preview-img"
+               src="{{ form.instance.imagen_file.url }}"
+               alt="Vista previa del sahumerio"
+               data-zoom-src="{{ form.instance.imagen_file.url }}">
+        {% else %}
+          <img id="preview-img"
+               alt="Vista previa"
+               style="display: none;"
+               data-zoom-src="">
+          <div class="empty-preview">
+            <div class="empty-preview-icon">🖼️</div>
+            <div>Aún no hay imagen seleccionada</div>
+            <small style="opacity: 0.7;">La imagen aparecerá aquí al seleccionarla</small>
+          </div>
+        {% endif %}
+      </div>
     </div>
   </div>
 </div>
@@ -73,24 +593,69 @@
 {% block scripts %}
 <script>
 (function(){
-  const input = document.getElementById('id_imagen_file');
+  const input = document.getElementById('{{ form.imagen_file.id_for_label }}');
   const box   = document.getElementById('preview-box');
   const img   = document.getElementById('preview-img');
+  const uploadArea = document.getElementById('upload-area');
+  const emptyText = box.querySelector('.empty-preview');
+  
   if(!input || !box || !img) return;
 
-  function show(src){
+  function showPreview(src){
     if(!src) return;
+    
     img.src = src;
+    img.style.display = 'block';
     img.setAttribute('data-zoom-src', src);
-    box.style.display = 'flex';
+    box.classList.add('has-image');
+    uploadArea.classList.add('has-file');
+    
+    if(emptyText) emptyText.style.display = 'none';
   }
 
+  // Cuando se selecciona un archivo
   input.addEventListener('change', function(){
-    const f = this.files && this.files[0];
-    if(!f) return;
+    const file = this.files && this.files[0];
+    if(!file) return;
+    
     const reader = new FileReader();
-    reader.onload = e => show(e.target.result);
-    reader.readAsDataURL(f);
+    reader.onload = e => showPreview(e.target.result);
+    reader.readAsDataURL(file);
+  });
+
+  // Drag and drop
+  uploadArea.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    uploadArea.classList.add('dragover');
+  });
+
+  uploadArea.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    uploadArea.classList.remove('dragover');
+  });
+
+  uploadArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    uploadArea.classList.remove('dragover');
+    
+    const file = e.dataTransfer.files[0];
+    if(file && file.type.startsWith('image/')){
+      input.files = e.dataTransfer.files;
+      
+      const reader = new FileReader();
+      reader.onload = evt => showPreview(evt.target.result);
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // Click en el área de upload
+  uploadArea.addEventListener('click', (e) => {
+    if(e.target !== input) {
+      input.click();
+    }
   });
 })();
 </script>

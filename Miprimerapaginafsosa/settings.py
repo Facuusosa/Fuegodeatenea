@@ -74,13 +74,15 @@ USE_TZ = True
 # ============================
 #  STATIC & MEDIA (IMPORTANTE)
 # ============================
-# Usar SIEMPRE barra inicial y final
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [BASE_DIR / "static"]      # <BASE_DIR>/static
-STATIC_ROOT = BASE_DIR / "staticfiles"        # usado en producción (collectstatic)
+STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# Configuración para archivos estáticos en producción
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"               # <BASE_DIR>/media
+MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

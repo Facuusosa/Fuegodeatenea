@@ -8,6 +8,8 @@ DEBUG = True
 ALLOWED_HOSTS = ["*"]  # Esto permite TODAS las conexiones
 
 INSTALLED_APPS = [
+    'cloudinary_storage',  # ← NUEVO: DEBE IR PRIMERO
+    'cloudinary',           # ← NUEVO
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -104,3 +106,18 @@ CART_SESSION_ID = "cart"
 
 # WhatsApp (ideal en formato internacional sin +, ej. 54911XXXXXXXX)
 WHATSAPP_PHONE = "1168079566"
+
+# ============================
+#  CLOUDINARY CONFIGURATION
+# ============================
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'dpt27mtyg',
+    'API_KEY': '457672287445357',
+    'API_SECRET': 'M0yCtiC0xjONbxM00K00zhsrr58'  # ← Reemplaza con tu API Secret de Cloudinary
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'

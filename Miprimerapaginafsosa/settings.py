@@ -1,32 +1,42 @@
-# settings.py
 from pathlib import Path
+import os
 
+# Ruta base del proyecto
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = "dev-only"
-DEBUG = True
-ALLOWED_HOSTS = ["*"]  # Esto permite TODAS las conexiones
+# Clave secreta - desde variable de entorno en producción
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-8k#m9p@x$wv7n2q&5j!h4r*6t^y8u+3d-f_a%b1c#e9g0i2k')
+
+# Debug - automático según entorno
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+
+# Hosts permitidos - automático según entorno
+if 'RAILWAY_ENVIRONMENT' in os.environ:
+    ALLOWED_HOSTS = ['*']  # Railway maneja esto
+elif not DEBUG:
+    ALLOWED_HOSTS = ['facuusosa.pythonanywhere.com']
+else:
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
 
 INSTALLED_APPS = [
-    'cloudinary_storage',  # ← NUEVO: DEBE IR PRIMERO
-    'cloudinary',           # ← NUEVO
+    'cloudinary_storage',
+    'cloudinary',
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "django.contrib.humanize",  # filtros de miles/moneda
-
-    # tus apps
+    "django.contrib.humanize",
     "appcoder",
     "usuarios",
     "productos",
-    "cart",  # carrito
+    "cart",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -49,7 +59,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                "cart.context_processors.cart_context",  # badge y total del carrito en toda la app
+                "cart.context_processors.cart_context",
             ],
         },
     },
@@ -57,6 +67,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "Miprimerapaginafsosa.wsgi.application"
 
+# Base de datos
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
@@ -64,62 +75,62 @@ DATABASES = {
     }
 }
 
+# Validadores de contraseña
 AUTH_PASSWORD_VALIDATORS = []
 
+# Internacionalización
 LANGUAGE_CODE = "es-ar"
 TIME_ZONE = "America/Argentina/Buenos_Aires"
 USE_I18N = True
 USE_TZ = True
 
-# ============================
-#  STATIC & MEDIA (IMPORTANTE)
-# ============================
+# Archivos estáticos
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Configuración para archivos estáticos en producción
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-
+# Archivos media
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# Autenticación
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "sahumerios_lista"
 LOGOUT_REDIRECT_URL = "sahumerios_lista"
 
-# ============================
-#  CONFIGURACIÓN DE SESIONES
-# ============================
-# Hacer que el carrito persista al cerrar el navegador
-SESSION_COOKIE_AGE = 1209600  # 2 semanas (en segundos)
-SESSION_SAVE_EVERY_REQUEST = True  # Actualiza la expiración en cada request
-SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # NO borrar al cerrar navegador
-SESSION_COOKIE_NAME = 'sessionid'  # Nombre de la cookie
-SESSION_COOKIE_HTTPONLY = True  # Seguridad: no accesible desde JavaScript
-SESSION_COOKIE_SAMESITE = 'Lax'  # Protección CSRF
+# Sesiones
+SESSION_COOKIE_AGE = 1209600
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+SESSION_COOKIE_NAME = "sessionid"
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"
 
-# ============================
-#  CARRITO
-# ============================
+# Carrito
 CART_SESSION_ID = "cart"
-
-# WhatsApp (ideal en formato internacional sin +, ej. 54911XXXXXXXX)
 WHATSAPP_PHONE = "1168079566"
 
-# ============================
-#  CLOUDINARY CONFIGURATION
-# ============================
-import cloudinary
-import cloudinary.uploader
-import cloudinary.api
-
+# Cloudinary - credenciales desde variables de entorno
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'dpt27mtyg',
-    'API_KEY': '457672287445357',
-    'API_SECRET': 'M0yCtiC0xjONbxM00K00zhsrr58'  # ← Reemplaza con tu API Secret de Cloudinary
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', 'dpt27mtyg'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY', '457672287445357'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', 'M0yCtiC0xjONbxM00K00zhsrr58')
 }
 
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+try:
+    import cloudinary
+    import cloudinary.uploader
+    import cloudinary.api
+    cloudinary.config(**CLOUDINARY_STORAGE)
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+except ImportError:
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
+# Configuración de seguridad para producción
+if not DEBUG:
+    SECURE_SSL_REDIRECT = False  # Railway maneja SSL
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True

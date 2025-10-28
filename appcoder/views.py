@@ -9,15 +9,18 @@ import pandas as pd
 import unicodedata, re
 from difflib import SequenceMatcher
 
+
 class SoloFsosaMixin(UserPassesTestMixin):
     def test_func(self):
         u = self.request.user
         return u.is_authenticated and u.username.lower() == "fsosa"
 
+
 def _norm_text(s: str) -> str:
     s = str(s or "").strip().lower()
     s = unicodedata.normalize("NFKD", s).encode("ascii", "ignore").decode("ascii")
     return re.sub(r"[^a-z0-9]+", "", s)
+
 
 def _pick_col(cols, *needles):
     norm_cols = { _norm_text(c): c for c in cols }
@@ -30,6 +33,7 @@ def _pick_col(cols, *needles):
             return orig
     return None
 
+
 def _index_product_files():
     prod_dir = Path(settings.BASE_DIR) / "static" / "img" / "productos"
     name_lut = {}
@@ -40,6 +44,7 @@ def _index_product_files():
                 name_lut[p.name.lower()] = p.name
                 stem_lut[_norm_text(p.stem)] = p.name
     return name_lut, stem_lut
+
 
 def _resolve_local_image(name: str, name_lut: dict, stem_lut: dict) -> str:
     if not name:
@@ -72,6 +77,7 @@ def _resolve_local_image(name: str, name_lut: dict, stem_lut: dict) -> str:
             best_name = fname
     return best_name if best_score >= 0.6 else ""
 
+
 def _parse_img_cell(cell: str, name_lut: dict, stem_lut: dict):
     s = str(cell or "").strip().strip("'\"").replace("\\", "/")
     if not s:
@@ -87,6 +93,7 @@ def _parse_img_cell(cell: str, name_lut: dict, stem_lut: dict):
             break
     s = s.split("/")[-1]
     return _resolve_local_image(s, name_lut, stem_lut), ""
+
 
 def _leer_excel():
     ruta = Path(settings.BASE_DIR) / "final.xlsx"
@@ -148,6 +155,7 @@ def _leer_excel():
         })
     return items
 
+
 class CatalogoExcelView(TemplateView):
     template_name = "catalogo.html"
     def get_context_data(self, **kwargs):
@@ -161,7 +169,7 @@ class CatalogoExcelView(TemplateView):
         db_qs = Sahumerio.objects.all()
         db_items = []
         for o in db_qs:
-            # CORRECCIÓN: Usar imagen_resuelta() para obtener la imagen correcta
+            # CORRECCIÓN: Usar imagen_resuelta() para obtener la imagen correcta (Cloudinary o local)
             img_url = o.imagen_resuelta()
             
             # Determinar si es file local o URL absoluta
@@ -169,11 +177,11 @@ class CatalogoExcelView(TemplateView):
             img_abs = ""
             
             if img_url:
-                # Si viene de imagen_file (ImageField), viene como /media/productos/...
-                if img_url.startswith('/media/') or img_url.startswith(settings.MEDIA_URL):
+                # Si es una URL de Cloudinary o externa (empieza con http:// o https://)
+                if img_url.startswith(('http://', 'https://')):
                     img_abs = img_url
-                # Si viene de imagen_url (URLField), es una URL externa
-                elif img_url.startswith(('http://', 'https://')):
+                # Si viene de ImageField local (/media/)
+                elif img_url.startswith('/media/') or img_url.startswith(settings.MEDIA_URL):
                     img_abs = img_url
                 # Si es una ruta relativa, es un archivo local
                 else:
@@ -215,6 +223,7 @@ class CatalogoExcelView(TemplateView):
         ctx["debug"] = bool(self.request.GET.get("debug"))
         return ctx
 
+
 class ExcelDetalleView(TemplateView):
     template_name = "sahumerio_detalle_excel.html"
     def get_context_data(self, **kwargs):
@@ -236,10 +245,12 @@ class ExcelDetalleView(TemplateView):
         ctx["match_id"] = match_id
         return ctx
 
+
 class SahumerioDetalle(DetailView):
     model = Sahumerio
     template_name = "sahumerio_detalle.html"
     context_object_name = "object"
+
 
 class SahumerioCrear(LoginRequiredMixin, SoloFsosaMixin, CreateView):
     model = Sahumerio
@@ -255,11 +266,13 @@ class SahumerioCrear(LoginRequiredMixin, SoloFsosaMixin, CreateView):
         if g.get("sug_precio"): ini["precio"] = g.get("sug_precio")
         return ini
 
+
 class SahumerioEditar(LoginRequiredMixin, SoloFsosaMixin, UpdateView):
     model = Sahumerio
     form_class = SahumerioForm
     template_name = "sahumerio_form.html"
     success_url = reverse_lazy("sahumerios_lista")
+
 
 class SahumerioBorrar(LoginRequiredMixin, SoloFsosaMixin, DeleteView):
     model = Sahumerio

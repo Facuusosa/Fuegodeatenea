@@ -37,3 +37,13 @@ def catalogo(request):
 # Reuse the main catalog view from ``appcoder`` so the context matches the
 # expectations of ``templates/catalogo.html`` (origen, idx, pk, etc.).
 catalogo = CatalogoExcelView.as_view()
+
+from django.http import HttpResponse
+from productos.models import Producto
+
+def test_imagen_url(request):
+    p = Producto.objects.first()
+    if p and p.imagen:
+        return HttpResponse(f"La URL de la imagen es: {p.imagen.url}")
+    else:
+        return HttpResponse("No se encontró ninguna imagen en productos")

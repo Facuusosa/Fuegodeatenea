@@ -100,23 +100,22 @@ SESSION_COOKIE_SAMESITE = "Lax"
 CART_SESSION_ID = "cart"
 WHATSAPP_PHONE = "1168079566"
 
-# Cloudinary - SOLO desde variables de entorno
+# Cloudinary - SOLO para media files
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
     'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
 }
 
-# Opcional: alerta si falta alguno
-if not all(CLOUDINARY_STORAGE.values()):
-    print("⚠️  WARNING: Cloudinary credentials not found in environment variables")
-
-import cloudinary
-import cloudinary.uploader
-import cloudinary.api
-
-cloudinary.config(**CLOUDINARY_STORAGE)
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+if all(CLOUDINARY_STORAGE.values()):
+    import cloudinary
+    import cloudinary.uploader
+    import cloudinary.api
+    
+    cloudinary.config(**CLOUDINARY_STORAGE)
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+else:
+    print("⚠️  WARNING: Cloudinary credentials not found - using local media storage")
 
 # Seguridad para producción
 if not DEBUG:

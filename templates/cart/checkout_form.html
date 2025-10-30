@@ -3,6 +3,7 @@
 {% load humanize %}
 {% block title %}Finalizar compra{% endblock %}
 
+
 {% block styles %}
 <style>
   .checkout-container {
@@ -11,6 +12,7 @@
     gap: 28px;
     max-width: 1200px;
     margin: 0 auto;
+    padding: 0 20px;
   }
   
   .checkout-header {
@@ -80,6 +82,7 @@
     font-size: 1rem;
     transition: all 0.15s ease;
     background: white;
+    box-sizing: border-box;
   }
   
   .field input:focus,
@@ -93,6 +96,7 @@
   .field textarea {
     resize: vertical;
     min-height: 80px;
+    font-family: inherit;
   }
   
   .radio-group {
@@ -122,6 +126,7 @@
     cursor: pointer;
     width: 18px;
     height: 18px;
+    flex-shrink: 0;
   }
   
   .radio-option label {
@@ -189,6 +194,7 @@
     align-items: center;
     justify-content: center;
     background: #fafafa;
+    flex-shrink: 0;
   }
   
   .summary-item-image img {
@@ -218,6 +224,7 @@
     font-weight: 800;
     text-align: right;
     white-space: nowrap;
+    flex-shrink: 0;
   }
   
   .summary-total {
@@ -275,8 +282,37 @@
       flex-direction: column-reverse;
     }
   }
+
+  @media (max-width: 640px) {
+    .checkout-container {
+      padding: 0 16px;
+      gap: 16px;
+    }
+    
+    .form-card {
+      padding: 20px;
+    }
+    
+    .summary-card {
+      padding: 20px;
+    }
+    
+    .checkout-title {
+      font-size: 1.5rem;
+    }
+    
+    .summary-item {
+      grid-template-columns: 60px 1fr auto;
+    }
+    
+    .summary-item-image {
+      width: 60px;
+      height: 60px;
+    }
+  }
 </style>
 {% endblock %}
+
 
 {% block content %}
 <div class="checkout-header">
@@ -284,12 +320,14 @@
   <p class="checkout-subtitle">Completá tus datos para confirmar el pedido por WhatsApp</p>
 </div>
 
+
 {% if cart|length == 0 %}
   <div class="cart-empty" style="text-align:center;padding:60px 20px">
     <p style="font-size:1.1rem;color:var(--muted);margin-bottom:24px">Tu carrito está vacío</p>
     <a class="btn" href="{% url 'catalogo' %}">Ver catálogo</a>
   </div>
 {% else %}
+
 
 <div class="checkout-container">
   <!-- Formulario -->
@@ -303,6 +341,7 @@
         </div>
       {% endif %}
 
+
       <!-- Datos personales -->
       <div class="form-section">
         <h3 class="form-section-title">Datos personales</h3>
@@ -313,12 +352,14 @@
           {{ form.nombre }}
         </div>
 
+
         <div class="field">
           <label for="{{ form.telefono.id_for_label }}">Teléfono de contacto</label>
           {{ form.telefono.errors }}
           {{ form.telefono }}
         </div>
       </div>
+
 
       <!-- Modalidad de entrega -->
       <div class="form-section">
@@ -336,6 +377,7 @@
           </div>
         </div>
 
+
         <div id="envio-fields" style="display:none">
           <div class="field">
             <label for="{{ form.direccion.id_for_label }}">Dirección</label>
@@ -348,6 +390,7 @@
         </div>
       </div>
 
+
       <!-- Medio de pago -->
       <div class="form-section">
         <h3 class="form-section-title">Medio de pago</h3>
@@ -358,6 +401,7 @@
           {{ form.medio_pago }}
         </div>
       </div>
+
 
       <!-- Comentarios -->
       <div class="form-section">
@@ -370,6 +414,7 @@
         </div>
       </div>
 
+
       <div class="form-actions">
         <a class="btn-sec" href="{% url 'cart:detail' %}">Volver al carrito</a>
         <button type="submit" class="btn">Confirmar por WhatsApp</button>
@@ -377,9 +422,11 @@
     </form>
   </div>
 
+
   <!-- Resumen -->
   <div class="summary-card">
     <h3 class="summary-title">Resumen del pedido</h3>
+
 
     <div class="summary-items">
       {% for item in cart %}
@@ -391,12 +438,14 @@
               loading="lazy">
           </div>
 
+
           <div class="summary-item-info">
             <div class="summary-item-name">{{ item.name }}</div>
             <div class="summary-item-meta">
               {{ item.quantity }} × $ {{ item.price|floatformat:0|intcomma }}
             </div>
           </div>
+
 
           <div class="summary-item-price">
             $ {{ item.subtotal|floatformat:0|intcomma }}
@@ -405,10 +454,12 @@
       {% endfor %}
     </div>
 
+
     <div class="summary-total">
       <div class="summary-total-label">Total</div>
       <div class="summary-total-amount">$ {{ cart.total|default:cart.get_total_price|floatformat:0|intcomma }}</div>
     </div>
+
 
     <div class="summary-note">
       Revisá las cantidades antes de confirmar. El costo de envío (si aplica) se coordina por WhatsApp.
@@ -416,7 +467,9 @@
   </div>
 </div>
 
+
 {% endif %}
+
 
 <script>
 (function() {
@@ -430,6 +483,7 @@
     return false;
   }
 
+
   function toggleEnvioFields() {
     var container = document.getElementById('envio-fields');
     if (container) {
@@ -437,11 +491,13 @@
     }
   }
 
+
   // Escuchar cambios en los radio buttons
   var modalidadRadios = document.querySelectorAll('input[name="modalidad"]');
   for (var i = 0; i < modalidadRadios.length; i++) {
     modalidadRadios[i].addEventListener('change', toggleEnvioFields);
   }
+
 
   // Ejecutar al cargar
   toggleEnvioFields();

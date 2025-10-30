@@ -14,8 +14,8 @@ else:
     ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
 
 INSTALLED_APPS = [
-    # 'cloudinary_storage',  # Comentado temporalmente
-    # 'cloudinary',  # Comentado temporalmente
+    'cloudinary_storage',
+    'cloudinary',
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -116,7 +116,7 @@ import cloudinary.uploader
 import cloudinary.api
 
 cloudinary.config(**CLOUDINARY_STORAGE)
-# DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'  # Comentado temporalmente
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Seguridad para producción
 if not DEBUG:

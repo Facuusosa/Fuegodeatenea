@@ -7,6 +7,7 @@ from django.contrib import messages
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_protect
 
 from .cart import Cart
 from .forms import OrderForm
@@ -15,6 +16,7 @@ from .forms import OrderForm
 # =========================
 # Helpers / utilidades
 # =========================
+
 
 def get_product_model():
     """
@@ -142,11 +144,13 @@ def _redirect_back(request: HttpRequest, fallback_name="cart:detail") -> HttpRes
 # Vistas
 # =========================
 
+
 def cart_detail(request: HttpRequest) -> HttpResponse:
     cart = Cart(request)
     return render(request, "cart/detail.html", {"cart": cart})
 
 
+@csrf_protect
 @require_POST
 def cart_add(request: HttpRequest) -> HttpResponse:
     """
@@ -180,7 +184,7 @@ def cart_add(request: HttpRequest) -> HttpResponse:
         if quantity > old_qty:
             messages.success(request, f"Agregaste {product_name} al carrito.")
         elif quantity < old_qty:
-            messages.info(request, f"Restaste una unidad del carrito de  {product_name}.")
+            messages.info(request, f"Restaste una unidad del carrito de {product_name}.")
         else:
             messages.info(request, f"Cantidad sin cambios.")
         
@@ -220,6 +224,7 @@ def cart_add(request: HttpRequest) -> HttpResponse:
     return _redirect_back(request)
 
 
+@csrf_protect
 @require_POST
 def cart_add_db(request: HttpRequest, product_id: int) -> HttpResponse:
     """
@@ -238,6 +243,7 @@ def cart_add_db(request: HttpRequest, product_id: int) -> HttpResponse:
     return _redirect_back(request)
 
 
+@csrf_protect
 @require_POST
 def cart_remove(request: HttpRequest) -> HttpResponse:
     """
@@ -251,6 +257,7 @@ def cart_remove(request: HttpRequest) -> HttpResponse:
     return _redirect_back(request)
 
 
+@csrf_protect
 @require_POST
 def cart_clear(request: HttpRequest) -> HttpResponse:
     """
@@ -290,8 +297,6 @@ def cart_checkout_form(request: HttpRequest) -> HttpResponse:
     return render(request, "cart/checkout_form.html", {"cart": cart, "form": form})
 
 
-# Reemplazá la función cart_summary en cart/views.py con esta versión:
-
 def cart_summary(request: HttpRequest) -> JsonResponse:
     """
     Vista API para obtener resumen del carrito (usada por AJAX)
@@ -305,13 +310,13 @@ def cart_summary(request: HttpRequest) -> JsonResponse:
         'items': []
     }
     
-    for item in cart_items[:5]:  # Máximo 5 items para el resumen
+    for item in cart_items[:5]:
         summary['items'].append({
             'name': item.get('name', 'Producto'),
             'quantity': item.get('quantity', 1),
             'price': str(item.get('price', 0)),
             'subtotal': str(item.get('subtotal', 0)),
-            'image_url': item.get('image_url', ''),  # ← AGREGÁ ESTA LÍNEA
+            'image_url': item.get('image_url', ''),
         })
     
     return JsonResponse(summary)

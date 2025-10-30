@@ -1,21 +1,23 @@
 from pathlib import Path
 import os
 
+
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-8k#m9p@x$wv7n2q&5j!h4r*6t^y8u+3d-f_a%b1c#e9g0i2k')
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
+
 if 'RAILWAY_ENVIRONMENT' in os.environ:
-    ALLOWED_HOSTS = ['*']  # Railway maneja esto
+    ALLOWED_HOSTS = ['*']
 elif not DEBUG:
     ALLOWED_HOSTS = ['facuusosa.pythonanywhere.com']
 else:
     ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
 
+
 INSTALLED_APPS = [
-    'cloudinary_storage',
-    'cloudinary',
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -27,7 +29,10 @@ INSTALLED_APPS = [
     "usuarios",
     "productos",
     "cart",
+    'cloudinary_storage',
+    'cloudinary',
 ]
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -41,7 +46,9 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+
 ROOT_URLCONF = "Miprimerapaginafsosa.urls"
+
 
 TEMPLATES = [
     {
@@ -60,7 +67,9 @@ TEMPLATES = [
     },
 ]
 
+
 WSGI_APPLICATION = "Miprimerapaginafsosa.wsgi.application"
+
 
 DATABASES = {
     "default": {
@@ -69,38 +78,41 @@ DATABASES = {
     }
 }
 
+
 AUTH_PASSWORD_VALIDATORS = []
+
 
 LANGUAGE_CODE = "es-ar"
 TIME_ZONE = "America/Argentina/Buenos_Aires"
 USE_I18N = True
 USE_TZ = True
 
+
+# ============================================
+# CONFIGURACIÓN DE ARCHIVOS ESTÁTICOS
+# ============================================
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
+if DEBUG:
+    # En desarrollo, WhiteNoise no comprime para que sea más rápido
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+else:
+    # En producción (Railway), WhiteNoise comprime y minifica
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+
+# ============================================
+# CONFIGURACIÓN DE ARCHIVOS MEDIA (Subidas)
+# ============================================
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-LOGIN_URL = "login"
-LOGIN_REDIRECT_URL = "sahumerios_lista"
-LOGOUT_REDIRECT_URL = "sahumerios_lista"
-
-SESSION_COOKIE_AGE = 1209600
-SESSION_SAVE_EVERY_REQUEST = True
-SESSION_EXPIRE_AT_BROWSER_CLOSE = False
-SESSION_COOKIE_NAME = "sessionid"
-SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SAMESITE = "Lax"
-
-CART_SESSION_ID = "cart"
-WHATSAPP_PHONE = "1168079566"
-
-# Cloudinary - SOLO para media files
+# ============================================
+# CONFIGURACIÓN DE CLOUDINARY (Solo para media/uploads)
+# ============================================
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
     'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
@@ -117,8 +129,31 @@ if all(CLOUDINARY_STORAGE.values()):
 else:
     print("⚠️  WARNING: Cloudinary credentials not found - using local media storage")
 
-# Seguridad para producción
+
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "sahumerios_lista"
+LOGOUT_REDIRECT_URL = "sahumerios_lista"
+
+
+SESSION_COOKIE_AGE = 1209600
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+SESSION_COOKIE_NAME = "sessionid"
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"
+
+
+CART_SESSION_ID = "cart"
+WHATSAPP_PHONE = "1168079566"
+
+
+# ============================================
+# SEGURIDAD PARA PRODUCCIÓN
+# ============================================
 if not DEBUG:
-    SECURE_SSL_REDIRECT = False  # Railway maneja SSL
+    SECURE_SSL_REDIRECT = False
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True

@@ -1,3 +1,4 @@
+import json
 from decimal import Decimal, InvalidOperation
 from urllib.parse import quote
 
@@ -11,12 +12,12 @@ from django.views.decorators.csrf import csrf_exempt
 
 from .cart import Cart
 from .forms import OrderForm
+from .models import Orden  # ← NUEVO: Importar Orden
 
 
 # =========================
 # Helpers / utilidades
 # =========================
-
 
 def get_product_model():
     """
@@ -143,7 +144,6 @@ def _redirect_back(request: HttpRequest, fallback_name="cart:detail") -> HttpRes
 # =========================
 # Vistas
 # =========================
-
 
 def cart_detail(request: HttpRequest) -> HttpResponse:
     cart = Cart(request)
@@ -275,7 +275,14 @@ def cart_checkout(request: HttpRequest) -> HttpResponse:
     return redirect(wa_url)
 
 
+# ← NUEVO: Función mejorada con BD
 def cart_checkout_form(request: HttpRequest) -> HttpResponse:
+    """
+    Procesa el formulario de checkout:
+    1. Guarda la orden en BD
+    2. Envía mensaje a WhatsApp
+    3. Limpia el carrito
+    """
     cart = Cart(request)
     if len(cart) == 0:
         return redirect("cart:detail")
@@ -283,9 +290,37 @@ def cart_checkout_form(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         form = OrderForm(request.POST)
         if form.is_valid():
+            # ==== GUARDAR ORDEN EN BD ====
+            
+            # 1. Crear objeto Orden
+            orden = Orden.objects.create(
+                nombre=form.cleaned_data.get('nombre', ''),
+                telefono=form.cleaned_data.get('telefono', ''),
+                email=form.cleaned_data.get('email', ''),
+                modalidad=form.cleaned_data.get('modalidad', 'retiro'),
+                direccion=form.cleaned_data.get('direccion', ''),
+                medio_pago=form.cleaned_data.get('medio_pago', 'mp'),
+                comentario=form.cleaned_data.get('comentario', ''),
+                total=_cart_total(cart),
+                items_json=json.dumps(list(cart)),  # Guardar items como JSON
+                estado='pendiente',
+            )
+            
+            # 2. Generar mensaje de WhatsApp
             msg = _build_wa_message(cart, form.cleaned_data)
             phone = (getattr(settings, "WHATSAPP_PHONE", "") or "").strip()
             wa_url = f"https://wa.me/{phone}?text={quote(msg)}" if phone else f"https://wa.me/?text={quote(msg)}"
+            
+            # 3. LIMPIAR CARRITO
+            cart.clear()
+            
+            # 4. Mostrar mensaje de éxito
+            messages.success(
+                request, 
+                f"¡Orden #{orden.id} creada! Serás redirigido a WhatsApp para confirmar."
+            )
+            
+            # 5. Redirigir a WhatsApp
             return redirect(wa_url)
     else:
         form = OrderForm()

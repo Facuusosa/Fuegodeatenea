@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
-from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.csrf import csrf_exempt
 
 from .cart import Cart
 from .forms import OrderForm
@@ -150,7 +150,7 @@ def cart_detail(request: HttpRequest) -> HttpResponse:
     return render(request, "cart/detail.html", {"cart": cart})
 
 
-@csrf_protect
+@csrf_exempt
 @require_POST
 def cart_add(request: HttpRequest) -> HttpResponse:
     """
@@ -170,7 +170,6 @@ def cart_add(request: HttpRequest) -> HttpResponse:
         product_id = request.POST.get("product_id")
         product = get_object_or_404(Product, id=product_id)
         
-        # Obtener cantidad anterior
         old_qty = 0
         for item in cart:
             if str(item.get("id")) == str(product_id):
@@ -179,7 +178,6 @@ def cart_add(request: HttpRequest) -> HttpResponse:
         
         cart.add(product=product, quantity=quantity, replace_quantity=replace)
         
-        # Mensaje contextual
         product_name = getattr(product, 'nombre', str(product))
         if quantity > old_qty:
             messages.success(request, f"Agregaste {product_name} al carrito.")
@@ -196,7 +194,6 @@ def cart_add(request: HttpRequest) -> HttpResponse:
     price = _parse_price_ar(request.POST.get("price", "0"))
     img = (request.POST.get("img") or "").strip()
 
-    # Obtener cantidad anterior
     old_qty = 0
     for item in cart:
         if str(item.get("id")) == str(product_id):
@@ -212,7 +209,6 @@ def cart_add(request: HttpRequest) -> HttpResponse:
         replace_quantity=replace,
     )
     
-    # Mensaje contextual
     display_name = name or "producto"
     if quantity > old_qty:
         messages.success(request, f"Agregaste {display_name} al carrito.")
@@ -224,7 +220,7 @@ def cart_add(request: HttpRequest) -> HttpResponse:
     return _redirect_back(request)
 
 
-@csrf_protect
+@csrf_exempt
 @require_POST
 def cart_add_db(request: HttpRequest, product_id: int) -> HttpResponse:
     """
@@ -243,7 +239,7 @@ def cart_add_db(request: HttpRequest, product_id: int) -> HttpResponse:
     return _redirect_back(request)
 
 
-@csrf_protect
+@csrf_exempt
 @require_POST
 def cart_remove(request: HttpRequest) -> HttpResponse:
     """
@@ -257,7 +253,7 @@ def cart_remove(request: HttpRequest) -> HttpResponse:
     return _redirect_back(request)
 
 
-@csrf_protect
+@csrf_exempt
 @require_POST
 def cart_clear(request: HttpRequest) -> HttpResponse:
     """

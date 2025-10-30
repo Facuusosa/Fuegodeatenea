@@ -398,68 +398,13 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // Obtener CSRF token de la cookie
-  function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-      const cookies = document.cookie.split(';');
-      for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim();
-        if (cookie.substring(0, name.length + 1) === (name + '=')) {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-          break;
-        }
-      }
+  // Enviar formulario directamente (Django manejará el CSRF)
+  form.addEventListener('submit', function(e) {
+    if (submitBtn) {
+      submitBtn.innerHTML = '<span>⏳</span><span>Agregando...</span>';
+      submitBtn.disabled = true;
     }
-    return cookieValue;
-  }
-  
-  // Submit con CSRF token correcto
-  form.addEventListener('submit', async function(event) {
-    event.preventDefault();
-    
-    if (!submitBtn) {
-      form.submit();
-      return;
-    }
-
-    const originalHTML = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<span>⏳</span><span>Agregando...</span>';
-    submitBtn.disabled = true;
-
-    try {
-      const csrftoken = getCookie('csrftoken');
-      const response = await fetch(form.action, {
-        method: 'POST',
-        body: new FormData(form),
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest',
-          'X-CSRFToken': csrftoken
-        }
-      });
-
-      if (!response.ok) {
-        console.error('Response status:', response.status);
-        throw new Error('HTTP ' + response.status);
-      }
-
-      document.dispatchEvent(new CustomEvent('cartUpdated'));
-      submitBtn.innerHTML = '<span>✓</span><span>¡Agregado!</span>';
-      quantityInput.value = '1';
-      
-      // Redirigir después de 1.5 segundos
-      setTimeout(() => {
-        window.location.reload();
-      }, 1500);
-    } catch (error) {
-      console.error('Error:', error);
-      submitBtn.innerHTML = '<span>✗</span><span>Error al agregar</span>';
-    } finally {
-      setTimeout(() => {
-        submitBtn.innerHTML = originalHTML;
-        submitBtn.disabled = false;
-      }, 2000);
-    }
+    // El formulario se envía normalmente, Django valida el token automáticamente
   });
 });
 </script>

@@ -1,13 +1,10 @@
 from pathlib import Path
 import os
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-8k#m9p@x$wv7n2q&5j!h4r*6t^y8u+3d-f_a%b1c#e9g0i2k')
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
-
 
 if 'RAILWAY_ENVIRONMENT' in os.environ:
     ALLOWED_HOSTS = ['*']
@@ -15,7 +12,6 @@ elif not DEBUG:
     ALLOWED_HOSTS = ['facuusosa.pythonanywhere.com']
 else:
     ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
-
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -33,7 +29,6 @@ INSTALLED_APPS = [
     'cloudinary',
 ]
 
-
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -46,9 +41,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-
 ROOT_URLCONF = "Miprimerapaginafsosa.urls"
-
 
 TEMPLATES = [
     {
@@ -67,9 +60,7 @@ TEMPLATES = [
     },
 ]
 
-
 WSGI_APPLICATION = "Miprimerapaginafsosa.wsgi.application"
-
 
 DATABASES = {
     "default": {
@@ -78,15 +69,12 @@ DATABASES = {
     }
 }
 
-
 AUTH_PASSWORD_VALIDATORS = []
-
 
 LANGUAGE_CODE = "es-ar"
 TIME_ZONE = "America/Argentina/Buenos_Aires"
 USE_I18N = True
 USE_TZ = True
-
 
 # ============================================
 # CONFIGURACIÓN DE ARCHIVOS ESTÁTICOS
@@ -96,19 +84,15 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 if DEBUG:
-    # En desarrollo, WhiteNoise no comprime para que sea más rápido
     STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 else:
-    # En producción (Railway), WhiteNoise comprime y minifica
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
 
 # ============================================
 # CONFIGURACIÓN DE ARCHIVOS MEDIA (Subidas)
 # ============================================
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
-
 
 # ============================================
 # CONFIGURACIÓN DE CLOUDINARY (Solo para media/uploads)
@@ -129,15 +113,15 @@ if all(CLOUDINARY_STORAGE.values()):
 else:
     print("⚠️  WARNING: Cloudinary credentials not found - using local media storage")
 
-
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
 
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "sahumerios_lista"
 LOGOUT_REDIRECT_URL = "sahumerios_lista"
 
-
+# ============================================
+# CONFIGURACIÓN DE SESIONES
+# ============================================
 SESSION_COOKIE_AGE = 1209600
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
@@ -145,15 +129,18 @@ SESSION_COOKIE_NAME = "sessionid"
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
 
-
 CART_SESSION_ID = "cart"
 WHATSAPP_PHONE = "1168079566"
 
-
 # ============================================
-# SEGURIDAD PARA PRODUCCIÓN
+# SEGURIDAD PARA PRODUCCIÓN (Railway + HTTPS)
 # ============================================
 if not DEBUG:
     SECURE_SSL_REDIRECT = False
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    CSRF_COOKIE_SAMESITE = "Lax"  # ✅ AGREGADO
+    CSRF_TRUSTED_ORIGINS = [
+        'https://fuegodeatenea.up.railway.app',
+        'https://*.railway.app'
+    ]  # ✅ AGREGADO

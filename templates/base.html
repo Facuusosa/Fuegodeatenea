@@ -545,6 +545,7 @@
       
       .cart-dropdown {
         right: 0;
+        left: auto;
         max-width: calc(100vw - 32px);
         min-width: 300px;
       }
@@ -584,9 +585,17 @@
       h1 { font-size: 2rem; }
       h2 { font-size: 1.5rem; }
       
+      /* CORRECCIÓN PRINCIPAL: Carrito en mobile */
       .cart-dropdown {
-        min-width: 280px;
+        position: fixed;
+        top: auto;
+        right: 8px;
+        left: 8px;
+        min-width: unset;
+        max-width: unset;
+        width: calc(100% - 16px);
         padding: 16px;
+        margin-top: 8px;
       }
       
       .cart-dropdown-header {
@@ -609,6 +618,14 @@
       .cart-total {
         font-size: 1.05rem;
       }
+      
+      .cart-actions {
+        flex-direction: column;
+      }
+      
+      .cart-actions .btn {
+        width: 100%;
+      }
     }
     
     @media (max-width: 480px) {
@@ -623,10 +640,6 @@
       .topbar nav a {
         font-size: 0.85rem;
         padding: 6px 10px;
-      }
-      
-      .cart-dropdown {
-        min-width: 260px;
       }
     }
   </style>
@@ -684,7 +697,7 @@
         <div class="cart-dropdown" id="cartDropdown">
           <div class="cart-dropdown-header">Tu Carrito</div>
           
-          <div class="cart-dropdown-empty" id="cartEmpty">
+          <div class="cart-dropdown-empty" id="cartEmpty" style="display:block;">
             Tu carrito está vacío
           </div>
           
@@ -745,9 +758,11 @@
     async function updateCart() {
       try {
         const response = await fetch('{% url "cart:summary" %}');
-        const data = await response.json();
+        if (!response.ok) throw new Error('Error en la respuesta del servidor');
         
+        const data = await response.json();
         const count = data.total_items || 0;
+        
         cartCount.textContent = count;
         
         if (count > 0) {
@@ -761,7 +776,7 @@
               <img src="${item.image_url || '{% static "img/placeholder.png" %}'}" 
                    alt="${item.name}" 
                    class="cart-item-img"
-                   onerror="this.src='{% static "img/placeholder.png" %}'">
+                   onerror="this.src='{% static 'img/placeholder.png' %}'">
               <div class="cart-item-info">
                 <div class="cart-item-name">${item.name}</div>
                 <div class="cart-item-details">${item.quantity} × $ ${item.price}</div>
@@ -778,6 +793,10 @@
         }
       } catch (error) {
         console.error('Error al actualizar carrito:', error);
+        cartCount.classList.add('hidden');
+        cartEmpty.style.display = 'block';
+        cartItems.style.display = 'none';
+        cartFooter.style.display = 'none';
       }
     }
     

@@ -520,11 +520,12 @@
       
       .topbar-logo {
         order: 1;
+        flex: 0 0 auto;
       }
       
       .cart-widget {
         order: 2;
-        margin-left: 0;
+        margin-left: auto;
       }
       
       .topbar nav {
@@ -543,6 +544,7 @@
         padding: 7px 12px;
       }
       
+      /* Dropdown del carrito en tablets */
       .cart-dropdown {
         right: 0;
         left: auto;
@@ -558,6 +560,11 @@
     @media (max-width: 640px) {
       .topbar .wrap {
         padding: 14px;
+        flex-wrap: nowrap;
+      }
+      
+      .topbar-logo {
+        flex: 0 0 auto;
       }
       
       .topbar-logo img {
@@ -566,6 +573,18 @@
       
       .topbar-logo strong {
         font-size: 0.95rem;
+      }
+      
+      .topbar nav {
+        order: 3;
+        width: 100%;
+        margin-top: 12px;
+        padding-top: 12px;
+      }
+      
+      .cart-widget {
+        order: 2;
+        margin-left: auto;
       }
       
       .cart-icon {
@@ -585,7 +604,7 @@
       h1 { font-size: 2rem; }
       h2 { font-size: 1.5rem; }
       
-      /* CORRECCIÓN PRINCIPAL: Carrito en mobile */
+      /* DROPDOWN FIJO EN MOBILE - Se ve bien cuando lo tocas */
       .cart-dropdown {
         position: fixed;
         top: auto;

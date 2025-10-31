@@ -1,6 +1,7 @@
 import json
 from decimal import Decimal, InvalidOperation
 from urllib.parse import quote
+import re  # ← NUEVO: import re
 
 from django.apps import apps
 from django.conf import settings
@@ -14,7 +15,6 @@ from .cart import Cart
 from .forms import OrderForm
 from .models import Orden  # ← NUEVO: Importar Orden
 
-
 # =========================
 # Helpers / utilidades
 # =========================
@@ -27,7 +27,6 @@ def get_product_model():
         return apps.get_model("appcoder", "Sahumerio")
     except LookupError:
         return apps.get_model("productos", "Producto")
-
 
 def _to_int(value, default=1, min_value=None, max_value=None) -> int:
     """
@@ -44,7 +43,6 @@ def _to_int(value, default=1, min_value=None, max_value=None) -> int:
         n = max_value
     return n
 
-
 def _money_ar(value) -> str:
     """
     Formateo $ 12.345 (entero + separador de miles con punto).
@@ -55,7 +53,6 @@ def _money_ar(value) -> str:
         d = Decimal("0")
     i = int(d)
     return "$ " + format(i, ",").replace(",", ".")
-
 
 def _parse_price_ar(raw: str) -> Decimal:
     """
@@ -72,7 +69,6 @@ def _parse_price_ar(raw: str) -> Decimal:
     except (InvalidOperation, TypeError):
         return Decimal("0")
 
-
 def _cart_total(cart: Cart) -> Decimal:
     try:
         return Decimal(cart.total)
@@ -84,7 +80,6 @@ def _cart_total(cart: Cart) -> Decimal:
             for it in cart:
                 total += Decimal(it.get("subtotal", 0))
             return total
-
 
 def _build_wa_message(cart: Cart, data: dict | None = None) -> str:
     """
@@ -132,7 +127,6 @@ def _build_wa_message(cart: Cart, data: dict | None = None) -> str:
     lines.append("¿Podemos coordinar entrega/pago? 🙌")
     return "\n".join(lines)
 
-
 def _redirect_back(request: HttpRequest, fallback_name="cart:detail") -> HttpResponse:
     """
     Intenta volver a la página anterior; si no, al detalle del carrito.
@@ -140,6 +134,29 @@ def _redirect_back(request: HttpRequest, fallback_name="cart:detail") -> HttpRes
     ref = request.META.get("HTTP_REFERER")
     return redirect(ref) if ref else redirect(fallback_name)
 
+# =========================
+# CORRECCIÓN VITAL: Helper WhatsApp para Argentina:
+# =========================
+
+def format_argentina_whatsapp(phone_raw):
+    """
+    Convierte cualquier número argentino a formato WhatsApp internacional:
+    Siempre 549[código área][celular sin 15]
+    Ej: '01112345678', '1134567890', '15 3456-7890' => '54911xxxxxxx'
+    """
+    num = re.sub(r"\D", "", phone_raw or "")
+    # Eliminar '0' inicial si existe
+    if num.startswith("0"):
+        num = num[1:]
+    # Eliminar '15' si lo tiene pos-código de área
+    if len(num) == 10 and num[2:4] == "15":
+        num = num[:2] + num[4:]
+    elif len(num) == 11 and num[3:5] == "15":
+        num = num[:3] + num[5:]
+    # Añadir el '9' de WhatsApp si no está
+    if not num.startswith("9"):
+        num = "9" + num
+    return f"54{num}"
 
 # =========================
 # Vistas
@@ -148,7 +165,6 @@ def _redirect_back(request: HttpRequest, fallback_name="cart:detail") -> HttpRes
 def cart_detail(request: HttpRequest) -> HttpResponse:
     cart = Cart(request)
     return render(request, "cart/detail.html", {"cart": cart})
-
 
 @csrf_exempt
 @require_POST
@@ -219,7 +235,6 @@ def cart_add(request: HttpRequest) -> HttpResponse:
     
     return _redirect_back(request)
 
-
 @csrf_exempt
 @require_POST
 def cart_add_db(request: HttpRequest, product_id: int) -> HttpResponse:
@@ -238,7 +253,6 @@ def cart_add_db(request: HttpRequest, product_id: int) -> HttpResponse:
     messages.success(request, f"Agregaste {product_name} al carrito.")
     return _redirect_back(request)
 
-
 @csrf_exempt
 @require_POST
 def cart_remove(request: HttpRequest) -> HttpResponse:
@@ -252,7 +266,6 @@ def cart_remove(request: HttpRequest) -> HttpResponse:
         messages.error(request, "Quitaste un producto del carrito.")
     return _redirect_back(request)
 
-
 @csrf_exempt
 @require_POST
 def cart_clear(request: HttpRequest) -> HttpResponse:
@@ -264,18 +277,16 @@ def cart_clear(request: HttpRequest) -> HttpResponse:
     messages.warning(request, "Vaciaste el carrito.")
     return _redirect_back(request)
 
-
 def cart_checkout(request: HttpRequest) -> HttpResponse:
     cart = Cart(request)
     if len(cart) == 0:
         return redirect("cart:detail")
     msg = _build_wa_message(cart)
-    phone = (getattr(settings, "WHATSAPP_PHONE", "") or "").strip()
+    phone_raw = (getattr(settings, "WHATSAPP_PHONE", "") or "").strip()
+    phone = format_argentina_whatsapp(phone_raw)  # ← USAR SIEMPRE LA FUNCIÓN
     wa_url = f"https://wa.me/{phone}?text={quote(msg)}" if phone else f"https://wa.me/?text={quote(msg)}"
     return redirect(wa_url)
 
-
-# ← NUEVO: Función mejorada con BD
 def cart_checkout_form(request: HttpRequest) -> HttpResponse:
     """
     Procesa el formulario de checkout:
@@ -291,8 +302,6 @@ def cart_checkout_form(request: HttpRequest) -> HttpResponse:
         form = OrderForm(request.POST)
         if form.is_valid():
             # ==== GUARDAR ORDEN EN BD ====
-            
-            # 1. Crear objeto Orden
             orden = Orden.objects.create(
                 nombre=form.cleaned_data.get('nombre', ''),
                 telefono=form.cleaned_data.get('telefono', ''),
@@ -305,28 +314,24 @@ def cart_checkout_form(request: HttpRequest) -> HttpResponse:
                 items_json=json.dumps(list(cart)),  # Guardar items como JSON
                 estado='pendiente',
             )
-            
             # 2. Generar mensaje de WhatsApp
             msg = _build_wa_message(cart, form.cleaned_data)
-            phone = (getattr(settings, "WHATSAPP_PHONE", "") or "").strip()
+            phone_raw = (getattr(settings, "WHATSAPP_PHONE", "") or "").strip()
+            phone = format_argentina_whatsapp(phone_raw)  # ← CORREGIDO USANDO LA FUNCIÓN
             wa_url = f"https://wa.me/{phone}?text={quote(msg)}" if phone else f"https://wa.me/?text={quote(msg)}"
-            
             # 3. LIMPIAR CARRITO
             cart.clear()
-            
             # 4. Mostrar mensaje de éxito
             messages.success(
                 request, 
                 f"¡Orden #{orden.id} creada! Serás redirigido a WhatsApp para confirmar."
             )
-            
             # 5. Redirigir a WhatsApp
             return redirect(wa_url)
     else:
         form = OrderForm()
 
     return render(request, "cart/checkout_form.html", {"cart": cart, "form": form})
-
 
 def cart_summary(request: HttpRequest) -> JsonResponse:
     """

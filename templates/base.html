@@ -13,10 +13,6 @@
   <link href="{% static 'css/mystical-background.css' %}?v=2" rel="stylesheet">
 
   <style>
-    /* ==========================================
-       ESTILOS BASE - TEMA MÍSTICO CLARO
-       ========================================== */
-    
     * {
       box-sizing: border-box;
     }
@@ -42,10 +38,7 @@
       padding: 0 22px;
     }
     
-    /* ==========================================
-       TOPBAR CON CARRITO
-       ========================================== */
-    
+    /* ========== TOPBAR ========== */
     .topbar {
       position: sticky;
       top: 0;
@@ -56,7 +49,6 @@
     .topbar .wrap {
       padding: 20px 22px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
       gap: 20px;
     }
@@ -67,17 +59,21 @@
       gap: 12px;
       font-weight: 500;
       letter-spacing: 0.02em;
+      flex-shrink: 0;
     }
     
     .topbar-logo img {
       height: 48px;
     }
     
+    /* NAV EN EL MEDIO */
     .topbar nav {
       display: flex;
       gap: 20px;
       align-items: center;
       flex-wrap: wrap;
+      flex: 1;
+      justify-content: center;
     }
     
     .topbar nav a {
@@ -92,21 +88,20 @@
       font-weight: 600;
     }
     
-    /* ==========================================
-       CARRITO DROPDOWN
-       ========================================== */
-    
+    /* ========== CARRITO A LA DERECHA ========== */
     .cart-widget {
       position: relative;
       display: inline-block;
+      flex-shrink: 0;
+      margin-left: auto;
     }
     
     .cart-trigger {
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 8px 14px;
-      border-radius: 6px;
+      padding: 10px 16px;
+      border-radius: 8px;
       cursor: pointer;
       transition: all 0.2s ease;
       font-weight: 500;
@@ -120,36 +115,36 @@
     
     .cart-count {
       position: absolute;
-      top: 2px;
-      right: 6px;
-      min-width: 18px;
-      height: 18px;
+      top: 0;
+      right: 4px;
+      min-width: 20px;
+      height: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 10px;
+      border-radius: 12px;
       font-size: 0.7rem;
       font-weight: 700;
-      padding: 0 5px;
+      padding: 0 6px;
       line-height: 1;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      transition: all 0.3s ease;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
     .cart-count.hidden {
       opacity: 0;
-      transform: scale(0.5);
+      transform: scale(0.3);
     }
     
     .cart-dropdown {
       position: absolute;
-      top: calc(100% + 8px);
+      top: calc(100% + 10px);
       right: 0;
-      min-width: 320px;
-      max-width: 380px;
+      min-width: 340px;
+      max-width: 400px;
       border-radius: 12px;
-      padding: 16px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      padding: 18px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
       opacity: 0;
       visibility: hidden;
       transform: translateY(-10px);
@@ -165,38 +160,38 @@
     
     .cart-dropdown-header {
       font-weight: 700;
-      font-size: 1rem;
-      margin-bottom: 12px;
-      padding-bottom: 10px;
+      font-size: 1.05rem;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
       border-bottom: 2px solid;
     }
     
     .cart-dropdown-empty {
       text-align: center;
-      padding: 24px 12px;
-      opacity: 0.7;
-      font-size: 0.9rem;
+      padding: 28px 16px;
+      opacity: 0.65;
+      font-size: 0.95rem;
     }
     
     .cart-dropdown-items {
-      max-height: 280px;
+      max-height: 300px;
       overflow-y: auto;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
     
     .cart-dropdown-item {
       display: flex;
       gap: 12px;
-      padding: 10px;
-      margin-bottom: 8px;
-      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 10px;
+      border-radius: 10px;
       transition: all 0.2s ease;
     }
     
     .cart-item-img {
-      width: 50px;
-      height: 50px;
-      border-radius: 6px;
+      width: 55px;
+      height: 55px;
+      border-radius: 8px;
       object-fit: cover;
       flex-shrink: 0;
       border: 1px solid;
@@ -209,7 +204,7 @@
     
     .cart-item-name {
       font-weight: 600;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       margin-bottom: 4px;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -217,12 +212,12 @@
     }
     
     .cart-item-details {
-      font-size: 0.8rem;
-      opacity: 0.8;
+      font-size: 0.85rem;
+      opacity: 0.75;
     }
     
     .cart-dropdown-footer {
-      padding-top: 12px;
+      padding-top: 14px;
       border-top: 2px solid;
     }
     
@@ -230,27 +225,24 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
       font-weight: 700;
-      font-size: 1.1rem;
+      font-size: 1.15rem;
     }
     
     .cart-actions {
       display: flex;
-      gap: 8px;
+      gap: 10px;
     }
     
     .cart-actions .btn {
       flex: 1;
-      font-size: 0.85rem;
-      padding: 10px 12px;
+      font-size: 0.9rem;
+      padding: 11px 14px;
       justify-content: center;
     }
     
-    /* ==========================================
-       MAIN CONTENT
-       ========================================== */
-    
+    /* ========== MAIN ========== */
     main.wrap {
       padding: 40px 22px;
       min-height: calc(100vh - 180px);
@@ -263,18 +255,10 @@
       letter-spacing: -0.02em;
     }
     
-    h1 {
-      font-size: 2.5rem;
-    }
+    h1 { font-size: 2.5rem; }
+    h2 { font-size: 1.8rem; }
     
-    h2 {
-      font-size: 1.8rem;
-    }
-    
-    /* ==========================================
-       BOTONES
-       ========================================== */
-    
+    /* ========== BOTONES ========== */
     .btn {
       display: inline-flex;
       align-items: center;
@@ -303,10 +287,7 @@
       backdrop-filter: blur(8px);
     }
     
-    /* ==========================================
-       MESSAGES
-       ========================================== */
-    
+    /* ========== MESSAGES ========== */
     .messages {
       margin-bottom: 20px;
     }
@@ -321,20 +302,11 @@
     }
     
     @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     
-    /* ==========================================
-       FOOTER
-       ========================================== */
-    
+    /* ========== FOOTER ========== */
     footer.wrap {
       padding: 32px 22px;
       text-align: center;
@@ -346,10 +318,7 @@
       transition: all 0.2s ease;
     }
     
-    /* ==========================================
-       LIGHTBOX
-       ========================================== */
-    
+    /* ========== LIGHTBOX ========== */
     .lb {
       position: fixed;
       inset: 0;
@@ -360,9 +329,7 @@
       z-index: 2000;
     }
     
-    .lb.show {
-      display: flex;
-    }
+    .lb.show { display: flex; }
     
     .lb img {
       max-width: 90vw;
@@ -390,10 +357,7 @@
       cursor: zoom-in;
     }
     
-    /* ==========================================
-       COLORES TEMA MÍSTICO CLARO
-       ========================================== */
-    
+    /* ========== TEMA MÍSTICO ========== */
     body.mystic-theme {
       --mystic-cream: #f5f3f0;
       --mystic-text: #3d3731;
@@ -432,18 +396,19 @@
     }
     
     body.mystic-theme .cart-trigger:hover {
-      background: rgba(201, 169, 97, 0.12);
+      background: rgba(201, 169, 97, 0.15);
       color: var(--mystic-gold);
+      transform: translateY(-1px);
     }
     
     body.mystic-theme .cart-count {
-      background: linear-gradient(135deg, var(--mystic-gold-light), var(--mystic-gold));
-      color: #3d3731;
+      background: linear-gradient(135deg, #ff6b35, #ff8c5a);
+      color: white;
     }
     
     body.mystic-theme .cart-dropdown {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(20px);
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(24px);
       border: 2px solid var(--mystic-border);
       color: var(--mystic-text);
     }
@@ -454,13 +419,14 @@
     }
     
     body.mystic-theme .cart-dropdown-item {
-      background: rgba(249, 247, 244, 0.6);
+      background: rgba(249, 247, 244, 0.7);
       border: 1px solid var(--mystic-border);
     }
     
     body.mystic-theme .cart-dropdown-item:hover {
-      background: rgba(249, 247, 244, 0.9);
+      background: rgba(249, 247, 244, 1);
       border-color: var(--mystic-gold);
+      transform: translateX(2px);
     }
     
     body.mystic-theme .cart-item-img {
@@ -483,13 +449,13 @@
     }
     
     body.mystic-theme .btn-sec {
-      background: rgba(255, 255, 255, 0.7);
+      background: rgba(255, 255, 255, 0.8);
       color: var(--mystic-text);
       border-color: var(--mystic-border);
     }
     
     body.mystic-theme .btn-sec:hover {
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 1);
       border-color: var(--mystic-gold);
     }
     
@@ -545,43 +511,122 @@
       border-color: var(--mystic-gold);
     }
     
-    /* ==========================================
-       RESPONSIVE
-       ========================================== */
-    
-    @media (max-width: 860px) {
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 900px) {
       .topbar .wrap {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
+        flex-wrap: wrap;
+        padding: 16px;
+      }
+      
+      .topbar-logo {
+        order: 1;
+      }
+      
+      .cart-widget {
+        order: 2;
+        margin-left: 0;
       }
       
       .topbar nav {
+        order: 3;
         width: 100%;
-        justify-content: space-between;
+        flex: unset;
+        justify-content: flex-start;
+        gap: 10px;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid var(--mystic-border);
+      }
+      
+      .topbar nav a {
+        font-size: 0.9rem;
+        padding: 7px 12px;
       }
       
       .cart-dropdown {
-        right: -10px;
+        right: 0;
         max-width: calc(100vw - 32px);
+        min-width: 300px;
       }
       
       main.wrap {
-        padding: 24px 16px;
+        padding: 28px 18px;
       }
     }
     
     @media (max-width: 640px) {
-      h1 {
-        font-size: 2rem;
+      .topbar .wrap {
+        padding: 14px;
       }
       
-      h2 {
-        font-size: 1.5rem;
+      .topbar-logo img {
+        height: 42px;
       }
+      
+      .topbar-logo strong {
+        font-size: 0.95rem;
+      }
+      
+      .cart-icon {
+        font-size: 1.4rem;
+      }
+      
+      .cart-trigger {
+        padding: 8px 12px;
+      }
+      
+      .cart-count {
+        min-width: 18px;
+        height: 18px;
+        font-size: 0.65rem;
+      }
+      
+      h1 { font-size: 2rem; }
+      h2 { font-size: 1.5rem; }
       
       .cart-dropdown {
         min-width: 280px;
+        padding: 16px;
+      }
+      
+      .cart-dropdown-header {
+        font-size: 1rem;
+      }
+      
+      .cart-item-img {
+        width: 50px;
+        height: 50px;
+      }
+      
+      .cart-item-name {
+        font-size: 0.85rem;
+      }
+      
+      .cart-item-details {
+        font-size: 0.8rem;
+      }
+      
+      .cart-total {
+        font-size: 1.05rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .topbar-logo strong {
+        display: none;
+      }
+      
+      .topbar nav {
+        gap: 8px;
+      }
+      
+      .topbar nav a {
+        font-size: 0.85rem;
+        padding: 6px 10px;
+      }
+      
+      .cart-dropdown {
+        min-width: 260px;
       }
     }
   </style>
@@ -589,7 +634,6 @@
   {% block styles %}{% endblock %}
 </head>
 <body class="mystic-theme {% block body_class %}{% endblock %}">
-  <!-- Sol místico decorativo -->
   <div class="mystic-sun"></div>
   <div class="constellation-lines"></div>
 
@@ -628,37 +672,36 @@
           <a href="{% url 'login' %}" {% if current == 'login' %}aria-current="page"{% endif %}>Ingresar</a>
           <a href="{% url 'registro' %}" {% if current == 'registro' %}aria-current="page"{% endif %}>Registrarse</a>
         {% endif %}
+      </nav>
+      {% endwith %}
 
-        <!-- CARRITO WIDGET -->
-        <div class="cart-widget">
-          <div class="cart-trigger">
-            <span class="cart-icon">🛒</span>
-            <span class="cart-count hidden" id="cartCount">0</span>
+      <div class="cart-widget">
+        <div class="cart-trigger">
+          <span class="cart-icon">🛒</span>
+          <span class="cart-count hidden" id="cartCount">0</span>
+        </div>
+        
+        <div class="cart-dropdown" id="cartDropdown">
+          <div class="cart-dropdown-header">Tu Carrito</div>
+          
+          <div class="cart-dropdown-empty" id="cartEmpty">
+            Tu carrito está vacío
           </div>
           
-          <div class="cart-dropdown" id="cartDropdown">
-            <div class="cart-dropdown-header">Tu Carrito</div>
-            
-            <div class="cart-dropdown-empty" id="cartEmpty">
-              Tu carrito está vacío
+          <div class="cart-dropdown-items" id="cartItems" style="display:none;"></div>
+          
+          <div class="cart-dropdown-footer" id="cartFooter" style="display:none;">
+            <div class="cart-total">
+              <span>Total:</span>
+              <span id="cartTotal">$ 0</span>
             </div>
-            
-            <div class="cart-dropdown-items" id="cartItems" style="display:none;"></div>
-            
-            <div class="cart-dropdown-footer" id="cartFooter" style="display:none;">
-              <div class="cart-total">
-                <span>Total:</span>
-                <span id="cartTotal">$ 0</span>
-              </div>
-              <div class="cart-actions">
-                <a href="{% url 'cart:detail' %}" class="btn btn-sec">Ver carrito</a>
-                <a href="{% url 'cart:checkout_form' %}" class="btn">Comprar</a>
-              </div>
+            <div class="cart-actions">
+              <a href="{% url 'cart:detail' %}" class="btn btn-sec">Ver carrito</a>
+              <a href="{% url 'cart:checkout_form' %}" class="btn">Comprar</a>
             </div>
           </div>
         </div>
-      </nav>
-      {% endwith %}
+      </div>
     </div>
   </header>
 
@@ -691,7 +734,6 @@
 
   <script>window.CSRF_TOKEN=document.querySelector('meta[name="csrf-token"]')?.content;</script>
   
-  <!-- CARRITO AJAX -->
   <script>
   (function() {
     const cartCount = document.getElementById('cartCount');
@@ -739,18 +781,12 @@
       }
     }
     
-    // Actualizar al cargar la página
     updateCart();
-    
-    // Actualizar cuando se agregue algo al carrito
     document.addEventListener('cartUpdated', updateCart);
-    
-    // Polling cada 30 segundos (opcional, para múltiples pestañas)
     setInterval(updateCart, 30000);
   })();
   </script>
   
-  <!-- LIGHTBOX -->
   <script>
     (function(){
       const lb=document.getElementById('lightbox');

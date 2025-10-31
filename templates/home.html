@@ -40,6 +40,7 @@
     padding: 80px 60px;
     background: linear-gradient(135deg, var(--warm-cream) 0%, #fff9f0 100%);
     position: relative;
+    order: 2;
   }
 
   .hero-content::before {
@@ -178,6 +179,7 @@
     padding: 60px;
     position: relative;
     overflow: hidden;
+    order: 1;
   }
 
   .hero-visual::before {
@@ -393,21 +395,33 @@
       min-height: auto;
     }
 
-    .hero-content {
+    /* El logo se ve primero en mobile */
+    .hero-visual {
+      order: 1;
       padding: 60px 40px;
+      min-height: 50vh;
     }
 
-    .hero-visual {
+    .hero-content {
+      order: 2;
       padding: 60px 40px;
-      min-height: 400px;
     }
 
     .hero-logo-display img {
-      max-width: 240px;
+      max-width: 280px;
     }
   }
 
   @media (max-width: 640px) {
+    .hero-visual {
+      padding: 40px 24px;
+      min-height: 45vh;
+    }
+
+    .hero-logo-display img {
+      max-width: 220px;
+    }
+
     .hero-content {
       padding: 40px 24px;
     }
@@ -453,6 +467,13 @@
 {% block content %}
 <!-- HERO SECTION -->
 <div class="hero-container">
+  <div class="hero-visual">
+    <div class="hero-logo-display">
+      <img src="{% static 'img/fuegodeatenealogo.png' %}?v=2" 
+           alt="Fuego de Atenea - Logo">
+    </div>
+  </div>
+
   <div class="hero-content">
     <div class="hero-badge">
       🔥 Artesanales · Naturales · Exclusivos
@@ -472,13 +493,6 @@
       <a href="{% url 'sahumerios_lista' %}" class="btn-hero-primary">
         Explorar productos 🌿
       </a>
-    </div>
-  </div>
-  
-  <div class="hero-visual">
-    <div class="hero-logo-display">
-      <img src="{% static 'img/fuegodeatenealogo.png' %}?v=2" 
-           alt="Fuego de Atenea - Logo">
     </div>
   </div>
 </div>

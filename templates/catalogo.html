@@ -27,7 +27,15 @@
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
-.page-catalog { background: var(--bg-primary); color: var(--text-primary); line-height: 1.6; min-height: 100vh; }
+.page-catalog { 
+  background: var(--bg-primary); 
+  color: var(--text-primary); 
+  line-height: 1.6; 
+  min-height: 100vh;
+  isolation: auto;
+  position: relative;
+  z-index: 1;
+}
 
 /* Typography */
 .catalog-header { text-align: center; margin: 0 auto 48px; max-width: 880px; padding: 24px; }
@@ -42,12 +50,37 @@
 .page-catalog .btn-danger { border-color:#d4756a; color:#d4756a; }
 .page-catalog .btn-danger:hover { background:#d4756a; color:#fff; }
 
-/* Grid */
-.products-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 28px; padding: 0 8px; max-width: 1400px; margin: 0 auto; }
+/* Grid - CRÍTICO: Controlar z-index */
+.products-grid { 
+  display:grid; 
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+  gap: 28px; 
+  padding: 0 8px; 
+  max-width: 1400px; 
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+}
 
-/* Product Cards */
-.product-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; transition: all .25s ease; position: relative; overflow: hidden; display:flex; flex-direction:column; }
-.product-card:hover { border-color: var(--accent); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+/* Product Cards - CRÍTICO: z-index controlado */
+.product-card { 
+  background: var(--bg-card); 
+  border: 1px solid var(--border); 
+  border-radius: 10px; 
+  transition: all .25s ease; 
+  position: relative; 
+  overflow: hidden; 
+  display:flex; 
+  flex-direction:column;
+  z-index: 2;
+}
+.product-card:hover { 
+  border-color: var(--accent); 
+  box-shadow: var(--shadow-md); 
+  transform: translateY(-2px);
+  z-index: 3;
+}
 
 /* Badges */
 .product-badges { position:absolute; top:12px; left:12px; z-index:2; display:flex; flex-direction:column; gap:8px; }
@@ -62,7 +95,7 @@
 .product-card:hover .product-image img { transform: scale(1.03); }
 
 /* Actions */
-.product-actions { position:absolute; top:12px; right:12px; display:flex; flex-direction:column; gap:8px; opacity:0; transform: translateX(8px); transition: all .25s ease; }
+.product-actions { position:absolute; top:12px; right:12px; display:flex; flex-direction:column; gap:8px; opacity:0; transform: translateX(8px); transition: all .25s ease; z-index: 3; }
 .product-card:hover .product-actions { opacity:1; transform: translateX(0); }
 .action-btn { width:38px; height:38px; border:1px solid var(--border); background: rgba(255,255,255,.95); color: var(--accent); display:flex; align-items:center; justify-content:center; cursor:pointer; transition: all .2s ease; backdrop-filter: blur(8px); border-radius: 6px; }
 .action-btn:hover { background: var(--bg-card-hover); border-color: var(--accent); }
@@ -91,7 +124,23 @@
 .qty-input:focus { outline:none; }
 
 /* Edit Mode */
-.edit-mode-banner { background: var(--bg-card); border:1px solid var(--border); padding: 18px; margin: 0 8px 28px; max-width: 1400px; margin-left:auto; margin-right:auto; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap: 12px; border-radius: 10px; }
+.edit-mode-banner { 
+  background: var(--bg-card); 
+  border:1px solid var(--border); 
+  padding: 18px; 
+  margin: 0 8px 28px; 
+  max-width: 1400px; 
+  margin-left:auto; 
+  margin-right:auto; 
+  display:flex; 
+  align-items:center; 
+  justify-content:space-between; 
+  flex-wrap:wrap; 
+  gap: 12px; 
+  border-radius: 10px;
+  position: relative;
+  z-index: 2;
+}
 .edit-actions { display:flex; gap: 10px; flex-wrap: wrap; }
 
 /* Forms */
@@ -270,31 +319,39 @@
   </div>
 
   <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const grid = document.querySelector('.products-grid');
-    if (!grid) return;
+  (function() {
+    'use strict';
 
-    grid.addEventListener('click', function (event) {
-      const minus = event.target.closest('.qty-minus');
-      const plus = event.target.closest('.qty-plus');
-      if (!minus && !plus) return;
+    document.addEventListener('DOMContentLoaded', function() {
+      const grid = document.querySelector('.products-grid');
+      if (!grid) return;
 
-      const form = event.target.closest('form');
-      if (!form) return;
+      // Event delegation para botones de cantidad
+      grid.addEventListener('click', function(e) {
+        const qtyBtn = e.target.closest('.qty-minus, .qty-plus');
+        if (!qtyBtn) return;
 
-      const input = form.querySelector('input[name="quantity"]');
-      if (!input) return;
+        const form = qtyBtn.closest('form');
+        const input = form?.querySelector('.qty-input');
+        if (!input) return;
 
-      const current = parseInt(input.value || '1', 10) || 1;
-      input.value = minus ? Math.max(1, current - 1) : current + 1;
-    });
+        const current = parseInt(input.value, 10) || 1;
+        const isPlus = qtyBtn.classList.contains('qty-plus');
+        input.value = isPlus ? current + 1 : Math.max(1, current - 1);
+      });
 
-    grid.querySelectorAll('form[data-cart-form]').forEach(function (form) {
-      form.addEventListener('submit', async function (event) {
-        event.preventDefault();
+      // Event delegation para formularios de carrito
+      grid.addEventListener('submit', async function(e) {
+        const form = e.target.closest('form[data-cart-form]');
+        if (!form) return;
+
+        e.preventDefault();
 
         const button = form.querySelector('.add-to-cart-btn');
-        if (!button) { form.submit(); return; }
+        if (!button) {
+          form.submit();
+          return;
+        }
 
         const originalText = button.innerHTML;
         button.innerHTML = 'Agregando...';
@@ -302,19 +359,32 @@
         button.disabled = true;
 
         try {
-          const response = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+          const response = await fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+          });
+
           if (!response.ok) throw new Error('HTTP ' + response.status);
+
           document.dispatchEvent(new CustomEvent('cartUpdated'));
-          button.innerHTML = 'Agregado';
+          button.innerHTML = '✓ Agregado';
+          button.style.background = 'var(--accent)';
+
         } catch (error) {
           console.error('Error:', error);
-          button.innerHTML = 'Error';
+          button.innerHTML = '✗ Error';
+          button.style.background = '#d4756a';
         } finally {
-          setTimeout(function () { button.innerHTML = originalText; button.style.opacity = '1'; button.disabled = false; }, 1500);
+          setTimeout(function() {
+            button.innerHTML = originalText;
+            button.style.opacity = '1';
+            button.style.background = '';
+            button.disabled = false;
+          }, 1500);
         }
       });
     });
-  });
+  })();
   </script>
 {% endblock %}
-

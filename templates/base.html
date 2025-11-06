@@ -288,84 +288,32 @@
       backdrop-filter: blur(8px);
     }
     
-    /* ========== BOTÓN FLOTANTE DE CARRITO - CORREGIDO ========== */
+    /* ========== BOTÓN FLOTANTE DE CARRITO - SOLUCIÓN DEFINITIVA ========== */
     .btn-carrito-flotante {
-/* ========== BOTÓN FLOTANTE DE CARRITO - SOLUCIÓN DEFINITIVA ========== */
-.btn-carrito-flotante {
-  /* Posicionamiento fijo CRÍTICO */
-  position: fixed !important;
-  right: 20px !important;
-  bottom: 20px !important;
-  
-  /* Z-index MÁXIMO - Por encima de TODO incluso lightbox */
-  z-index: 2147483647 !important;
-  
-  /* Aislamiento total del stacking context */
-  isolation: isolate !important;
-  
-  /* Estilos visuales */
-  background: #fff088 !important;
-  color: #333 !important;
-  border-radius: 50px !important;
-  padding: 14px 28px !important;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3) !important;
-  font-weight: bold !important;
-  border: 2px solid #b68e2d !important;
-  
-  /* Display y visibilidad FORZADA */
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  white-space: nowrap !important;
-  
-  /* Interacción garantizada */
-  pointer-events: auto !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  
-  /* Evitar que otros elementos lo cubran */
-  transform: translateZ(999px) !important;
-  will-change: transform !important;
-  
-  /* Transición suave */
-  transition: all 0.3s ease !important;
-  
-  /* Sin decoración de texto */
-  text-decoration: none !important;
-  
-  /* Forzar layer de composición propio */
-  backface-visibility: hidden !important;
-  -webkit-backface-visibility: hidden !important;
-}
-
-.btn-carrito-flotante:hover {
-  background: #b68e2d !important;
-  color: #fff !important;
-  transform: translateZ(999px) scale(1.05) !important;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4) !important;
-}
-
-/* Forzar que el body y sus hijos directos no interfieran */
-body {
-  position: relative;
-  z-index: auto;
-}
-
-body > *:not(.btn-carrito-flotante):not(script):not(style) {
-  position: relative;
-  z-index: auto;
-}
-
-/* Asegurar que elementos con position fixed/absolute no cubran el botón */
-.topbar,
-.lb,
-main,
-footer,
-header {
-  z-index: auto !important;
-  max-z-index: 9999 !important;
-}
-     white-space: nowrap !important;
+      /* Posicionamiento fijo CRÍTICO */
+      position: fixed !important;
+      right: 20px !important;
+      bottom: 20px !important;
+      
+      /* Z-index MÁXIMO - Por encima de TODO */
+      z-index: 999999 !important;
+      
+      /* Estilos visuales */
+      background: #fff088 !important;
+      color: #333 !important;
+      border-radius: 50px !important;
+      padding: 14px 28px !important;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3) !important;
+      font-weight: bold !important;
+      border: 2px solid #b68e2d !important;
+      
+      /* Display y visibilidad FORZADA */
+      display: flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      white-space: nowrap !important;
+      
+      /* Interacción garantizada */
       pointer-events: auto !important;
       visibility: visible !important;
       opacity: 1 !important;
@@ -373,15 +321,15 @@ header {
       /* Transición suave */
       transition: all 0.3s ease !important;
       
-      /* Evitar que otros elementos lo cubran */
-      isolation: isolate !important;
+      /* Sin decoración de texto */
+      text-decoration: none !important;
     }
     
     .btn-carrito-flotante:hover {
       background: #b68e2d !important;
       color: #fff !important;
       transform: scale(1.05) !important;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25) !important;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4) !important;
     }
     
     /* ========== MESSAGES ========== */
@@ -750,7 +698,7 @@ header {
         bottom: 15px !important;
         right: 15px !important;
         font-size: 0.95rem !important;
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2) !important;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25) !important;
       }
       
       footer.wrap {

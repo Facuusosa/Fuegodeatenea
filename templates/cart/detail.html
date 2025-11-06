@@ -3,6 +3,8 @@
 {% load humanize %}
 {% block title %}Carrito{% endblock %}
 
+{% block body_class %}cart-page{% endblock %}
+
 {% block styles %}
 <style>
   .cart-header {
@@ -23,12 +25,12 @@
   .cart-title {
     font-size: 2rem;
     font-weight: 800;
-    color: var(--text);
+    color: var(--mystic-text);
     margin: 0;
   }
   
   .cart-count {
-    color: var(--muted);
+    color: var(--mystic-gold);
     font-size: 0.95rem;
     font-weight: 500;
     display: block;
@@ -45,7 +47,8 @@
   
   .cart-empty p {
     font-size: 1.1rem;
-    color: var(--muted);
+    color: var(--mystic-text);
+    opacity: 0.7;
     margin-bottom: 24px;
   }
   
@@ -56,8 +59,8 @@
   }
   
   .cart-item {
-    background: var(--card);
-    border: 1px solid var(--b);
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid var(--mystic-border);
     border-radius: 16px;
     padding: 24px;
     display: grid;
@@ -69,14 +72,15 @@
   }
   
   .cart-item:hover {
-    box-shadow: 0 4px 16px rgba(0,0,0,.08);
+    box-shadow: 0 4px 16px rgba(201, 169, 97, 0.15);
     transform: translateY(-2px);
+    border-color: var(--mystic-gold);
   }
   
   .cart-item-image {
     width: 140px;
     height: 140px;
-    border: 2px solid var(--b);
+    border: 2px solid var(--mystic-border);
     border-radius: 14px;
     overflow: hidden;
     display: flex;
@@ -103,14 +107,14 @@
   .cart-item-name {
     font-size: 1.2rem;
     font-weight: 700;
-    color: var(--text);
+    color: var(--mystic-text);
     margin: 0;
     line-height: 1.3;
   }
   
   .cart-item-price {
     font-size: 1.1rem;
-    color: var(--muted);
+    color: var(--mystic-gold);
     font-weight: 600;
   }
   
@@ -124,9 +128,9 @@
     width: 36px;
     height: 36px;
     border-radius: 8px;
-    border: 1px solid var(--b);
+    border: 1px solid var(--mystic-border);
     background: white;
-    color: var(--text);
+    color: var(--mystic-text);
     font-size: 1.2rem;
     font-weight: 700;
     cursor: pointer;
@@ -137,8 +141,9 @@
   }
   
   .qty-btn:hover {
-    background: var(--bg);
-    border-color: var(--text);
+    background: var(--mystic-gold);
+    border-color: var(--mystic-gold);
+    color: white;
   }
   
   .qty-btn:active {
@@ -150,7 +155,7 @@
     height: 36px;
     text-align: center;
     padding: 8px;
-    border: 1px solid var(--b);
+    border: 1px solid var(--mystic-border);
     border-radius: 8px;
     font-size: 1rem;
     font-weight: 600;
@@ -159,7 +164,7 @@
   
   .qty-input:focus {
     outline: none;
-    border-color: var(--brand);
+    border-color: var(--mystic-gold);
   }
   
   .cart-item-actions {
@@ -173,14 +178,14 @@
   .cart-item-subtotal {
     font-size: 1.4rem;
     font-weight: 800;
-    color: var(--text);
+    color: var(--mystic-text);
     white-space: nowrap;
   }
   
   .remove-btn {
     background: transparent;
-    color: var(--btnDanger);
-    border: 1px solid var(--btnDanger);
+    color: #dc2626;
+    border: 1px solid #dc2626;
     padding: 6px 16px;
     border-radius: 8px;
     font-weight: 600;
@@ -189,13 +194,13 @@
   }
   
   .remove-btn:hover {
-    background: var(--btnDanger);
+    background: #dc2626;
     color: white;
   }
   
   .cart-summary {
-    background: var(--card);
-    border: 2px solid var(--b);
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid var(--mystic-border);
     border-radius: 16px;
     padding: 28px;
     display: flex;
@@ -203,13 +208,13 @@
     align-items: center;
     gap: 20px;
     flex-wrap: wrap;
-    box-shadow: 0 4px 12px rgba(0,0,0,.06);
+    box-shadow: 0 4px 12px rgba(201, 169, 97, 0.1);
   }
   
   .cart-total {
     font-size: 1.8rem;
     font-weight: 900;
-    color: var(--text);
+    color: var(--mystic-text);
   }
   
   .cart-actions {

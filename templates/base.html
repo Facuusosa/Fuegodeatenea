@@ -288,17 +288,12 @@
       backdrop-filter: blur(8px);
     }
     
-    /* ========== BOTÓN FLOTANTE DE CARRITO - SOLUCIÓN DEFINITIVA ========== */
+    /* ========== BOTÓN FLOTANTE DEL CARRITO ========== */
     .btn-carrito-flotante {
-      /* Posicionamiento fijo CRÍTICO */
       position: fixed !important;
       right: 20px !important;
       bottom: 20px !important;
-      
-      /* Z-index MÁXIMO - Por encima de TODO */
       z-index: 999999 !important;
-      
-      /* Estilos visuales */
       background: #fff088 !important;
       color: #333 !important;
       border-radius: 50px !important;
@@ -306,22 +301,14 @@
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3) !important;
       font-weight: bold !important;
       border: 2px solid #b68e2d !important;
-      
-      /* Display y visibilidad FORZADA */
       display: flex !important;
       align-items: center !important;
       gap: 8px !important;
       white-space: nowrap !important;
-      
-      /* Interacción garantizada */
       pointer-events: auto !important;
       visibility: visible !important;
       opacity: 1 !important;
-      
-      /* Transición suave */
       transition: all 0.3s ease !important;
-      
-      /* Sin decoración de texto */
       text-decoration: none !important;
     }
     
@@ -330,6 +317,11 @@
       color: #fff !important;
       transform: scale(1.05) !important;
       box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4) !important;
+    }
+    
+    /* OCULTAR BOTÓN FLOTANTE EN PÁGINA DE CARRITO */
+    body.cart-page .btn-carrito-flotante {
+      display: none !important;
     }
     
     /* ========== MESSAGES ========== */
@@ -356,7 +348,6 @@
       padding: 32px 22px;
       text-align: center;
       backdrop-filter: blur(8px);
-      /* Añadir padding-bottom extra para que no tape el botón flotante */
       padding-bottom: 100px;
     }
     
@@ -607,11 +598,6 @@
     @media (max-width: 640px) {
       .topbar .wrap {
         padding: 14px;
-        flex-wrap: nowrap;
-      }
-      
-      .topbar-logo {
-        flex: 0 0 auto;
       }
       
       .topbar-logo img {
@@ -620,18 +606,6 @@
       
       .topbar-logo strong {
         font-size: 0.95rem;
-      }
-      
-      .topbar nav {
-        order: 3;
-        width: 100%;
-        margin-top: 12px;
-        padding-top: 12px;
-      }
-      
-      .cart-widget {
-        order: 2;
-        margin-left: auto;
       }
       
       .cart-icon {
@@ -828,12 +802,10 @@
     <img id="lbImg" src="" alt="">
   </div>
 
-  <!-- BOTÓN FLOTANTE DEL CARRITO (oculto en página de carrito) -->
-  {% if request.resolver_match.url_name != 'cart_detail' %}
+  <!-- BOTÓN FLOTANTE DEL CARRITO -->
   <a href="{% url 'cart:detail' %}" class="btn-carrito-flotante" id="floatingCartBtn">
     🛒 Ver carrito
   </a>
-  {% endif %}
 
   <script>window.CSRF_TOKEN=document.querySelector('meta[name="csrf-token"]')?.content;</script>
   

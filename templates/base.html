@@ -43,7 +43,7 @@
     .topbar {
       position: sticky;
       top: 0;
-      z-index: 100;
+      z-index: 9999;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     }
     
@@ -828,10 +828,12 @@
     <img id="lbImg" src="" alt="">
   </div>
 
-  <!-- BOTÓN FLOTANTE DEL CARRITO -->
+  <!-- BOTÓN FLOTANTE DEL CARRITO (oculto en página de carrito) -->
+  {% if request.resolver_match.url_name != 'cart_detail' %}
   <a href="{% url 'cart:detail' %}" class="btn-carrito-flotante" id="floatingCartBtn">
     🛒 Ver carrito
   </a>
+  {% endif %}
 
   <script>window.CSRF_TOKEN=document.querySelector('meta[name="csrf-token"]')?.content;</script>
   

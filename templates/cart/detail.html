@@ -8,16 +8,16 @@
   .cart-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     margin-bottom: 32px;
     gap: 16px;
-    flex-wrap: wrap;
   }
   
   .cart-title-section {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 4px;
+    flex: 1;
   }
   
   .cart-title {
@@ -29,8 +29,13 @@
   
   .cart-count {
     color: var(--muted);
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 500;
+    display: block;
+  }
+  
+  .cart-header-actions {
+    flex-shrink: 0;
   }
   
   .cart-empty {
@@ -216,7 +221,7 @@
   @media (max-width: 768px) {
     .cart-header {
       flex-direction: column;
-      align-items: flex-start;
+      align-items: stretch;
       gap: 16px;
     }
     
@@ -224,11 +229,15 @@
       width: 100%;
     }
     
-    .cart-header form {
+    .cart-header-actions {
       width: 100%;
     }
     
-    .cart-header form button {
+    .cart-header-actions form {
+      width: 100%;
+    }
+    
+    .cart-header-actions form button {
       width: 100%;
     }
     
@@ -280,6 +289,10 @@
       font-size: 1.4rem;
     }
     
+    .cart-count {
+      font-size: 0.85rem;
+    }
+    
     .cart-item {
       padding: 16px;
     }
@@ -317,15 +330,17 @@
   <div class="cart-title-section">
     <h2 class="cart-title">Carrito</h2>
     {% if cart|length > 0 %}
-      <div class="cart-count">{{ cart|length }} {% if cart|length == 1 %}ítem{% else %}ítems{% endif %}</div>
+      <span class="cart-count">{{ cart|length }} {% if cart|length == 1 %}ítem{% else %}ítems{% endif %}</span>
     {% endif %}
   </div>
   
   {% if cart|length > 0 %}
-    <form method="post" action="{% url 'cart:clear' %}">
-      {% csrf_token %}
-      <button class="btn-sec" type="submit">Vaciar carrito</button>
-    </form>
+    <div class="cart-header-actions">
+      <form method="post" action="{% url 'cart:clear' %}">
+        {% csrf_token %}
+        <button class="btn-sec" type="submit">Vaciar carrito</button>
+      </form>
+    </div>
   {% endif %}
 </div>
 

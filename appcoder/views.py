@@ -95,6 +95,35 @@ def _parse_img_cell(cell: str, name_lut: dict, stem_lut: dict):
     return _resolve_local_image(s, name_lut, stem_lut), ""
 
 
+def _parse_stock(value):
+    """Convierte el valor de stock a número entero."""
+    if pd.isna(value) or value == "" or value is None:
+        return 0
+    try:
+        return int(float(str(value)))
+    except (ValueError, TypeError):
+        return 0
+
+
+def _parse_activo(value):
+    """Determina si el producto está activo."""
+    if pd.isna(value) or value == "" or value is None:
+        return True  # Por defecto, activo
+    
+    val_str = str(value).strip().upper()
+    
+    # Si es "NO", "N", "FALSE", "0", "INACTIVO" -> False
+    if val_str in ("NO", "N", "FALSE", "0", "INACTIVO", "INACTIVE"):
+        return False
+    
+    # Si es "SI", "YES", "TRUE", "1", "ACTIVO" -> True
+    if val_str in ("SI", "S", "YES", "Y", "TRUE", "1", "ACTIVO", "ACTIVE"):
+        return True
+    
+    # Por defecto, activo
+    return True
+
+
 def _leer_excel():
     ruta = Path(settings.BASE_DIR) / "final.xlsx"
     if not ruta.exists():
@@ -103,6 +132,7 @@ def _leer_excel():
         df = pd.read_excel(ruta).fillna("")
     except Exception:
         return []
+    
     cols = list(df.columns)
     col_marca    = _pick_col(cols, "marca", "brand")
     col_titulo   = _pick_col(cols, "titulo","nombre","producto","material","sahumerio")
@@ -110,8 +140,12 @@ def _leer_excel():
     col_precio   = _pick_col(cols, "precio","valor","importe")
     col_duracion = _pick_col(cols, "duracion","duración")
     col_imagen   = _pick_col(cols, "imagenes","imagen","image","foto","pic")
+    col_stock    = _pick_col(cols, "stock", "cantidad", "existencia")
+    col_activo   = _pick_col(cols, "activo", "active", "estado", "status")
+    
     name_lut, stem_lut = _index_product_files()
     items = []
+    
     for i, r in df.iterrows():
         marca = str(r.get(col_marca, "")).strip()
         titulo = str(r.get(col_titulo, "")).strip()
@@ -119,11 +153,18 @@ def _leer_excel():
         precio = r.get(col_precio, "")
         duracion = str(r.get(col_duracion, "")).strip()
         imgs_raw = str(r.get(col_imagen, "")).strip()
+        
+        # NUEVO: Leer stock y activo
+        stock = _parse_stock(r.get(col_stock, ""))
+        activo = _parse_activo(r.get(col_activo, ""))
+        
         first_val = ""
         if imgs_raw:
             partes = [p.strip() for p in re.split(r"[;,]", imgs_raw) if p.strip()]
             first_val = partes[0] if partes else ""
+        
         img_file, img_abs = _parse_img_cell(first_val, name_lut, stem_lut)
+        
         if not img_file and not img_abs and titulo:
             key = _norm_text(titulo)
             if key in stem_lut:
@@ -142,6 +183,7 @@ def _leer_excel():
                         best_name = fname
                 if best_score >= 0.6:
                     img_file = best_name
+        
         items.append({
             "idx": i,
             "marca": marca,
@@ -152,25 +194,36 @@ def _leer_excel():
             "img_file": img_file,
             "img_abs": img_abs,
             "raw": first_val,
+            "stock": stock,        # NUEVO
+            "activo": activo,      # NUEVO
         })
+    
     return items
 
 
 class CatalogoExcelView(TemplateView):
     template_name = "catalogo.html"
+    
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         x_items = _leer_excel()
+        
         edit_mode = (
             self.request.user.is_authenticated
             and self.request.user.username.lower() == "fsosa"
             and self.request.GET.get("modo") == "edit"
         )
+        
         db_qs = Sahumerio.objects.all()
         db_items = []
+        
         for o in db_qs:
-            # CORRECCIÓN: Usar imagen_resuelta() para obtener la imagen correcta (Cloudinary o local)
-            img_url = o.imagen_resuelta()
+            # Usar imagen_resuelta() si existe, sino intentar otros campos
+            img_url = ""
+            if hasattr(o, 'imagen_resuelta'):
+                img_url = o.imagen_resuelta()
+            elif hasattr(o, 'imagen') and o.imagen:
+                img_url = str(o.imagen.url) if hasattr(o.imagen, 'url') else str(o.imagen)
             
             # Determinar si es file local o URL absoluta
             img_file = ""
@@ -187,6 +240,12 @@ class CatalogoExcelView(TemplateView):
                 else:
                     img_file = img_url
             
+            # NUEVO: Obtener stock y activo del modelo
+            stock = getattr(o, "stock", 0) or 0
+            activo = getattr(o, "activo", True)
+            if activo is None:
+                activo = True
+            
             db_items.append({
                 "origen": "DB",
                 "pk": o.pk,
@@ -200,7 +259,10 @@ class CatalogoExcelView(TemplateView):
                 "img_abs": img_abs,
                 "raw": "",
                 "marca": getattr(o, "marca", "") or "",
+                "stock": stock,      # NUEVO
+                "activo": activo,    # NUEVO
             })
+        
         qs = db_qs.values("id", "nombre", "marca")
         lut = {}
         for q in qs:
@@ -208,30 +270,38 @@ class CatalogoExcelView(TemplateView):
             m = q["marca"] or ""
             for k in {_norm_text(n), _norm_text(f"{m} {n}"), _norm_text(f"{n} {m}")}:
                 lut[k] = q["id"]
+        
         for it in x_items:
             it["origen"] = "XLSX"
             it["pk"] = None
             it["match_id"] = lut.get(_norm_text(it["titulo"]))
+        
         combinados = x_items + db_items
+        
         def _key(x):
             a = (x.get("marca") or "").lower()
             b = (x.get("titulo") or "").lower()
             return (a, b)
+        
         combinados.sort(key=_key)
+        
         ctx["items"] = combinados
         ctx["edit_mode"] = edit_mode
         ctx["debug"] = bool(self.request.GET.get("debug"))
+        
         return ctx
 
 
 class ExcelDetalleView(TemplateView):
     template_name = "sahumerio_detalle_excel.html"
+    
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         items = _leer_excel()
         idx = kwargs.get("idx")
         it = next((x for x in items if x["idx"] == idx), None)
         ctx["it"] = it
+        
         match_id = None
         if it:
             qs = Sahumerio.objects.values("id", "nombre", "marca")
@@ -242,6 +312,7 @@ class ExcelDetalleView(TemplateView):
                 for k in {_norm_text(n), _norm_text(f"{m} {n}"), _norm_text(f"{n} {m}")}:
                     lut[k] = q["id"]
             match_id = lut.get(_norm_text(it["titulo"]))
+        
         ctx["match_id"] = match_id
         return ctx
 
@@ -257,6 +328,7 @@ class SahumerioCrear(LoginRequiredMixin, SoloFsosaMixin, CreateView):
     form_class = SahumerioForm
     template_name = "sahumerio_form.html"
     success_url = reverse_lazy("sahumerios_lista")
+    
     def get_initial(self):
         ini = super().get_initial()
         g = self.request.GET

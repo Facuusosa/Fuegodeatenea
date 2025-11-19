@@ -50,7 +50,7 @@
 .page-catalog .btn-danger { border-color:#d4756a; color:#d4756a; }
 .page-catalog .btn-danger:hover { background:#d4756a; color:#fff; }
 
-/* Grid - CRÍTICO: Controlar z-index */
+/* Grid */
 .products-grid { 
   display:grid; 
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
@@ -63,7 +63,7 @@
   isolation: isolate;
 }
 
-/* Product Cards - CRÍTICO: z-index controlado */
+/* Product Cards */
 .product-card { 
   background: var(--bg-card); 
   border: 1px solid var(--border); 
@@ -82,21 +82,64 @@
   z-index: 3;
 }
 
+/* PRODUCTOS SIN STOCK - Estilos mejorados */
+.product-card.out-of-stock {
+  opacity: 0.65;
+  background: rgba(245, 245, 245, 0.8);
+  border-color: rgba(150, 150, 150, 0.3);
+}
+
+.product-card.out-of-stock .product-image {
+  position: relative;
+}
+
+.product-card.out-of-stock .product-image::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.5);
+  pointer-events: none;
+}
+
+.product-card.out-of-stock .product-image img {
+  filter: grayscale(100%) brightness(1.2);
+  opacity: 0.6;
+}
+
+.product-card.out-of-stock:hover {
+  transform: none;
+  box-shadow: var(--shadow-sm);
+  border-color: rgba(150, 150, 150, 0.3);
+}
+
+.product-card.out-of-stock .product-title a {
+  color: var(--text-muted);
+}
+
+.product-card.out-of-stock .current-price {
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
 /* Badges */
 .product-badges { position:absolute; top:12px; left:12px; z-index:2; display:flex; flex-direction:column; gap:8px; }
 .badge { padding: 6px 12px; font-size: .7rem; font-weight: 500; text-transform: uppercase; letter-spacing: .08em; background: rgba(255,255,255,.95); color: var(--text-primary); border: 1px solid var(--border); backdrop-filter: blur(8px); border-radius: 4px; }
 .badge-best-seller { background: var(--accent); color: #fff; border-color: var(--accent); }
 .badge-new { background: rgba(255,255,255,.95); color: var(--accent); border-color: var(--accent); }
 .badge-import { background: rgba(255,255,255,.95); color: var(--text-secondary); border-color: var(--border-hover); }
+.badge-out-of-stock { background: rgba(128, 128, 128, 0.95); color: #fff; border-color: #808080; font-weight: 600; }
 
 /* Image */
 .product-image { position: relative; height: 300px; background: var(--bg-secondary); overflow: hidden; display:flex; align-items:center; justify-content:center; border-bottom:1px solid var(--border); }
 .product-image img { width: 100%; height: 100%; object-fit: contain; padding: 28px; transition: transform .35s ease, opacity .25s ease; }
-.product-card:hover .product-image img { transform: scale(1.03); }
+.product-card:not(.out-of-stock):hover .product-image img { transform: scale(1.03); }
 
 /* Actions */
 .product-actions { position:absolute; top:12px; right:12px; display:flex; flex-direction:column; gap:8px; opacity:0; transform: translateX(8px); transition: all .25s ease; z-index: 3; }
-.product-card:hover .product-actions { opacity:1; transform: translateX(0); }
+.product-card:not(.out-of-stock):hover .product-actions { opacity:1; transform: translateX(0); }
 .action-btn { width:38px; height:38px; border:1px solid var(--border); background: rgba(255,255,255,.95); color: var(--accent); display:flex; align-items:center; justify-content:center; cursor:pointer; transition: all .2s ease; backdrop-filter: blur(8px); border-radius: 6px; }
 .action-btn:hover { background: var(--bg-card-hover); border-color: var(--accent); }
 
@@ -122,6 +165,19 @@
 .qty-btn:last-child { border-left:1px solid var(--border); }
 .qty-input { width: 52px; height:36px; border:none; background:transparent; color: var(--text-primary); text-align:center; font-weight:600; font-size:.95rem; }
 .qty-input:focus { outline:none; }
+
+/* Mensaje de sin stock mejorado */
+.out-of-stock-message {
+  text-align: center;
+  padding: 14px;
+  background: rgba(128, 128, 128, 0.08);
+  border: 1px solid rgba(128, 128, 128, 0.2);
+  border-radius: 6px;
+  color: #666;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
 
 /* Edit Mode */
 .edit-mode-banner { 
@@ -185,8 +241,13 @@
 
   <div class="products-grid">
     {% for it in items %}
-      {% with target_url=it.pk|default:it.idx %}
-      <article class="product-card" data-product-id="{{ target_url }}" data-product-origin="{{ it.origen }}">
+      {% comment %}Detectar si el producto está sin stock o inactivo - LÓGICA CORREGIDA{% endcomment %}
+      {% if it.stock == 0 or it.stock == "0" or it.stock == None or it.activo == "NO" or it.activo == "no" or it.activo == False %}
+      <article class="product-card out-of-stock" data-product-id="{{ it.pk|default:it.idx }}" data-product-origin="{{ it.origen }}">
+      {% else %}
+      <article class="product-card" data-product-id="{{ it.pk|default:it.idx }}" data-product-origin="{{ it.origen }}">
+      {% endif %}
+      
         {% if it.origen == 'DB' and it.pk %}
           {% url 'sahumerio_detalle' it.pk as detail_url %}
         {% elif it.match_id %}
@@ -196,40 +257,46 @@
         {% endif %}
 
         <div class="product-badges">
-          {% if forloop.counter <= 3 %}
-          <span class="badge badge-best-seller">Favorito</span>
-          {% endif %}
-
-          {% if not it.match_id %}
-            {% if it.origen != 'DB' or not it.pk %}
-          <span class="badge badge-import">Destacado</span>
+          {% comment %}DEBUG: Mostrar valores reales{% endcomment %}
+          {% comment %}Stock: {{ it.stock|default:"None" }} | Activo: {{ it.activo|default:"None" }}{% endcomment %}
+          
+          {% if it.stock == 0 or it.stock == "0" or it.stock == None or it.stock == '' or it.activo == "NO" or it.activo == "no" or it.activo == False %}
+          <span class="badge badge-out-of-stock">Sin Stock</span>
+          {% else %}
+            {% if forloop.counter <= 3 %}
+            <span class="badge badge-best-seller">Favorito</span>
             {% endif %}
-          {% endif %}
 
-          {% if forloop.counter|divisibleby:5 %}
-          <span class="badge badge-new">Nuevo</span>
+            {% if not it.match_id %}
+              {% if it.origen != 'DB' or not it.pk %}
+            <span class="badge badge-import">Destacado</span>
+              {% endif %}
+            {% endif %}
+
+            {% if forloop.counter|divisibleby:5 %}
+            <span class="badge badge-new">Nuevo</span>
+            {% endif %}
           {% endif %}
         </div>
 
         <div class="product-image">
           <a href="{{ detail_url }}">
-            {% with img_src=it.img_abs|default:it.img_file %}
-              {% if img_src %}
-                {% if it.img_file and not it.img_abs %}
-                  <img src="{% static 'img/productos/' %}{{ img_src }}" alt="{{ it.titulo }}" loading="lazy" decoding="async">
-                {% else %}
-                  <img src="{{ img_src }}" alt="{{ it.titulo }}" loading="lazy" decoding="async">
-                {% endif %}
-              {% else %}
-                <img src="{% static 'img/placeholder.png' %}" alt="Sin imagen" loading="lazy" decoding="async">
-              {% endif %}
-            {% endwith %}
+            {% if it.img_abs %}
+              <img src="{{ it.img_abs }}" alt="{{ it.titulo }}" loading="lazy" decoding="async">
+            {% elif it.img_file %}
+              <img src="{% static 'img/productos/' %}{{ it.img_file }}" alt="{{ it.titulo }}" loading="lazy" decoding="async">
+            {% else %}
+              <img src="{% static 'img/placeholder.png' %}" alt="Sin imagen" loading="lazy" decoding="async">
+            {% endif %}
           </a>
 
+          {% comment %}Solo mostrar acciones si tiene stock{% endcomment %}
+          {% if it.stock != 0 and it.stock != "0" and it.stock != None and it.activo != "NO" and it.activo != "no" and it.activo != False %}
           <div class="product-actions">
             <button class="action-btn" type="button" title="Vista rápida">👁️</button>
             <button class="action-btn" type="button" title="Favorito">❤</button>
           </div>
+          {% endif %}
         </div>
 
         <div class="product-info">
@@ -248,8 +315,10 @@
           <div class="product-price">
             <span class="current-price">$ {{ it.precio|floatformat:2|intcomma }}</span>
             {% if forloop.counter|divisibleby:4 %}
+              {% if it.stock != 0 and it.stock != "0" and it.stock != None and it.activo != "NO" and it.activo != "no" and it.activo != False %}
             <span class="old-price">$ {{ it.precio|add:500|floatformat:2|intcomma }}</span>
             <span class="discount-badge">-15%</span>
+              {% endif %}
             {% endif %}
           </div>
 
@@ -267,52 +336,55 @@
           </div>
           {% endif %}
 
-          {% if it.origen == 'DB' and it.pk %}
-            {% with item_id=it.pk %}
-            <form action="{% url 'cart:add_db' item_id %}" method="post" class="cart-form" data-cart-form data-product-id="{{ item_id }}">
-              {% csrf_token %}
-              <input type="hidden" name="replace" value="0">
-              <div class="quantity-selector">
-                <button type="button" class="qty-btn qty-minus">−</button>
-                <input type="number" name="quantity" value="1" min="1" class="qty-input" required>
-                <button type="button" class="qty-btn qty-plus">+</button>
-              </div>
-              <button type="submit" class="btn btn-primary add-to-cart-btn">Agregar al carrito</button>
-            </form>
-            {% endwith %}
-          {% elif it.match_id %}
-            {% with item_id=it.match_id %}
-            <form action="{% url 'cart:add_db' item_id %}" method="post" class="cart-form" data-cart-form data-product-id="{{ item_id }}">
-              {% csrf_token %}
-              <input type="hidden" name="replace" value="0">
-              <div class="quantity-selector">
-                <button type="button" class="qty-btn qty-minus">−</button>
-                <input type="number" name="quantity" value="1" min="1" class="qty-input" required>
-                <button type="button" class="qty-btn qty-plus">+</button>
-              </div>
-              <button type="submit" class="btn btn-primary add-to-cart-btn">Agregar al carrito</button>
-            </form>
-            {% endwith %}
+          {% comment %}MENSAJE O FORMULARIO según stock{% endcomment %}
+          {% if it.stock == 0 or it.stock == "0" or it.stock == None or it.activo == "NO" or it.activo == "no" or it.activo == False %}
+            <div class="out-of-stock-message">
+              🚫 Producto no disponible
+            </div>
           {% else %}
-            <form action="{% url 'cart:add' %}" method="post" class="cart-form" data-cart-form>
-              {% csrf_token %}
-              <input type="hidden" name="origin" value="X">
-              <input type="hidden" name="product_id" value="{{ it.idx }}">
-              <input type="hidden" name="name" value="{{ it.titulo }}">
-              <input type="hidden" name="price" value="{{ it.precio }}">
-              <input type="hidden" name="img" value="{% if it.img_abs %}{{ it.img_abs }}{% elif it.img_file %}{% static 'img/productos/' %}{{ it.img_file }}{% else %}{% static 'img/placeholder.png' %}{% endif %}">
-              <input type="hidden" name="replace" value="0">
-              <div class="quantity-selector">
-                <button type="button" class="qty-btn qty-minus">−</button>
-                <input type="number" name="quantity" value="1" min="1" class="qty-input" required>
-                <button type="button" class="qty-btn qty-plus">+</button>
-              </div>
-              <button type="submit" class="btn add-to-cart-btn">Agregar material</button>
-            </form>
+            {% comment %}FORMULARIOS DE CARRITO - Solo si hay stock{% endcomment %}
+            {% if it.origen == 'DB' and it.pk %}
+              <form action="{% url 'cart:add_db' it.pk %}" method="post" class="cart-form" data-cart-form data-product-id="{{ it.pk }}">
+                {% csrf_token %}
+                <input type="hidden" name="replace" value="0">
+                <div class="quantity-selector">
+                  <button type="button" class="qty-btn qty-minus">−</button>
+                  <input type="number" name="quantity" value="1" min="1" class="qty-input" required>
+                  <button type="button" class="qty-btn qty-plus">+</button>
+                </div>
+                <button type="submit" class="btn btn-primary add-to-cart-btn">Agregar al carrito</button>
+              </form>
+            {% elif it.match_id %}
+              <form action="{% url 'cart:add_db' it.match_id %}" method="post" class="cart-form" data-cart-form data-product-id="{{ it.match_id }}">
+                {% csrf_token %}
+                <input type="hidden" name="replace" value="0">
+                <div class="quantity-selector">
+                  <button type="button" class="qty-btn qty-minus">−</button>
+                  <input type="number" name="quantity" value="1" min="1" class="qty-input" required>
+                  <button type="button" class="qty-btn qty-plus">+</button>
+                </div>
+                <button type="submit" class="btn btn-primary add-to-cart-btn">Agregar al carrito</button>
+              </form>
+            {% else %}
+              <form action="{% url 'cart:add' %}" method="post" class="cart-form" data-cart-form>
+                {% csrf_token %}
+                <input type="hidden" name="origin" value="X">
+                <input type="hidden" name="product_id" value="{{ it.idx }}">
+                <input type="hidden" name="name" value="{{ it.titulo }}">
+                <input type="hidden" name="price" value="{{ it.precio }}">
+                <input type="hidden" name="img" value="{% if it.img_abs %}{{ it.img_abs }}{% elif it.img_file %}{% static 'img/productos/' %}{{ it.img_file }}{% else %}{% static 'img/placeholder.png' %}{% endif %}">
+                <input type="hidden" name="replace" value="0">
+                <div class="quantity-selector">
+                  <button type="button" class="qty-btn qty-minus">−</button>
+                  <input type="number" name="quantity" value="1" min="1" class="qty-input" required>
+                  <button type="button" class="qty-btn qty-plus">+</button>
+                </div>
+                <button type="submit" class="btn btn-primary add-to-cart-btn">Agregar material</button>
+              </form>
+            {% endif %}
           {% endif %}
         </div>
       </article>
-      {% endwith %}
     {% empty %}
       <p style="text-align:center; color: var(--text-secondary); grid-column: 1 / -1;">{% trans "No hay sahumerios disponibles" %}</p>
     {% endfor %}

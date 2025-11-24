@@ -2,6 +2,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import TemplateView, DetailView, CreateView, UpdateView, DeleteView
 from django.conf import settings
+from django.templatetags.static import static
 from pathlib import Path
 from .models import Sahumerio
 from .forms import SahumerioForm
@@ -108,20 +109,45 @@ def _parse_stock(value):
 def _parse_activo(value):
     """Determina si el producto está activo."""
     if pd.isna(value) or value == "" or value is None:
-        return True  # Por defecto, activo
+        return True
     
     val_str = str(value).strip().upper()
     
-    # Si es "NO", "N", "FALSE", "0", "INACTIVO" -> False
     if val_str in ("NO", "N", "FALSE", "0", "INACTIVO", "INACTIVE"):
         return False
     
-    # Si es "SI", "YES", "TRUE", "1", "ACTIVO" -> True
     if val_str in ("SI", "S", "YES", "Y", "TRUE", "1", "ACTIVO", "ACTIVE"):
         return True
     
-    # Por defecto, activo
     return True
+
+
+def _reconstruir_nombre_imagen(row, col_imagenes):
+    """
+    ✨ NUEVA FUNCIÓN: Reconstruye el nombre completo de la imagen
+    concatenando todas las columnas Imagen 1-12
+    """
+    partes = []
+    
+    for col in col_imagenes:
+        valor = str(row.get(col, "")).strip()
+        if valor and valor != "-" and not pd.isna(valor):
+            partes.append(valor)
+    
+    if not partes:
+        return ""
+    
+    # Unir todas las partes
+    nombre_completo = "".join(partes)
+    
+    # Limpiar caracteres extraños
+    nombre_completo = nombre_completo.replace(" ", "").replace("-", "")
+    
+    # Si no tiene extensión, agregar .jpg por defecto
+    if not any(nombre_completo.lower().endswith(ext) for ext in [".jpg", ".jpeg", ".png", ".webp", ".gif"]):
+        nombre_completo += ".jpg"
+    
+    return nombre_completo
 
 
 def _leer_excel():
@@ -135,13 +161,19 @@ def _leer_excel():
     
     cols = list(df.columns)
     col_marca    = _pick_col(cols, "marca", "brand")
-    col_titulo   = _pick_col(cols, "titulo","nombre","producto","material","sahumerio")
+    col_titulo   = _pick_col(cols, "titulo","nombre","producto","material","sahumerio", "concatena nombre")
     col_desc     = _pick_col(cols, "descripcion","descripción","detalle","desc")
     col_precio   = _pick_col(cols, "precio","valor","importe")
     col_duracion = _pick_col(cols, "duracion","duración")
-    col_imagen   = _pick_col(cols, "imagenes","imagen","image","foto","pic")
     col_stock    = _pick_col(cols, "stock", "cantidad", "existencia")
     col_activo   = _pick_col(cols, "activo", "active", "estado", "status")
+    
+    # ✨ NUEVO: Buscar TODAS las columnas de imagen (Imagen 1 a Imagen 12)
+    col_imagenes = []
+    for i in range(1, 13):
+        col_name = f"Imagen {i}"
+        if col_name in cols:
+            col_imagenes.append(col_name)
     
     name_lut, stem_lut = _index_product_files()
     items = []
@@ -152,19 +184,20 @@ def _leer_excel():
         descripcion = str(r.get(col_desc, "")).strip()
         precio = r.get(col_precio, "")
         duracion = str(r.get(col_duracion, "")).strip()
-        imgs_raw = str(r.get(col_imagen, "")).strip()
         
-        # NUEVO: Leer stock y activo
         stock = _parse_stock(r.get(col_stock, ""))
         activo = _parse_activo(r.get(col_activo, ""))
         
-        first_val = ""
-        if imgs_raw:
-            partes = [p.strip() for p in re.split(r"[;,]", imgs_raw) if p.strip()]
-            first_val = partes[0] if partes else ""
+        # ✨ NUEVO: Reconstruir el nombre completo de la imagen
+        nombre_imagen_completo = _reconstruir_nombre_imagen(r, col_imagenes)
         
-        img_file, img_abs = _parse_img_cell(first_val, name_lut, stem_lut)
+        img_file = ""
+        img_abs = ""
         
+        if nombre_imagen_completo:
+            img_file, img_abs = _parse_img_cell(nombre_imagen_completo, name_lut, stem_lut)
+        
+        # Si no se encontró, intentar buscar por título
         if not img_file and not img_abs and titulo:
             key = _norm_text(titulo)
             if key in stem_lut:
@@ -184,6 +217,15 @@ def _leer_excel():
                 if best_score >= 0.6:
                     img_file = best_name
         
+        # Construir la URL completa
+        img_url = ""
+        if img_abs:
+            img_url = img_abs
+        elif img_file:
+            img_url = static(f"img/productos/{img_file}")
+        else:
+            img_url = static("img/placeholder.png")
+        
         items.append({
             "idx": i,
             "marca": marca,
@@ -193,9 +235,10 @@ def _leer_excel():
             "duracion": duracion,
             "img_file": img_file,
             "img_abs": img_abs,
-            "raw": first_val,
-            "stock": stock,        # NUEVO
-            "activo": activo,      # NUEVO
+            "img_url": img_url,
+            "raw": nombre_imagen_completo,
+            "stock": stock,
+            "activo": activo,
         })
     
     return items
@@ -218,33 +261,35 @@ class CatalogoExcelView(TemplateView):
         db_items = []
         
         for o in db_qs:
-            # Usar imagen_resuelta() si existe, sino intentar otros campos
             img_url = ""
             if hasattr(o, 'imagen_resuelta'):
                 img_url = o.imagen_resuelta()
             elif hasattr(o, 'imagen') and o.imagen:
                 img_url = str(o.imagen.url) if hasattr(o.imagen, 'url') else str(o.imagen)
             
-            # Determinar si es file local o URL absoluta
             img_file = ""
             img_abs = ""
             
             if img_url:
-                # Si es una URL de Cloudinary o externa (empieza con http:// o https://)
                 if img_url.startswith(('http://', 'https://')):
                     img_abs = img_url
-                # Si viene de ImageField local (/media/)
                 elif img_url.startswith('/media/') or img_url.startswith(settings.MEDIA_URL):
                     img_abs = img_url
-                # Si es una ruta relativa, es un archivo local
                 else:
                     img_file = img_url
             
-            # NUEVO: Obtener stock y activo del modelo
             stock = getattr(o, "stock", 0) or 0
             activo = getattr(o, "activo", True)
             if activo is None:
                 activo = True
+            
+            final_img_url = ""
+            if img_abs:
+                final_img_url = img_abs
+            elif img_file:
+                final_img_url = static(f"img/productos/{img_file}")
+            else:
+                final_img_url = static("img/placeholder.png")
             
             db_items.append({
                 "origen": "DB",
@@ -257,10 +302,11 @@ class CatalogoExcelView(TemplateView):
                 "duracion": "",
                 "img_file": img_file,
                 "img_abs": img_abs,
+                "img_url": final_img_url,
                 "raw": "",
                 "marca": getattr(o, "marca", "") or "",
-                "stock": stock,      # NUEVO
-                "activo": activo,    # NUEVO
+                "stock": stock,
+                "activo": activo,
             })
         
         qs = db_qs.values("id", "nombre", "marca")

@@ -241,7 +241,7 @@
 
   <div class="products-grid">
     {% for it in items %}
-      {% comment %}Detectar si el producto está sin stock o inactivo - LÓGICA CORREGIDA{% endcomment %}
+      {% comment %}Detectar si el producto está sin stock o inactivo{% endcomment %}
       {% if it.stock == 0 or it.stock == "0" or it.stock == None or it.activo == "NO" or it.activo == "no" or it.activo == False %}
       <article class="product-card out-of-stock" data-product-id="{{ it.pk|default:it.idx }}" data-product-origin="{{ it.origen }}">
       {% else %}
@@ -257,9 +257,6 @@
         {% endif %}
 
         <div class="product-badges">
-          {% comment %}DEBUG: Mostrar valores reales{% endcomment %}
-          {% comment %}Stock: {{ it.stock|default:"None" }} | Activo: {{ it.activo|default:"None" }}{% endcomment %}
-          
           {% if it.stock == 0 or it.stock == "0" or it.stock == None or it.stock == '' or it.activo == "NO" or it.activo == "no" or it.activo == False %}
           <span class="badge badge-out-of-stock">Sin Stock</span>
           {% else %}
@@ -281,13 +278,8 @@
 
         <div class="product-image">
           <a href="{{ detail_url }}">
-            {% if it.img_abs %}
-              <img src="{{ it.img_abs }}" alt="{{ it.titulo }}" loading="lazy" decoding="async">
-            {% elif it.img_file %}
-              <img src="{% static 'img/productos/' %}{{ it.img_file }}" alt="{{ it.titulo }}" loading="lazy" decoding="async">
-            {% else %}
-              <img src="{% static 'img/placeholder.png' %}" alt="Sin imagen" loading="lazy" decoding="async">
-            {% endif %}
+            {# ✨ CORRECCIÓN: Usar img_url construida en la vista #}
+            <img src="{{ it.img_url }}" alt="{{ it.titulo }}" loading="lazy" decoding="async">
           </a>
 
           {% comment %}Solo mostrar acciones si tiene stock{% endcomment %}
@@ -372,7 +364,8 @@
                 <input type="hidden" name="product_id" value="{{ it.idx }}">
                 <input type="hidden" name="name" value="{{ it.titulo }}">
                 <input type="hidden" name="price" value="{{ it.precio }}">
-                <input type="hidden" name="img" value="{% if it.img_abs %}{{ it.img_abs }}{% elif it.img_file %}{% static 'img/productos/' %}{{ it.img_file }}{% else %}{% static 'img/placeholder.png' %}{% endif %}">
+                {# ✨ CORRECCIÓN: Usar img_url en lugar de construir manualmente #}
+                <input type="hidden" name="img" value="{{ it.img_url }}">
                 <input type="hidden" name="replace" value="0">
                 <div class="quantity-selector">
                   <button type="button" class="qty-btn qty-minus">−</button>

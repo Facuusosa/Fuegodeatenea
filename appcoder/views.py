@@ -324,6 +324,13 @@ class CatalogoExcelView(TemplateView):
         
         combinados = x_items + db_items
         
+        # ✨✨✨ CAMBIO AQUÍ: Filtrar productos sin stock o inactivos ✨✨✨
+        combinados = [
+            item for item in combinados
+            if item.get("stock", 0) > 0 and item.get("activo", True) is not False
+        ]
+        # ✨✨✨ FIN DEL CAMBIO ✨✨✨
+        
         def _key(x):
             a = (x.get("marca") or "").lower()
             b = (x.get("titulo") or "").lower()

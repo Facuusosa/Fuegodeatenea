@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Pedido Confirmado - Fuego de Atenea{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            
+            <!-- Mensaje de éxito -->
+            <div class="text-center mb-5">
+                <div class="mb-4">
+                    <svg width="80" height="80" fill="#28a745" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                    </svg>
+                </div>
+                <h1 class="display-4 mb-3">¡Pedido Confirmado!</h1>
+                <p class="lead text-muted">Orden #{{ orden.id }}</p>
+            </div>
+
+            <!-- Card con detalles -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body p-4">
+                    
+                    <!-- Productos -->
+                    <h5 class="mb-3">📦 Productos</h5>
+                    <ul class="list-unstyled mb-4">
+                        {% for item in items %}
+                        <li class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                            <span>
+                                <strong>{{ item.quantity }}x</strong> {{ item.name }}
+                            </span>
+                            <span class="text-muted">$ {{ item.subtotal }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+
+                    <!-- Total -->
+                    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                        <h5 class="mb-0">💰 Total</h5>
+                        <h4 class="mb-0 text-success">$ {{ orden.total }}</h4>
+                    </div>
+
+                    <!-- Datos del cliente -->
+                    <h5 class="mb-3">👤 Tus datos</h5>
+                    <p class="mb-1"><strong>Nombre:</strong> {{ orden.nombre }}</p>
+                    <p class="mb-1"><strong>Teléfono:</strong> {{ orden.telefono }}</p>
+                    
+                    {% if orden.modalidad == "envio" %}
+                        <p class="mb-1"><strong>Modalidad:</strong> Envío a domicilio</p>
+                        <p class="mb-1"><strong>Dirección:</strong> {{ orden.direccion }}</p>
+                    {% else %}
+                        <p class="mb-1"><strong>Modalidad:</strong> Retiro en punto de entrega</p>
+                    {% endif %}
+                    
+                    <p class="mb-1"><strong>Medio de pago:</strong> {{ orden.get_medio_pago_display }}</p>
+                    
+                    {% if orden.comentario %}
+                        <p class="mb-0"><strong>Comentario:</strong> {{ orden.comentario }}</p>
+                    {% endif %}
+
+                </div>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="d-grid gap-3">
+                <a href="{{ wa_url }}" class="btn btn-success btn-lg" target="_blank">
+                    📱 Confirmar por WhatsApp
+                </a>
+                <a href="{% url 'appcoder:lista_sahumerios' %}" class="btn btn-outline-secondary">
+                    🏠 Volver al catálogo
+                </a>
+            </div>
+
+            <!-- Nota informativa -->
+            <div class="alert alert-info mt-4">
+                <small>
+                    💡 <strong>Importante:</strong> Al hacer click en "Confirmar por WhatsApp" se abrirá una conversación con nosotros donde podrás coordinar la entrega y el pago.
+                </small>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

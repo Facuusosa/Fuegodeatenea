@@ -53,8 +53,8 @@ class Cart:
         
         # Lista de candidatos en orden de prioridad
         candidates = (
-            "imagen_file",  # Campo principal del modelo Sahumerio
-            "imagen_url",   # Campo alternativo del modelo Sahumerio
+            "imagen_file",
+            "imagen_url",
             "imagen", 
             "image", 
             "foto", 
@@ -139,7 +139,6 @@ class Cart:
             }
             exts = [".jpg", ".jpeg", ".png", ".webp", ".gif"]
             for b in bases:
-                # si venía con carpeta ya se agregó arriba; acá aseguramos ruta productos
                 candidates.append(f"img/productos/{b}")
                 for ext in exts:
                     candidates.append(f"img/productos/{b}{ext}")
@@ -158,7 +157,7 @@ class Cart:
             if finders.find(rel):
                 return static(rel)
 
-        # Si no lo encontró, devolver el primero como estático (el <img> caerá a placeholder via onerror)
+        # Si no lo encontró, devolver el primero como estático
         return static(uniq[0]) if uniq else None
 
     # ------------------------------ núcleo ----------------------------------
@@ -180,7 +179,7 @@ class Cart:
         name = getattr(product, "nombre", None) or getattr(product, "name", None) or str(product)
         price = self._to_decimal(getattr(product, "precio", None) or getattr(product, "price", None) or 0)
         
-        # CORRECCIÓN: Usar el método mejorado que busca imagen_file e imagen_url
+        # Usar el método mejorado que busca imagen_file e imagen_url
         image_url = self._guess_image_url_from_product(product)
 
         item = self.cart.get(pid)
@@ -276,8 +275,18 @@ class Cart:
         """
         Devuelve ítems uniformes y calcula subtotal.
         Garantiza que 'image_url' siempre venga poblado (o placeholder).
+        BUG #3 CORREGIDO: Placeholder SVG inline (no depende de archivos).
         """
-        placeholder = static("img/placeholder.svg")  # asegurate de tener este archivo
+        # BUG #3 CORREGIDO: Data URI SVG para evitar 404
+        placeholder = (
+            "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' "
+            "width='200' height='200' viewBox='0 0 200 200'%3E"
+            "%3Crect width='200' height='200' fill='%23f0f0f0'/%3E"
+            "%3Ctext x='50%25' y='50%25' dominant-baseline='middle' "
+            "text-anchor='middle' font-family='sans-serif' font-size='14' "
+            "fill='%23999'%3ESin imagen%3C/text%3E%3C/svg%3E"
+        )
+        
         for it in list(self.cart.values()):
             qty = int(it.get("quantity", 0))
             price = self._to_decimal(it.get("price", 0))

@@ -21,6 +21,8 @@ class Orden(models.Model):
     direccion = models.TextField(blank=True, null=True)
     
     # Método de pago
+    # NOTA: Estos valores (mp, efectivo, transferencia) son los CORRECTOS
+    # y fueron usados como referencia para corregir forms.py
     MEDIOS_CHOICES = [
         ('mp', 'Mercado Pago'),
         ('efectivo', 'Efectivo'),
@@ -48,7 +50,7 @@ class Orden(models.Model):
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='pendiente')
     
     # JSON con items (simple pero funciona)
-    items_json = models.TextField(default='[]')  # Guardamos como JSON string
+    items_json = models.TextField(default='[]')
     
     class Meta:
         ordering = ['-fecha_creacion']

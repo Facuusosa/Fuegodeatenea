@@ -176,7 +176,17 @@ class Cart:
 
     def add(self, product, quantity: int = 1, replace_quantity: bool = False):
         pid = str(getattr(product, "id"))
-        name = getattr(product, "nombre", None) or getattr(product, "name", None) or str(product)
+        
+        # ✅ SOLUCIÓN: Concatenar marca + nombre
+        marca = getattr(product, "marca", "").strip()
+        nombre = getattr(product, "nombre", None) or getattr(product, "name", None) or str(product)
+        
+        # Si tiene marca, agregar al nombre
+        if marca:
+            name = f"{marca} - {nombre}"
+        else:
+            name = nombre
+        
         price = self._to_decimal(getattr(product, "precio", None) or getattr(product, "price", None) or 0)
         
         # Usar el método mejorado que busca imagen_file e imagen_url
@@ -221,16 +231,23 @@ class Cart:
         img: str | None = None,
         quantity: int = 1,
         replace_quantity: bool = False,
+        marca: str | None = None,  # ✅ NUEVO: Parámetro opcional para marca
     ):
         pid = str(product_id)
         price = self._to_decimal(price)
         image_url = self._resolve_payload_image_url(img)
+        
+        # ✅ SOLUCIÓN: Si viene marca, concatenar con nombre
+        if marca and marca.strip():
+            display_name = f"{marca.strip()} - {name}"
+        else:
+            display_name = name
 
         item = self.cart.get(pid)
         if item is None:
             item = {
                 "id": pid,
-                "name": name,
+                "name": display_name,
                 "price": float(price),
                 "quantity": 0,
                 "img": img,
@@ -246,7 +263,7 @@ class Cart:
             item["quantity"] = max(0, int(item["quantity"]) + int(quantity))
 
         # refresca datos
-        item["name"] = name or item["name"]
+        item["name"] = display_name or item["name"]
         item["price"] = float(price)
         item["img"] = img
         if image_url:

@@ -223,6 +223,7 @@ def cart_add(request: HttpRequest) -> HttpResponse:
     """
     BUG #4 CORREGIDO: Permite quantity=0 para eliminar productos.
     Agrega o reemplaza cantidad (según 'replace'=1) para items de DB o XLS.
+    ✅ ACTUALIZADO: Soporte para marca en productos XLS
     """
     cart = Cart(request)
     origin = (request.POST.get("origin") or "X").upper()
@@ -236,7 +237,11 @@ def cart_add(request: HttpRequest) -> HttpResponse:
         Product = get_product_model()
         product_id = request.POST.get("product_id")
         product = get_object_or_404(Product, id=product_id)
-        product_name = getattr(product, 'nombre', str(product))
+        
+        # ✅ Construir nombre con marca para el mensaje
+        marca = getattr(product, 'marca', '').strip()
+        nombre = getattr(product, 'nombre', str(product))
+        product_name = f"{marca} - {nombre}" if marca else nombre
         
         # BUG #4 CORREGIDO: Eliminar explícitamente si qty <= 0
         if quantity <= 0:
@@ -263,10 +268,16 @@ def cart_add(request: HttpRequest) -> HttpResponse:
 
     # XLS / payload
     product_id = request.POST.get("product_id")
+    marca = (request.POST.get("marca") or "").strip()  # ✅ NUEVO: Obtener marca del POST
     name = (request.POST.get("name") or "").strip()
     price = _parse_price_ar(request.POST.get("price", "0"))
     img = (request.POST.get("img") or "").strip()
-    display_name = name or "producto"
+    
+    # ✅ Construir display_name con marca para mensajes
+    if marca:
+        display_name = f"{marca} - {name}" if name else marca
+    else:
+        display_name = name or "producto"
     
     # BUG #4 CORREGIDO: Eliminar explícitamente si qty <= 0
     if quantity <= 0:
@@ -280,6 +291,7 @@ def cart_add(request: HttpRequest) -> HttpResponse:
             old_qty = int(item.get("quantity", 0))
             break
 
+    # ✅ Pasar marca al método add_payload
     cart.add_payload(
         product_id=product_id,
         name=name,
@@ -287,6 +299,7 @@ def cart_add(request: HttpRequest) -> HttpResponse:
         img=img,
         quantity=quantity,
         replace_quantity=replace,
+        marca=marca,  # ✅ NUEVO parámetro
     )
     
     if quantity > old_qty:
@@ -312,7 +325,12 @@ def cart_add_db(request: HttpRequest, product_id: int) -> HttpResponse:
     replace = str(request.POST.get("replace", "0")) == "1"
 
     cart.add(product=product, quantity=quantity, replace_quantity=replace)
-    product_name = getattr(product, 'nombre', str(product))
+    
+    # ✅ Construir nombre con marca para el mensaje
+    marca = getattr(product, 'marca', '').strip()
+    nombre = getattr(product, 'nombre', str(product))
+    product_name = f"{marca} - {nombre}" if marca else nombre
+    
     messages.success(request, f"Agregaste {product_name} al carrito.")
     return _redirect_back(request)
 
@@ -418,13 +436,9 @@ def cart_summary(request: HttpRequest) -> JsonResponse:
     
     return JsonResponse(summary)
 
-# =========================
-# PASO 1 - Nueva vista
-# =========================
-
 def order_success(request: HttpRequest, orden_id: int) -> HttpResponse:
     """
-    PASO 1 - Página de confirmación después de crear una orden.
+    Página de confirmación después de crear una orden.
     Muestra resumen del pedido y botón para WhatsApp con mensaje mejorado.
     """
     orden = get_object_or_404(Orden, id=orden_id)
@@ -435,13 +449,13 @@ def order_success(request: HttpRequest, orden_id: int) -> HttpResponse:
     except:
         items = []
     
-    # Generar URL de WhatsApp con mensaje mejorado (PASO 2)
+    # Generar URL de WhatsApp con mensaje mejorado
     cart_temp = type('obj', (object,), {
         '__iter__': lambda self: iter(items),
         'total': float(orden.total)
     })()
     
-    # PASO 2: Agregar orden_id al dict para que aparezca en el mensaje
+    # Construir mensaje con datos de la orden
     msg = _build_wa_message(cart_temp, {
         'orden_id': orden.id,
         'nombre': orden.nombre,
@@ -453,14 +467,14 @@ def order_success(request: HttpRequest, orden_id: int) -> HttpResponse:
         'comentario': orden.comentario,
     })
     
+    # Generar URL de WhatsApp
     phone_raw = (getattr(settings, "WHATSAPP_PHONE", "") or "").strip()
     phone = format_argentina_whatsapp(phone_raw)
-    whatsapp_url = f"https://wa.me/{phone}?text={quote(msg)}" if phone else f"https://wa.me/?text={quote(msg)}"
+    wa_url = f"https://wa.me/{phone}?text={quote(msg)}" if phone else f"https://wa.me/?text={quote(msg)}"
     
-    context = {
+    # Renderizar template con todos los datos
+    return render(request, 'cart/order_success.html', {
         'orden': orden,
         'items': items,
-        'whatsapp_url': whatsapp_url,
-    }
-    
-    return render(request, "cart/order_success.html", context)
+        'whatsapp_url': wa_url,
+    })

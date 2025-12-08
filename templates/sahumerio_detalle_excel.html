@@ -340,6 +340,7 @@
         {% csrf_token %}
         <input type="hidden" name="origin" value="X">
         <input type="hidden" name="product_id" value="{{ it.idx }}">
+        <input type="hidden" name="marca" value="{{ it.marca }}">
         <input type="hidden" name="name" value="{{ it.titulo }}">
         <input type="hidden" name="price" value="{{ it.precio }}">
         <input type="hidden" name="img" value="{% if it.img_abs %}{{ it.img_abs }}{% elif it.img_file %}{% static 'img/productos/' %}{{ it.img_file }}{% else %}{% static 'img/placeholder.png' %}{% endif %}">

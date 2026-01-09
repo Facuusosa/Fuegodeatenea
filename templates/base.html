@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <title>{% block title %}Fuego de Atenea{% endblock %}</title>
@@ -16,29 +17,30 @@
     * {
       box-sizing: border-box;
     }
-    
-    html, body {
+
+    html,
+    body {
       height: 100%;
       margin: 0;
     }
-    
+
     body {
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans";
       position: relative;
     }
-    
+
     a {
       text-decoration: none;
       color: inherit;
       transition: all 0.2s ease;
     }
-    
+
     .wrap {
       max-width: 1150px;
       margin: 0 auto;
       padding: 0 22px;
     }
-    
+
     /* ========== TOPBAR ========== */
     .topbar {
       position: sticky;
@@ -46,14 +48,14 @@
       z-index: 9999;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     }
-    
+
     .topbar .wrap {
       padding: 20px 22px;
       display: flex;
       align-items: center;
       gap: 20px;
     }
-    
+
     .topbar-logo {
       display: flex;
       align-items: center;
@@ -62,17 +64,17 @@
       letter-spacing: 0.02em;
       flex-shrink: 0;
     }
-    
+
     .topbar-logo img {
       height: 64px;
       width: auto;
     }
-    
+
     .topbar-logo strong {
       font-size: 1.2rem;
       white-space: nowrap;
     }
-    
+
     /* NAV EN EL MEDIO */
     .topbar nav {
       display: flex;
@@ -82,7 +84,7 @@
       flex: 1;
       justify-content: center;
     }
-    
+
     .topbar nav a {
       font-weight: 500;
       font-size: 1rem;
@@ -90,11 +92,11 @@
       border-radius: 6px;
       transition: all 0.2s ease;
     }
-    
+
     .topbar nav a[aria-current="page"] {
       font-weight: 600;
     }
-    
+
     /* ========== CARRITO A LA DERECHA ========== */
     .cart-widget {
       position: relative;
@@ -102,7 +104,7 @@
       flex-shrink: 0;
       margin-left: auto;
     }
-    
+
     .cart-trigger {
       display: flex;
       align-items: center;
@@ -114,12 +116,12 @@
       font-weight: 500;
       position: relative;
     }
-    
+
     .cart-icon {
       font-size: 1.5rem;
       line-height: 1;
     }
-    
+
     .cart-count {
       position: absolute;
       top: 0;
@@ -137,12 +139,12 @@
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    
+
     .cart-count.hidden {
       opacity: 0;
       transform: scale(0.3);
     }
-    
+
     .cart-dropdown {
       position: absolute;
       top: calc(100% + 10px);
@@ -158,13 +160,13 @@
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       z-index: 1000;
     }
-    
+
     .cart-widget:hover .cart-dropdown {
       opacity: 1;
       visibility: visible;
       transform: translateY(0);
     }
-    
+
     .cart-dropdown-header {
       font-weight: 700;
       font-size: 1.05rem;
@@ -172,20 +174,20 @@
       padding-bottom: 12px;
       border-bottom: 2px solid;
     }
-    
+
     .cart-dropdown-empty {
       text-align: center;
       padding: 28px 16px;
       opacity: 0.65;
       font-size: 0.95rem;
     }
-    
+
     .cart-dropdown-items {
       max-height: 300px;
       overflow-y: auto;
       margin-bottom: 14px;
     }
-    
+
     .cart-dropdown-item {
       display: flex;
       gap: 12px;
@@ -194,7 +196,7 @@
       border-radius: 10px;
       transition: all 0.2s ease;
     }
-    
+
     .cart-item-img {
       width: 55px;
       height: 55px;
@@ -203,12 +205,12 @@
       flex-shrink: 0;
       border: 1px solid;
     }
-    
+
     .cart-item-info {
       flex: 1;
       min-width: 0;
     }
-    
+
     .cart-item-name {
       font-weight: 600;
       font-size: 0.9rem;
@@ -217,17 +219,17 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    
+
     .cart-item-details {
       font-size: 0.85rem;
       opacity: 0.75;
     }
-    
+
     .cart-dropdown-footer {
       padding-top: 14px;
       border-top: 2px solid;
     }
-    
+
     .cart-total {
       display: flex;
       justify-content: space-between;
@@ -236,35 +238,42 @@
       font-weight: 700;
       font-size: 1.15rem;
     }
-    
+
     .cart-actions {
       display: flex;
       gap: 10px;
     }
-    
+
     .cart-actions .btn {
       flex: 1;
       font-size: 0.9rem;
       padding: 11px 14px;
       justify-content: center;
     }
-    
+
     /* ========== MAIN ========== */
     main.wrap {
       padding: 40px 22px;
       min-height: calc(100vh - 180px);
       position: relative;
     }
-    
-    h1, h2, h3 {
+
+    h1,
+    h2,
+    h3 {
       margin: 0 0 1rem 0;
       font-weight: 300;
       letter-spacing: -0.02em;
     }
-    
-    h1 { font-size: 2.5rem; }
-    h2 { font-size: 1.8rem; }
-    
+
+    h1 {
+      font-size: 2.5rem;
+    }
+
+    h2 {
+      font-size: 1.8rem;
+    }
+
     /* ========== BOTONES ========== */
     .btn {
       display: inline-flex;
@@ -281,19 +290,19 @@
       letter-spacing: 0.01em;
       text-decoration: none;
     }
-    
+
     .btn:hover {
       transform: translateY(-1px);
     }
-    
+
     .btn:active {
       transform: translateY(0);
     }
-    
+
     .btn-sec {
       backdrop-filter: blur(8px);
     }
-    
+
     /* ========== BOTÓN FLOTANTE DEL CARRITO ========== */
     .btn-carrito-flotante {
       position: fixed !important;
@@ -317,24 +326,24 @@
       transition: all 0.3s ease !important;
       text-decoration: none !important;
     }
-    
+
     .btn-carrito-flotante:hover {
       background: #b68e2d !important;
       color: #fff !important;
       transform: scale(1.05) !important;
       box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4) !important;
     }
-    
+
     /* OCULTAR BOTÓN FLOTANTE EN PÁGINA DE CARRITO */
     body.cart-page .btn-carrito-flotante {
       display: none !important;
     }
-    
+
     /* ========== MESSAGES ========== */
     .messages {
       margin-bottom: 20px;
     }
-    
+
     .msg {
       padding: 14px 18px;
       border-radius: 10px;
@@ -343,12 +352,19 @@
       border: 1px solid;
       animation: slideIn 0.3s ease-out;
     }
-    
+
     @keyframes slideIn {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
-    
+
     /* ========== FOOTER ========== */
     footer.wrap {
       padding: 32px 22px;
@@ -356,12 +372,12 @@
       backdrop-filter: blur(8px);
       padding-bottom: 100px;
     }
-    
+
     footer a {
       border-bottom: 1px solid;
       transition: all 0.2s ease;
     }
-    
+
     /* ========== LIGHTBOX ========== */
     .lb {
       position: fixed;
@@ -372,9 +388,11 @@
       backdrop-filter: blur(20px);
       z-index: 10000;
     }
-    
-    .lb.show { display: flex; }
-    
+
+    .lb.show {
+      display: flex;
+    }
+
     .lb img {
       max-width: 90vw;
       max-height: 90vh;
@@ -383,7 +401,7 @@
       touch-action: none;
       border-radius: 8px;
     }
-    
+
     .lb .close {
       position: absolute;
       top: 20px;
@@ -397,11 +415,11 @@
       border: 1px solid;
       z-index: 10001;
     }
-    
+
     [data-zoom-src] {
       cursor: zoom-in;
     }
-    
+
     /* ========== TEMA MÍSTICO ========== */
     body.mystic-theme {
       --mystic-cream: #f5f3f0;
@@ -410,173 +428,173 @@
       --mystic-gold-light: #dfc889;
       --mystic-border: rgba(201, 169, 97, 0.25);
     }
-    
+
     body.mystic-theme .topbar {
       background: rgba(245, 243, 240, 0.98);
       backdrop-filter: blur(12px);
       border-bottom: 2px solid var(--mystic-border);
       color: var(--mystic-text);
     }
-    
+
     body.mystic-theme .topbar-logo {
       color: var(--mystic-text);
     }
-    
+
     body.mystic-theme .topbar nav a {
       color: var(--mystic-text);
     }
-    
+
     body.mystic-theme .topbar nav a:hover {
       background: rgba(201, 169, 97, 0.12);
       color: var(--mystic-gold);
     }
-    
+
     body.mystic-theme .topbar nav a[aria-current="page"] {
       background: rgba(201, 169, 97, 0.2);
       color: var(--mystic-gold);
     }
-    
+
     body.mystic-theme .cart-trigger {
       color: var(--mystic-text);
     }
-    
+
     body.mystic-theme .cart-trigger:hover {
       background: rgba(201, 169, 97, 0.15);
       color: var(--mystic-gold);
       transform: translateY(-1px);
     }
-    
+
     body.mystic-theme .cart-count {
       background: linear-gradient(135deg, #ff6b35, #ff8c5a);
       color: white;
     }
-    
+
     body.mystic-theme .cart-dropdown {
       background: rgba(255, 255, 255, 0.98);
       backdrop-filter: blur(24px);
       border: 2px solid var(--mystic-border);
       color: var(--mystic-text);
     }
-    
+
     body.mystic-theme .cart-dropdown-header {
       color: var(--mystic-gold);
       border-bottom-color: var(--mystic-border);
     }
-    
+
     body.mystic-theme .cart-dropdown-item {
       background: rgba(249, 247, 244, 0.7);
       border: 1px solid var(--mystic-border);
     }
-    
+
     body.mystic-theme .cart-dropdown-item:hover {
       background: rgba(249, 247, 244, 1);
       border-color: var(--mystic-gold);
       transform: translateX(2px);
     }
-    
+
     body.mystic-theme .cart-item-img {
       border-color: var(--mystic-border);
       background: white;
     }
-    
+
     body.mystic-theme .cart-dropdown-footer {
       border-top-color: var(--mystic-border);
     }
-    
+
     body.mystic-theme .btn {
       background: linear-gradient(135deg, var(--mystic-gold-light), var(--mystic-gold));
       color: #3d3731;
       box-shadow: 0 4px 12px rgba(201, 169, 97, 0.3);
     }
-    
+
     body.mystic-theme .btn:hover {
       box-shadow: 0 6px 20px rgba(201, 169, 97, 0.4);
     }
-    
+
     body.mystic-theme .btn-sec {
       background: rgba(255, 255, 255, 0.8);
       color: var(--mystic-text);
       border-color: var(--mystic-border);
     }
-    
+
     body.mystic-theme .btn-sec:hover {
       background: rgba(255, 255, 255, 1);
       border-color: var(--mystic-gold);
     }
-    
+
     body.mystic-theme .msg {
       background: rgba(255, 255, 255, 0.8);
       border-color: var(--mystic-border);
       color: var(--mystic-text);
     }
-    
+
     body.mystic-theme .msg.success {
       background: rgba(34, 197, 94, 0.15);
       border-color: rgba(34, 197, 94, 0.4);
       color: #166534;
     }
-    
+
     body.mystic-theme .msg.error {
       background: rgba(239, 68, 68, 0.15);
       border-color: rgba(239, 68, 68, 0.4);
       color: #991b1b;
     }
-    
+
     body.mystic-theme .msg.warning {
       background: rgba(251, 191, 36, 0.15);
       border-color: rgba(251, 191, 36, 0.4);
       color: #92400e;
     }
-    
+
     body.mystic-theme footer {
       color: rgba(61, 55, 49, 0.7);
     }
-    
+
     body.mystic-theme footer a {
       color: var(--mystic-gold);
       border-bottom-color: var(--mystic-gold);
     }
-    
+
     body.mystic-theme footer a:hover {
       color: var(--mystic-text);
     }
-    
+
     body.mystic-theme .lb {
       background: rgba(0, 0, 0, 0.9);
     }
-    
+
     body.mystic-theme .lb .close {
       background: rgba(245, 243, 240, 0.95);
       color: var(--mystic-text);
       border-color: var(--mystic-border);
     }
-    
+
     body.mystic-theme .lb .close:hover {
       background: var(--mystic-cream);
       border-color: var(--mystic-gold);
     }
-    
+
     /* ========== RESPONSIVE ========== */
     @media (max-width: 900px) {
       .topbar .wrap {
         flex-wrap: wrap;
         padding: 16px;
       }
-      
+
       .topbar-logo {
         order: 1;
         flex: 0 0 auto;
       }
-      
+
       .topbar-logo img {
         height: 56px;
       }
-      
+
       .cart-widget {
         order: 2;
         margin-left: auto;
       }
-      
+
       .topbar nav {
         order: 3;
         width: 100%;
@@ -587,54 +605,59 @@
         padding-top: 12px;
         border-top: 1px solid var(--mystic-border);
       }
-      
+
       .topbar nav a {
         font-size: 0.9rem;
         padding: 7px 12px;
       }
-      
+
       .cart-dropdown {
         right: 0;
         left: auto;
         max-width: calc(100vw - 32px);
         min-width: 300px;
       }
-      
+
       main.wrap {
         padding: 28px 18px;
       }
     }
-    
+
     @media (max-width: 640px) {
       .topbar .wrap {
         padding: 14px;
       }
-      
+
       .topbar-logo img {
         height: 50px;
       }
-      
+
       .topbar-logo strong {
         font-size: 1rem;
       }
-      
+
       .cart-icon {
         font-size: 1.4rem;
       }
-      
+
       .cart-trigger {
         padding: 8px 12px;
       }
-      
+
       .cart-count {
         min-width: 18px;
         height: 18px;
         font-size: 0.65rem;
       }
-      
-      h1 { font-size: 2rem; }
-      h2 { font-size: 1.5rem; }
-      
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      h2 {
+        font-size: 1.5rem;
+      }
+
       .cart-dropdown {
         position: fixed;
         top: auto;
@@ -646,36 +669,36 @@
         padding: 16px;
         margin-top: 8px;
       }
-      
+
       .cart-dropdown-header {
         font-size: 1rem;
       }
-      
+
       .cart-item-img {
         width: 50px;
         height: 50px;
       }
-      
+
       .cart-item-name {
         font-size: 0.85rem;
       }
-      
+
       .cart-item-details {
         font-size: 0.8rem;
       }
-      
+
       .cart-total {
         font-size: 1.05rem;
       }
-      
+
       .cart-actions {
         flex-direction: column;
       }
-      
+
       .cart-actions .btn {
         width: 100%;
       }
-      
+
       /* Botón flotante optimizado para móvil */
       .btn-carrito-flotante {
         padding: 12px 20px !important;
@@ -684,30 +707,30 @@
         font-size: 0.95rem !important;
         box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25) !important;
       }
-      
+
       footer.wrap {
         padding-bottom: 100px !important;
       }
     }
-    
+
     @media (max-width: 480px) {
       .topbar-logo img {
         height: 44px;
       }
-      
+
       .topbar-logo strong {
         font-size: 0.95rem;
       }
-      
+
       .topbar nav {
         gap: 8px;
       }
-      
+
       .topbar nav a {
         font-size: 0.85rem;
         padding: 6px 10px;
       }
-      
+
       .btn-carrito-flotante {
         padding: 10px 16px !important;
         font-size: 0.9rem !important;
@@ -717,6 +740,7 @@
 
   {% block styles %}{% endblock %}
 </head>
+
 <body class="mystic-theme {% block body_class %}{% endblock %}">
   <div class="mystic-sun"></div>
   <div class="constellation-lines"></div>
@@ -728,33 +752,36 @@
         <strong>Fuego de Atenea</strong>
       </a>
 
+      <button class="nav-toggle" aria-label="Abrir menú">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
       {% with current=request.resolver_match.url_name|default:'' edit=request.GET.modo|default:'' %}
-      <nav>
-        <a href="{% url 'sahumerios_lista' %}"
-           {% if current == 'sahumerios_lista' and edit != 'edit' %}aria-current="page"{% endif %}>
-           Catálogo
+      <nav class="nav-menu">
+        <a href="{% url 'sahumerios_lista' %}" {% if current=='sahumerios_lista' and edit !='edit' %}aria-current="page"
+          {% endif %}>
+          Catálogo
         </a>
 
         {% if user.is_authenticated and user.username|lower == 'fsosa' %}
-          <a href="{% url 'sahumerios_lista' %}?modo=edit"
-             {% if current == 'sahumerios_lista' and edit == 'edit' %}
-               aria-current="page"
-             {% elif current == 'sahumerio_nuevo' or current == 'sahumerio_editar' %}
-               aria-current="page"
-             {% endif %}>
-             Editar
-          </a>
-          <a href="/admin/" target="_blank" rel="noopener noreferrer">Admin</a>
+        <a href="{% url 'sahumerios_lista' %}?modo=edit" {% if current=='sahumerios_lista' and edit=='edit' %}
+          aria-current="page" {% elif current=='sahumerio_nuevo' or current=='sahumerio_editar' %} aria-current="page"
+          {% endif %}>
+          Editar
+        </a>
+        <a href="/admin/" target="_blank" rel="noopener noreferrer">Admin</a>
         {% endif %}
 
         {% if user.is_authenticated %}
-          <a href="{% url 'perfil' %}" {% if current == 'perfil' %}aria-current="page"{% endif %}>
-            {{ user.username }}
-          </a>
-          <a href="{% url 'logout' %}">Salir</a>
+        <a href="{% url 'perfil' %}" {% if current=='perfil' %}aria-current="page" {% endif %}>
+          {{ user.username }}
+        </a>
+        <a href="{% url 'logout' %}">Salir</a>
         {% else %}
-          <a href="{% url 'login' %}" {% if current == 'login' %}aria-current="page"{% endif %}>Ingresar</a>
-          <a href="{% url 'registro' %}" {% if current == 'registro' %}aria-current="page"{% endif %}>Registrarse</a>
+        <a href="{% url 'login' %}" {% if current=='login' %}aria-current="page" {% endif %}>Ingresar</a>
+        <a href="{% url 'registro' %}" {% if current=='registro' %}aria-current="page" {% endif %}>Registrarse</a>
         {% endif %}
       </nav>
       {% endwith %}
@@ -764,16 +791,16 @@
           <span class="cart-icon">🛒</span>
           <span class="cart-count hidden" id="cartCount">0</span>
         </div>
-        
+
         <div class="cart-dropdown" id="cartDropdown">
           <div class="cart-dropdown-header">Tu Carrito</div>
-          
+
           <div class="cart-dropdown-empty" id="cartEmpty" style="display:block;">
             Tu carrito está vacío
           </div>
-          
+
           <div class="cart-dropdown-items" id="cartItems" style="display:none;"></div>
-          
+
           <div class="cart-dropdown-footer" id="cartFooter" style="display:none;">
             <div class="cart-total">
               <span>Total:</span>
@@ -789,22 +816,124 @@
     </div>
   </header>
 
+  <style>
+    /* HAMBURGER MENU STYLES */
+    .nav-toggle {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 10px;
+      flex-direction: column;
+      gap: 5px;
+      z-index: 10001;
+    }
+
+    .nav-toggle span {
+      display: block;
+      width: 25px;
+      height: 3px;
+      background-color: var(--mystic-text, #333);
+      border-radius: 3px;
+      transition: all 0.3s ease;
+    }
+
+    @media (max-width: 900px) {
+      .nav-toggle {
+        display: flex;
+        order: 3;
+        /* Position right of logo or adjust flex order */
+        margin-left: auto;
+      }
+
+      .mobile-menu-open .nav-toggle span:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 6px);
+      }
+
+      .mobile-menu-open .nav-toggle span:nth-child(2) {
+        opacity: 0;
+      }
+
+      .mobile-menu-open .nav-toggle span:nth-child(3) {
+        transform: rotate(-45deg) translate(5px, -6px);
+      }
+
+      .topbar nav.nav-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(12px);
+        padding: 20px;
+        border-bottom: 2px solid var(--mystic-border);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+
+      .topbar nav.nav-menu.open {
+        display: flex;
+        animation: slideDown 0.3s ease-out;
+      }
+
+      .cart-widget {
+        margin-left: 0;
+        /* Align cart closer to toggle */
+        order: 2;
+      }
+
+      /* Reduce main padding for mobile */
+      main.wrap {
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+      }
+
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    }
+  </style>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const toggleBtn = document.querySelector('.nav-toggle');
+      const navMenu = document.querySelector('.nav-menu');
+      const body = document.body;
+
+      if (toggleBtn && navMenu) {
+        toggleBtn.addEventListener('click', () => {
+          navMenu.classList.toggle('open');
+          body.classList.toggle('mobile-menu-open');
+        });
+      }
+    });
+  </script>
+
   <main class="wrap">
     {% if messages %}
-      <div class="messages" aria-live="polite" role="region">
-        {% for message in messages %}
-          <div class="msg {% if message.tags %}{{ message.tags }}{% endif %}" role="alert">
-            {{ message }}
-          </div>
-        {% endfor %}
+    <div class="messages" aria-live="polite" role="region">
+      {% for message in messages %}
+      <div class="msg {% if message.tags %}{{ message.tags }}{% endif %}" role="alert">
+        {{ message }}
       </div>
+      {% endfor %}
+    </div>
     {% endif %}
     {% block content %}{% endblock %}
   </main>
 
   <footer class="wrap">
     <small>
-      © {% now "Y" %} Fuego de Atenea · 
+      © {% now "Y" %} Fuego de Atenea ·
       <a href="https://www.instagram.com/fuego.de.atenea" target="_blank" rel="noopener">
         @fuego.de.atenea
       </a>
@@ -821,33 +950,33 @@
     🛒 Ver carrito
   </a>
 
-  <script>window.CSRF_TOKEN=document.querySelector('meta[name="csrf-token"]')?.content;</script>
-  
+  <script>window.CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]')?.content;</script>
+
   <script>
-  (function() {
-    const cartCount = document.getElementById('cartCount');
-    const cartEmpty = document.getElementById('cartEmpty');
-    const cartItems = document.getElementById('cartItems');
-    const cartFooter = document.getElementById('cartFooter');
-    const cartTotal = document.getElementById('cartTotal');
-    
-    async function updateCart() {
-      try {
-        const response = await fetch('{% url "cart:summary" %}');
-        if (!response.ok) throw new Error('Error en la respuesta del servidor');
-        
-        const data = await response.json();
-        const count = data.total_items || 0;
-        
-        cartCount.textContent = count;
-        
-        if (count > 0) {
-          cartCount.classList.remove('hidden');
-          cartEmpty.style.display = 'none';
-          cartItems.style.display = 'block';
-          cartFooter.style.display = 'block';
-          
-          cartItems.innerHTML = data.items.map(item => `
+    (function () {
+      const cartCount = document.getElementById('cartCount');
+      const cartEmpty = document.getElementById('cartEmpty');
+      const cartItems = document.getElementById('cartItems');
+      const cartFooter = document.getElementById('cartFooter');
+      const cartTotal = document.getElementById('cartTotal');
+
+      async function updateCart() {
+        try {
+          const response = await fetch('{% url "cart:summary" %}');
+          if (!response.ok) throw new Error('Error en la respuesta del servidor');
+
+          const data = await response.json();
+          const count = data.total_items || 0;
+
+          cartCount.textContent = count;
+
+          if (count > 0) {
+            cartCount.classList.remove('hidden');
+            cartEmpty.style.display = 'none';
+            cartItems.style.display = 'block';
+            cartFooter.style.display = 'block';
+
+            cartItems.innerHTML = data.items.map(item => `
             <div class="cart-dropdown-item">
               <img src="${item.image_url || '{% static "img/placeholder.png" %}'}" 
                    alt="${item.name}" 
@@ -859,54 +988,56 @@
               </div>
             </div>
           `).join('');
-          
-          cartTotal.textContent = '$ ' + data.total_price;
-        } else {
+
+            cartTotal.textContent = '$ ' + data.total_price;
+          } else {
+            cartCount.classList.add('hidden');
+            cartEmpty.style.display = 'block';
+            cartItems.style.display = 'none';
+            cartFooter.style.display = 'none';
+          }
+        } catch (error) {
+          console.error('Error al actualizar carrito:', error);
           cartCount.classList.add('hidden');
           cartEmpty.style.display = 'block';
           cartItems.style.display = 'none';
           cartFooter.style.display = 'none';
         }
-      } catch (error) {
-        console.error('Error al actualizar carrito:', error);
-        cartCount.classList.add('hidden');
-        cartEmpty.style.display = 'block';
-        cartItems.style.display = 'none';
-        cartFooter.style.display = 'none';
       }
-    }
-    
-    updateCart();
-    document.addEventListener('cartUpdated', updateCart);
-    setInterval(updateCart, 30000);
-  })();
+
+      updateCart();
+      document.addEventListener('cartUpdated', updateCart);
+      setInterval(updateCart, 30000);
+    })();
   </script>
-  
+
   <script>
-    (function(){
-      const lb=document.getElementById('lightbox');
-      const img=document.getElementById('lbImg');
-      const btn=document.getElementById('lbClose');
+    (function () {
+      const lb = document.getElementById('lightbox');
+      const img = document.getElementById('lbImg');
+      const btn = document.getElementById('lbClose');
 
-      let scale=1, tx=0, ty=0, dragging=false, sx=0, sy=0;
+      let scale = 1, tx = 0, ty = 0, dragging = false, sx = 0, sy = 0;
 
-      function open(src){
-        scale=1;tx=0;ty=0;
-        img.style.transform='translate(0,0) scale(1)';
-        img.src=src;
+      function open(src) {
+        scale = 1; tx = 0; ty = 0;
+        img.style.transform = 'translate(0,0) scale(1)';
+        img.src = src;
         lb.classList.add('show');
       }
-      function close(){lb.classList.remove('show'); img.src=''}
-      function apply(){img.style.transform=`translate(
-${tx}px, ${ty}px) scale(${scale})`}
-      function onWheel(e){
+      function close() { lb.classList.remove('show'); img.src = '' }
+      function apply() {
+        img.style.transform = `translate(
+${tx}px, ${ty}px) scale(${scale})`
+      }
+      function onWheel(e) {
         e.preventDefault();
-        scale+=e.deltaY*0.005;
-        scale=Math.min(Math.max(1,scale),5);
+        scale += e.deltaY * 0.005;
+        scale = Math.min(Math.max(1, scale), 5);
         apply();
       }
-      function onDragStart(e){
+      function onDragStart(e) {
         e.preventDefault();
-        dragging=true;
-        sx=e.clientX-(tx||0);
-        sy=e.clientY-(ty||0);
+        dragging = true;
+        sx = e.clientX - (tx || 0);
+        sy = e.clientY - (ty || 0);

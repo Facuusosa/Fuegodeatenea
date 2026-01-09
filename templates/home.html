@@ -450,9 +450,16 @@
      ========================================== */
   @media (max-width: 1024px) {
     .hero-container {
-      grid-template-columns: 1fr;
+      display: flex;
+      flex-direction: column;
+      /* Stack image on top, text below */
+      width: 100%;
       min-height: auto;
-      margin: -40px -22px 0;
+      margin: 0;
+      /* Reset negative margins from breakout */
+      left: 0;
+      right: 0;
+      position: relative;
     }
 
     /* El logo se ve primero en mobile */
@@ -464,9 +471,15 @@
 
     .hero-content {
       order: 2;
-      padding: 60px 40px;
+      /* Text below image */
+      padding: 40px 20px;
+      /* Reduced padding for mobile */
       align-items: center;
       text-align: center;
+      width: 100%;
+      /* Ensure content fits container */
+      box-sizing: border-box;
+      /* Include padding in width */
     }
 
     .hero-logo-display img {

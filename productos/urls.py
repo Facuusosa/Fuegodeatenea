@@ -1,12 +1,11 @@
 from django.urls import path
-from .views import catalogo
+from .views import catalogo_view
+
+app_name = 'productos'
 
 urlpatterns = [
-    path('catalogo/', catalogo, name='catalogo'),
-]
-
-from .views import test_imagen_url
-
-urlpatterns += [
-    path('test-imagen/', test_imagen_url),
+    path('sahumerios/', catalogo_view, name='catalogo'),
+    # Agrega aquí otras URLs de productos según necesites
+    # path('sahumerios/<int:id>/', producto_detalle_view, name='sahumerio_detalle'),
+    # path('categoria/<str:categoria>/', productos_por_categoria, name='productos_categoria'),
 ]

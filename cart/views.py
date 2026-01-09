@@ -224,11 +224,13 @@ def cart_add(request: HttpRequest) -> HttpResponse:
     BUG #4 CORREGIDO: Permite quantity=0 para eliminar productos.
     Agrega o reemplaza cantidad (según 'replace'=1) para items de DB o XLS.
     ✅ ACTUALIZADO: Soporte para marca en productos XLS
+    ✅ MEJORADO: Respuesta JSON para peticiones AJAX
     """
     cart = Cart(request)
     origin = (request.POST.get("origin") or "X").upper()
     replace = str(request.POST.get("replace", "0")) == "1"
     quantity_raw = request.POST.get("quantity", "1")
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.content_type == 'application/json'
 
     # BUG #4 CORREGIDO: min_value=0 para permitir eliminación
     quantity = _to_int(quantity_raw, default=1, min_value=0)
@@ -246,16 +248,72 @@ def cart_add(request: HttpRequest) -> HttpResponse:
         # BUG #4 CORREGIDO: Eliminar explícitamente si qty <= 0
         if quantity <= 0:
             cart.remove(product_id)
+            if is_ajax:
+                return JsonResponse({
+                    'success': True,
+                    'message': f'Quitaste {product_name} del carrito.',
+                    'cart_total': len(cart),
+                    'cart_total_price': str(_cart_total(cart))
+                })
             messages.error(request, f"Quitaste {product_name} del carrito.")
             return _redirect_back(request)
         
+        # ✅ VALIDACIÓN DE STOCK: Verificar stock disponible
+        stock_disponible = getattr(product, 'stock', 0) or 0
+        if stock_disponible <= 0:
+            error_msg = f"No hay stock disponible de {product_name}."
+            if is_ajax:
+                return JsonResponse({
+                    'success': False,
+                    'message': error_msg,
+                    'cart_total': len(cart),
+                    'cart_total_price': str(_cart_total(cart))
+                }, status=400)
+            messages.error(request, error_msg)
+            return _redirect_back(request)
+        
+        # Calcular cantidad actual en el carrito
         old_qty = 0
         for item in cart:
             if str(item.get("id")) == str(product_id):
                 old_qty = int(item.get("quantity", 0))
                 break
         
+        # Calcular cantidad total que quedaría en el carrito
+        if replace:
+            nueva_cantidad_total = quantity
+        else:
+            nueva_cantidad_total = old_qty + quantity
+        
+        # Validar que no exceda el stock disponible
+        if nueva_cantidad_total > stock_disponible:
+            error_msg = f"Stock insuficiente. Disponible: {stock_disponible}, solicitado: {nueva_cantidad_total}."
+            if is_ajax:
+                return JsonResponse({
+                    'success': False,
+                    'message': error_msg,
+                    'cart_total': len(cart),
+                    'cart_total_price': str(_cart_total(cart)),
+                    'stock_disponible': stock_disponible
+                }, status=400)
+            messages.error(request, error_msg)
+            return _redirect_back(request)
+        
         cart.add(product=product, quantity=quantity, replace_quantity=replace)
+        
+        if is_ajax:
+            if quantity > old_qty:
+                msg = f"Agregaste {product_name} al carrito."
+            elif quantity < old_qty:
+                msg = f"Restaste una unidad de {product_name}."
+            else:
+                msg = "Cantidad sin cambios."
+            return JsonResponse({
+                'success': True,
+                'message': msg,
+                'cart_total': len(cart),
+                'cart_total_price': str(_cart_total(cart))
+            })
         
         if quantity > old_qty:
             messages.success(request, f"Agregaste {product_name} al carrito.")
@@ -282,14 +340,58 @@ def cart_add(request: HttpRequest) -> HttpResponse:
     # BUG #4 CORREGIDO: Eliminar explícitamente si qty <= 0
     if quantity <= 0:
         cart.remove(product_id)
+        if is_ajax:
+            return JsonResponse({
+                'success': True,
+                'message': f'Quitaste {display_name} del carrito.',
+                'cart_total': len(cart),
+                'cart_total_price': str(_cart_total(cart))
+            })
         messages.error(request, f"Quitaste {display_name} del carrito.")
         return _redirect_back(request)
 
+    # ✅ VALIDACIÓN DE STOCK PARA PRODUCTOS EXCEL
+    stock_disponible_raw = request.POST.get("stock", "")
+    stock_disponible = _to_int(stock_disponible_raw, default=0, min_value=0)
+    
+    if stock_disponible <= 0:
+        error_msg = f"No hay stock disponible de {display_name}."
+        if is_ajax:
+            return JsonResponse({
+                'success': False,
+                'message': error_msg,
+                'cart_total': len(cart),
+                'cart_total_price': str(_cart_total(cart))
+            }, status=400)
+        messages.error(request, error_msg)
+        return _redirect_back(request)
+    
+    # Calcular cantidad actual en el carrito
     old_qty = 0
     for item in cart:
         if str(item.get("id")) == str(product_id):
             old_qty = int(item.get("quantity", 0))
             break
+    
+    # Calcular cantidad total que quedaría en el carrito
+    if replace:
+        nueva_cantidad_total = quantity
+    else:
+        nueva_cantidad_total = old_qty + quantity
+    
+    # Validar que no exceda el stock disponible
+    if nueva_cantidad_total > stock_disponible:
+        error_msg = f"Stock insuficiente. Disponible: {stock_disponible}, solicitado: {nueva_cantidad_total}."
+        if is_ajax:
+            return JsonResponse({
+                'success': False,
+                'message': error_msg,
+                'cart_total': len(cart),
+                'cart_total_price': str(_cart_total(cart)),
+                'stock_disponible': stock_disponible
+            }, status=400)
+        messages.error(request, error_msg)
+        return _redirect_back(request)
 
     # ✅ Pasar marca al método add_payload
     cart.add_payload(
@@ -301,6 +403,20 @@ def cart_add(request: HttpRequest) -> HttpResponse:
         replace_quantity=replace,
         marca=marca,  # ✅ NUEVO parámetro
     )
+    
+    if is_ajax:
+        if quantity > old_qty:
+            msg = f"Agregaste {display_name} al carrito."
+        elif quantity < old_qty:
+            msg = f"Restaste una unidad de {display_name}."
+        else:
+            msg = "Cantidad sin cambios."
+        return JsonResponse({
+            'success': True,
+            'message': msg,
+            'cart_total': len(cart),
+            'cart_total_price': str(_cart_total(cart))
+        })
     
     if quantity > old_qty:
         messages.success(request, f"Agregaste {display_name} al carrito.")
@@ -396,17 +512,39 @@ def cart_checkout_form(request: HttpRequest) -> HttpResponse:
                 estado='pendiente',
             )
             
+            # Preparar datos para el mensaje (antes de borrar carrito)
+            items_list = list(cart)
+            cart_temp = type('obj', (object,), {
+                '__iter__': lambda self: iter(items_list),
+                'total': float(orden.total)
+            })()
+            
+            data_context = {
+                'orden_id': orden.id,
+                'nombre': orden.nombre,
+                'telefono': orden.telefono,
+                'email': orden.email,
+                'modalidad': orden.modalidad,
+                'direccion': orden.direccion,
+                'medio_pago': orden.medio_pago,
+                'comentario': orden.comentario,
+            }
+            
+            msg = _build_wa_message(cart_temp, data_context)
+            
             # Limpiar carrito
             cart.clear()
             
-            # Mensaje de éxito
-            messages.success(
-                request, 
-                f"¡Orden #{orden.id} creada exitosamente!"
-            )
+            # Mensaje flash
+            messages.success(request, f"¡Pedido #{orden.id} registrado! Abriendo WhatsApp...")
             
-            # PASO 1: Redirigir a página de confirmación en vez de WhatsApp directo
-            return redirect('cart:order_success', orden_id=orden.id)
+            # URL WhatsApp
+            phone_raw = (getattr(settings, "WHATSAPP_PHONE", "") or "").strip()
+            phone = format_argentina_whatsapp(phone_raw)
+            wa_url = f"https://wa.me/{phone}?text={quote(msg)}" if phone else f"https://wa.me/?text={quote(msg)}"
+            
+            # Redirección directa (Turbo Checkout)
+            return redirect(wa_url)
     else:
         form = OrderForm()
 

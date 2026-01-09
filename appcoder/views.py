@@ -3,11 +3,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import TemplateView, DetailView, CreateView, UpdateView, DeleteView
 from django.conf import settings
 from django.templatetags.static import static
+from django.core.cache import cache
 from pathlib import Path
 from .models import Sahumerio
 from .forms import SahumerioForm
 import pandas as pd
 import unicodedata, re
+import random
 from difflib import SequenceMatcher
 
 
@@ -123,10 +125,7 @@ def _parse_activo(value):
 
 
 def _reconstruir_nombre_imagen(row, col_imagenes):
-    """
-    ✨ NUEVA FUNCIÓN: Reconstruye el nombre completo de la imagen
-    concatenando todas las columnas Imagen 1-12
-    """
+    """Reconstruye el nombre completo de la imagen concatenando columnas Imagen 1-12"""
     partes = []
     
     for col in col_imagenes:
@@ -137,13 +136,9 @@ def _reconstruir_nombre_imagen(row, col_imagenes):
     if not partes:
         return ""
     
-    # Unir todas las partes
     nombre_completo = "".join(partes)
-    
-    # Limpiar caracteres extraños
     nombre_completo = nombre_completo.replace(" ", "").replace("-", "")
     
-    # Si no tiene extensión, agregar .jpg por defecto
     if not any(nombre_completo.lower().endswith(ext) for ext in [".jpg", ".jpeg", ".png", ".webp", ".gif"]):
         nombre_completo += ".jpg"
     
@@ -151,6 +146,11 @@ def _reconstruir_nombre_imagen(row, col_imagenes):
 
 
 def _leer_excel():
+    # Intentar obtener del cache primero (TTL: 1 hora)
+    cached_data = cache.get('productos_excel')
+    if cached_data is not None:
+        return cached_data
+
     ruta = Path(settings.BASE_DIR) / "final.xlsx"
     if not ruta.exists():
         return []
@@ -161,14 +161,13 @@ def _leer_excel():
     
     cols = list(df.columns)
     col_marca    = _pick_col(cols, "marca", "brand")
-    col_titulo   = _pick_col(cols, "titulo","nombre","producto","material","sahumerio", "concatena nombre")
+    col_titulo   = _pick_col(cols, "titulo","nombre","producto","material","sahumerio", "concatena nombre", "concatenacion")
     col_desc     = _pick_col(cols, "descripcion","descripción","detalle","desc")
     col_precio   = _pick_col(cols, "precio","valor","importe")
     col_duracion = _pick_col(cols, "duracion","duración")
     col_stock    = _pick_col(cols, "stock", "cantidad", "existencia")
     col_activo   = _pick_col(cols, "activo", "active", "estado", "status")
     
-    # ✨ NUEVO: Buscar TODAS las columnas de imagen (Imagen 1 a Imagen 12)
     col_imagenes = []
     for i in range(1, 13):
         col_name = f"Imagen {i}"
@@ -188,7 +187,10 @@ def _leer_excel():
         stock = _parse_stock(r.get(col_stock, ""))
         activo = _parse_activo(r.get(col_activo, ""))
         
-        # ✨ NUEVO: Reconstruir el nombre completo de la imagen
+        # Optimización: ignorar productos inactivos y sin stock
+        if not activo and stock <= 0:
+             continue
+
         nombre_imagen_completo = _reconstruir_nombre_imagen(r, col_imagenes)
         
         img_file = ""
@@ -197,7 +199,6 @@ def _leer_excel():
         if nombre_imagen_completo:
             img_file, img_abs = _parse_img_cell(nombre_imagen_completo, name_lut, stem_lut)
         
-        # Si no se encontró, intentar buscar por título
         if not img_file and not img_abs and titulo:
             key = _norm_text(titulo)
             if key in stem_lut:
@@ -217,7 +218,6 @@ def _leer_excel():
                 if best_score >= 0.6:
                     img_file = best_name
         
-        # Construir la URL completa
         img_url = ""
         if img_abs:
             img_url = img_abs
@@ -241,6 +241,8 @@ def _leer_excel():
             "activo": activo,
         })
     
+    # Guardar en cache
+    cache.set('productos_excel', items, 3600)
     return items
 
 
@@ -249,15 +251,12 @@ class CatalogoExcelView(TemplateView):
     
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
+        
+        # Leer productos del Excel (con cache)
         x_items = _leer_excel()
         
-        edit_mode = (
-            self.request.user.is_authenticated
-            and self.request.user.username.lower() == "fsosa"
-            and self.request.GET.get("modo") == "edit"
-        )
-        
-        db_qs = Sahumerio.objects.all()
+        # Leer productos de la DB (Optimizado: solo activos)
+        db_qs = Sahumerio.objects.filter(activo=True)
         db_items = []
         
         for o in db_qs:
@@ -279,9 +278,6 @@ class CatalogoExcelView(TemplateView):
                     img_file = img_url
             
             stock = getattr(o, "stock", 0) or 0
-            activo = getattr(o, "activo", True)
-            if activo is None:
-                activo = True
             
             final_img_url = ""
             if img_abs:
@@ -306,42 +302,105 @@ class CatalogoExcelView(TemplateView):
                 "raw": "",
                 "marca": getattr(o, "marca", "") or "",
                 "stock": stock,
-                "activo": activo,
+                "activo": True,
             })
         
-        qs = db_qs.values("id", "nombre", "marca")
-        lut = {}
-        for q in qs:
-            n = q["nombre"] or ""
-            m = q["marca"] or ""
-            for k in {_norm_text(n), _norm_text(f"{m} {n}"), _norm_text(f"{n} {m}")}:
-                lut[k] = q["id"]
-        
-        for it in x_items:
-            it["origen"] = "XLSX"
-            it["pk"] = None
-            it["match_id"] = lut.get(_norm_text(it["titulo"]))
-        
+        # Lookup para matching
+        if x_items and db_items:
+            lut = { _norm_text(q["nombre"]): q["id"] for q in db_qs.values("id", "nombre", "marca") }
+            for it in x_items:
+                it["origen"] = "XLSX"
+                it["pk"] = None
+                it["match_id"] = lut.get(_norm_text(it["titulo"]))
+        else:
+             for it in x_items:
+                it["origen"] = "XLSX"
+                it["pk"] = None
+                it["match_id"] = None
+
+        # Combinar
         combinados = x_items + db_items
         
-        # ✨✨✨ CAMBIO AQUÍ: Filtrar productos sin stock o inactivos ✨✨✨
-        combinados = [
-            item for item in combinados
-            if item.get("stock", 0) > 0 and item.get("activo", True) is not False
-        ]
-        # ✨✨✨ FIN DEL CAMBIO ✨✨✨
+        # 1. BÚSQUEDA por texto
+        busqueda = self.request.GET.get('search', '').strip()
+        if busqueda:
+            busqueda_lower = busqueda.lower()
+            combinados = [
+                item for item in combinados
+                if (busqueda_lower in item.get('titulo', '').lower() or
+                    busqueda_lower in item.get('marca', '').lower() or
+                    busqueda_lower in item.get('descripcion', '').lower())
+            ]
         
-        def _key(x):
-            a = (x.get("marca") or "").lower()
-            b = (x.get("titulo") or "").lower()
-            return (a, b)
+        # 2. FILTRO por marca
+        marca_activa = self.request.GET.get('marca', '').strip()
+        if marca_activa:
+            combinados = [
+                item for item in combinados 
+                if item.get('marca', '').lower() == marca_activa.lower()
+            ]
         
-        combinados.sort(key=_key)
+        # 3. EXTRAER TODAS LAS MARCAS
+        all_items_unfiltered = x_items + db_items
+        todas_las_marcas = sorted({
+            item.get('marca', '').strip()
+            for item in all_items_unfiltered
+            if item.get('marca', '').strip()
+        })
+        
+        # Ordenar items
+        combinados.sort(key=lambda x: ((x.get("marca") or "").lower(), (x.get("titulo") or "").lower()))
         
         ctx["items"] = combinados
-        ctx["edit_mode"] = edit_mode
-        ctx["debug"] = bool(self.request.GET.get("debug"))
+        ctx["marcas"] = todas_las_marcas
+        ctx["marca_activa"] = marca_activa
+        ctx["search"] = busqueda
         
+        return ctx
+
+
+class HomeView(TemplateView):
+    template_name = "home.html"
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        
+        # Obtener candidatos para bestsellers
+        # 1. Cache
+        items = _leer_excel()
+        
+        # 2. DB (limitado)
+        db_promoted = Sahumerio.objects.filter(activo=True).order_by('?')[:4]
+        
+        # Mezclamos
+        bestsellers = []
+        
+        for o in db_promoted:
+            img_url = ""
+            if hasattr(o, 'imagen_resuelta'): img_url = o.imagen_resuelta()
+            elif hasattr(o, 'imagen') and o.imagen: img_url = o.imagen.url
+            
+            final_img = img_url if img_url else static("img/placeholder.png")
+            
+            bestsellers.append({
+                "pk": o.pk,
+                "titulo": o.nombre,
+                "precio": float(o.precio or 0),
+                "img_url": final_img,
+                "marca": o.marca,
+                "origen": "DB",
+                "stock": o.stock or 0
+            })
+            
+        # Rellenar con Excel si faltan
+        if len(bestsellers) < 4:
+            # Tomar algunos aleatorios del Excel que tengan foto
+            excel_cands = [x for x in items if (x.get('img_file') or x.get('img_abs')) and x.get('stock',0) > 0]
+            if excel_cands:
+                sample = random.sample(excel_cands, min(4 - len(bestsellers), len(excel_cands)))
+                bestsellers.extend(sample)
+        
+        ctx['bestsellers'] = bestsellers
         return ctx
 
 

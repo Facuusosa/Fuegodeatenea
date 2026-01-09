@@ -4,14 +4,17 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-8k#m9p@x$wv7n2q&5j!h4r*6t^y8u+3d-f_a%b1c#e9g0i2k')
-DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
+# SEGURIDAD: DEBUG False en producción, True en desarrollo local
 if 'RAILWAY_ENVIRONMENT' in os.environ:
+    DEBUG = os.environ.get('DEBUG', 'False') == 'True'
     ALLOWED_HOSTS = ['*']
-elif not DEBUG:
-    ALLOWED_HOSTS = ['facuusosa.pythonanywhere.com']
 else:
-    ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
+    DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+    if not DEBUG:
+        ALLOWED_HOSTS = ['facuusosa.pythonanywhere.com']
+    else:
+        ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -111,7 +114,7 @@ if all(CLOUDINARY_STORAGE.values()):
     cloudinary.config(**CLOUDINARY_STORAGE)
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 else:
-    print("⚠️  WARNING: Cloudinary credentials not found - using local media storage")
+    print("WARNING: Cloudinary credentials not found - using local media storage")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
